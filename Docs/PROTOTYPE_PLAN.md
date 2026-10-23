@@ -47,8 +47,9 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 - Coyote time ve zıplama tamponu; havada momentum korunur (kayma, sıçrama ve kancadan gelen hız düşmez).
 - Kayma: sprint hızında eğil tuşu ile; alçak engellerin altından geçirir. Yavaşken basılı tutmak eğilerek yürümektir.
 - Duvar koşusu: havada, ileri basarken, yeterli hızla yan duvara değince. Süre sınırlı, hafif yerçekimi.
+  Girişte küçük bir yukarı hız verilir; kenardan zıplamadan çıkılsa bile boşluk geçilir, zıplayınca daha yüksekten gidilir.
 - Duvardan sıçrama: duvar koşusunda veya havada bir duvara değerken zıpla.
-- Tırmanma: ileri basarken önündeki kenar 1.0-2.4 m yükseklikteyse otomatik tırmanır.
+- Tırmanma: ileri basarken önündeki kenar 0.9-2.4 m yükseklikteyse yerden veya havadan otomatik tırmanır.
 - Kanca: görüş alanındaki en uygun kanca noktası işaretlenir, E ile çekilir. Zıpla veya tekrar E ile bırakılır.
 
 ### Dövüş (`TsunagiWeapon`, veri `SO_Tsunagi_Katana`)
@@ -69,6 +70,10 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 | Alarm Saatli Ofis Çalışanı | Yakın dövüş, saldırmadan önce "çalar" (kırmızı uyarı) | Çalarken vurulursa uzun süre sersemler |
 | Klozet Kapaklı Kalkan | Önden gelen hafif vuruşları kapakla engeller | Ağır saldırı, fırlatma veya bitirici kalkanı kırar; arkadan ve havadan vuruşlar geçer |
 | Turta Atan Palyaço | Mesafeyi korur, yan adımlar, turta fırlatır | Az canlı; turtalar kılıçla kesilebilir |
+
+- **Saldırı sırası:** Aynı anda en fazla 2 düşman saldırı hazırlığında olabilir; diğerleri yaklaşıp bekler.
+  Böylece oyuncu kalabalıkta da kombo kurabilir.
+- Düşmanlar kenardan düşmez (önlerinde zemin yoksa durur), arenadan çıkamaz.
 
 ### Alter ego (`AlterEgoCommentator`, replikler `SO_AlterEgo_Pigeon`)
 - Olaylara altyazıyla tepki: bölüm başı, küçük/büyük/dev kombo, kombo bozulması, boşluğa düşme, ölüm, son an kaçınma,
@@ -104,6 +109,21 @@ Her parkur bölümünden sonra kontrol noktası var; boşluğa düşen oyuncu so
 
 Tsunagi'nin diğer formları ve form geçiş bonusu, Aura harcama (kontrol noktası dükkânı), animasyonlu karakter ve
 düşman modelleri, ses ve seslendirme, gerçek seviye tasarımı, menüler, kaydetme, tuvalet arayışının hikâye akışı.
+
+## Test durumu (v0.1)
+
+Editörde Play modunda, girdi simülasyonu ve doğrudan çağrılarla doğrulananlar:
+
+- Sprint → boşluk üstünde duvar koşusu → karşı zemine iniş → 2.2 m kenara tırmanma → Arena A'ya iniş; kontrol noktaları kaydediliyor.
+- Kayma (sprint + Ctrl), Zincirli Kama ile ilk kanca noktasına çekilme ve bırakma.
+- Boşluğa düşünce son kontrol noktasına dönüş, ölünce yeniden doğma.
+- Tsunagi: hafif vuruş, Çakılma, fırlatma ve öldürme; vuruş komboya işleniyor.
+- Kombo sonu Aura ödemesi (5 farklı hamle: 161 puan × 1.8 = 290 Aura), alter ego tepkisi.
+- Son an kaçınma: hasar iptal, ağır çekim, +40 bonus, alter ego tepkisi.
+- Düşman yapay zekası saldırıyor, saldırı sırası en fazla 2 saldırgana izin veriyor.
+
+Henüz elle oynanarak denenmeyenler: fare ile nişan ve vuruş hissi, duvardan sıçrama bacası, iki kanca noktasının
+zincirlenmesi, palyaço turtaları, kalkanlı düşmanın blok/kırılma davranışı, bölüm sonu, genel denge ve zorluk.
 
 ## Oynanış testi kontrol listesi
 

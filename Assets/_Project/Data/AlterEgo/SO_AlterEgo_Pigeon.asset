@@ -1,0 +1,139 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 370bb438b9e107541bacf10eb0b594c3, type: 3}
+  m_Name: SO_AlterEgo_Pigeon
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.AlterEgo.AlterEgoLines
+  speakerName: "G\xFCvercin"
+  lineDuration: 3.5
+  cooldown: 2.5
+  bigComboPoints: 150
+  hugeComboPoints: 400
+  lineSets:
+  - trigger: 0
+    chance: 1
+    interrupt: 1
+    calm:
+    - "Yine mi r\xFCya? Tuvaleti bulana kadar seni izleyece\u011Fim. Zevkle."
+    - "Jack, mesanen bir anime finalinden daha gergin. Ko\u015F."
+    uneasy: []
+    panic: []
+  - trigger: 1
+    chance: 0.6
+    interrupt: 0
+    calm:
+    - "Buna kombo mu diyorsun? Kumrular bile daha iyi kanat \xE7\u0131rpar."
+    - "Vay. Birka\xE7 vuru\u015F. Tarihe ge\xE7tin."
+    - "Aura m\u0131 kazand\u0131n, yoksa sadece terledin mi?"
+    uneasy:
+    - "Hmm. Fena de\u011Fil. Yani... fena."
+    - "Bu Aura i\u015Fi biraz fazla oluyor ama, de\u011Fil mi?"
+    panic:
+    - "Dur. Her vuru\u015Fta biraz daha siliniyorum gibi."
+    - "Jack, ben buraday\u0131m, unutma beni!"
+  - trigger: 2
+    chance: 1
+    interrupt: 0
+    calm:
+    - "Tamam, kabul. Bu biraz haval\u0131yd\u0131. Biraz."
+    - "Kafanda anime a\xE7\u0131l\u0131\u015F \u015Fark\u0131s\u0131 m\u0131 \xE7al\u0131yor?
+      Buradan duyabiliyorum."
+    uneasy:
+    - "Bu kadar Aura sa\u011Fl\u0131\u011Fa zararl\u0131. Magnezyum takviyesi gibi:
+      doktor kontrol\xFCnde!"
+    - "Sesim neden k\u0131s\u0131l\u0131yor? Jack?"
+    panic:
+    - "Kanatlar\u0131m \u015Feffafla\u015F\u0131yor! Bu normal mi?!"
+    - "L\xFCtfen biraz s\u0131radan ol. Bir kerecik."
+  - trigger: 3
+    chance: 1
+    interrupt: 1
+    calm:
+    - "TAMAM! Sen bir anime kahraman\u0131s\u0131n. Mutlu musun?"
+    - "Bu kombo u\xE7an diskimin motorunu \u0131s\u0131tt\u0131."
+    uneasy:
+    - "Bu kadar parlarsan beni kim hat\u0131rlayacak?"
+    - "Aura g\xF6stergesi patlad\u0131. Ben de patlamak \xFCzereyim."
+    panic:
+    - "JACK! Ben senin i\xE7 sesinim! Beni silme!"
+    - "Disk... d\xFC\u015F\xFCyor... Aura \xE7ok fazla!"
+  - trigger: 4
+    chance: 0.8
+    interrupt: 0
+    calm:
+    - "Ve kombo pencereden u\xE7tu. Ben u\xE7ar\u0131m, kombo u\xE7maz."
+    - "Darbe ald\u0131n, Aura gitti. Klasik Jack."
+    uneasy:
+    - "Kaybettin. Bir yan\u0131m rahatlad\u0131, nedenini bilmiyorum."
+    - "Bu ac\u0131tt\u0131 m\u0131? Beni biraz rahatlatt\u0131."
+    panic:
+    - "G\xFCzel! Yani... k\xF6t\xFC! Ama bana iyi geldi!"
+    - "Bir nefes ald\u0131m. Te\u015Fekk\xFCrler, d\xFC\u015Fman."
+  - trigger: 5
+    chance: 1
+    interrupt: 1
+    calm:
+    - "Bo\u015Flu\u011Fa d\xFC\u015Ft\xFCn. Tuvalet orada de\u011Fil, emin ol."
+    - "Yer\xE7ekimi bir, Jack s\u0131f\u0131r."
+    uneasy:
+    - "Hi\xE7li\u011Fe bak\u0131nca ben de geri bakt\u0131m. Pek ho\u015F de\u011Fildi."
+    - "D\xFC\u015Ferken ba\u011F\u0131rmad\u0131n. Geli\u015Fme var."
+    panic:
+    - "Bo\u015Fluk bana her seferinde daha yak\u0131n geliyor..."
+    - "A\u015Fa\u011F\u0131da biri vard\u0131. San\u0131r\u0131m bendim."
+  - trigger: 6
+    chance: 1
+    interrupt: 1
+    calm:
+    - "\xD6ld\xFCn. R\xFCyada. Tuvaletsiz. \u015Eiirsel."
+    - "Bir ofis \xE7al\u0131\u015Fan\u0131ndan dayak yedin. Ger\xE7ek hayat gibi."
+    uneasy:
+    - "Kalk hadi. Bensiz \xF6lemezsin, de\u011Fil mi?"
+    panic:
+    - "\xD6l\xFCnce bir an eski h\xE2lime d\xF6nd\xFCm. G\xFCzeldi."
+  - trigger: 7
+    chance: 1
+    interrupt: 1
+    calm:
+    - Ooo, son anda! Neredeyse etkilendim.
+    - "Matrix izledin, de\u011Fil mi?"
+    uneasy:
+    - "Bu refleksler nereden \xE7\u0131kt\u0131? Beni korkutuyorsun."
+    panic:
+    - "\xC7ok h\u0131zl\u0131s\u0131n, sana yeti\u015Femiyorum!"
+  - trigger: 8
+    chance: 0.25
+    interrupt: 0
+    calm:
+    - Bir mesai daha bitti.
+    - Alarm sustu. Huzur.
+    uneasy:
+    - "Bir tane daha. Say\u0131yorum, bilmi\u015F ol."
+    panic:
+    - Onlar gidince ben de gidiyorum sanki.
+  - trigger: 9
+    chance: 0.7
+    interrupt: 0
+    calm:
+    - "Kontrol noktas\u0131. Burada biraz dur, ben de nefesleneyim."
+    - "Kaydedildi. Utanc\u0131n da."
+    uneasy: []
+    panic: []
+  - trigger: 10
+    chance: 1
+    interrupt: 1
+    calm:
+    - "Tuvalet! Ger\xE7ekten bulduk! ...Bu bir r\xFCya, de\u011Fil mi?"
+    uneasy:
+    - "Buldun. Ama ben neden bu kadar soluk g\xF6r\xFCn\xFCyorum?"
+    panic:
+    - "Tuvaleti buldun ve ben neredeyse yokum. Bir sonraki b\xF6l\xFCmde g\xF6r\xFC\u015F\xFCr\xFCz.
+      Belki."
