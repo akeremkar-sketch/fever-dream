@@ -6,7 +6,7 @@ Unity **6000.3.19f1**, 3D, Universal Render Pipeline. Team of 5.
 
 ```bash
 git lfs install
-git clone https://github.com/<owner>/fever-dream.git
+git clone https://github.com/akeremkar-sketch/fever-dream.git
 cd fever-dream
 git config merge.unityyamlmerge.name "Unity SmartMerge"
 git config merge.unityyamlmerge.driver "\"C:/Program Files/Unity/Hub/Editor/6000.3.19f1/Editor/Data/Tools/UnityYAMLMerge.exe\" merge -p %O %B %A %A"
