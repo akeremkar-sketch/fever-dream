@@ -1,4 +1,6 @@
 using System;
+using FeverDream.Aura;
+using FeverDream.Combat;
 using FeverDream.Core;
 using UnityEngine;
 
@@ -21,6 +23,10 @@ namespace FeverDream.Player
         private Health health;
         private PlayerDamageReceiver damageReceiver;
         private PlayerRespawner respawner;
+        private TsunagiWeapon weapon;
+        private PlayerDodge dodge;
+        private ComboTracker combo;
+        private AuraWallet wallet;
 
         public PlayerInputReader Input => Resolve(ref input);
         public PlayerMovement Movement => Resolve(ref movement);
@@ -28,6 +34,10 @@ namespace FeverDream.Player
         public Health Health => Resolve(ref health);
         public PlayerDamageReceiver DamageReceiver => Resolve(ref damageReceiver);
         public PlayerRespawner Respawner => Resolve(ref respawner);
+        public TsunagiWeapon Weapon => Resolve(ref weapon);
+        public PlayerDodge Dodge => Resolve(ref dodge);
+        public ComboTracker Combo => Resolve(ref combo);
+        public AuraWallet Wallet => Resolve(ref wallet);
 
         private void Awake()
         {
