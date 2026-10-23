@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a85af579d5b2a434e9c4249f33992680, type: 3}
+  m_Name: SO_Enemy_ToiletLidShield
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.Enemies.EnemySettings
+  displayName: "Klozet Kapakl\u0131 Kalkan"
+  maxHealth: 60
+  moveSpeed: 2.6
+  acceleration: 20
+  groundFriction: 14
+  turnSpeed: 540
+  detectionRange: 22
+  gravity: -25
+  attackRange: 2.2
+  dodgeLeniency: 2.5
+  attackWindup: 0.9
+  attackRecovery: 0.6
+  attackCooldown: 1.8
+  attackDamage: 16
+  attackKnockback: 9
+  staggerDuration: 0.35
+  knockbackResistance: 0.5
+  launchResistance: 0.2
+  juggleUpSpeed: 2.5
+  airHoldDuration: 0.6
+  airHoldGravityScale: 0.1
+  windupInterruptStaggerMultiplier: 1
+  guardBreakDuration: 2.5
+  guardFrontArc: 0.3
+  preferredDistance: 11
+  projectileSpeed: 15
+  strafeSwitchInterval: 1.6
+  aimLeadFactor: 0.5
