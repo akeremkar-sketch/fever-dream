@@ -72,7 +72,7 @@ namespace FeverDream.Combat
             }
 
             float dt = Time.deltaTime;
-            ReadInput(dt);
+            ReadInput();
             if (context.Movement.IsGrounded)
             {
                 airIndex = 0;
@@ -99,25 +99,34 @@ namespace FeverDream.Combat
                     break;
             }
 
-            if (phase != Phase.Idle)
+            if (phase == Phase.Idle)
             {
-                return;
+                if (Time.time > chainExpireTime)
+                {
+                    groundIndex = 0;
+                    airIndex = 0;
+                    lightHitsInChain = 0;
+                }
+                if (buffered != AttackInput.None && context.Movement.State != MovementState.Mantling)
+                {
+                    var move = SelectMove(buffered);
+                    buffered = AttackInput.None;
+                    StartMove(move);
+                }
             }
-            if (Time.time > chainExpireTime)
+
+            // Age the buffer only after it had its chance this frame, so a press on a long frame is never lost.
+            if (buffered != AttackInput.None)
             {
-                groundIndex = 0;
-                airIndex = 0;
-                lightHitsInChain = 0;
-            }
-            if (buffered != AttackInput.None && context.Movement.State != MovementState.Mantling)
-            {
-                var move = SelectMove(buffered);
-                buffered = AttackInput.None;
-                StartMove(move);
+                bufferTimer -= dt;
+                if (bufferTimer <= 0f)
+                {
+                    buffered = AttackInput.None;
+                }
             }
         }
 
-        private void ReadInput(float dt)
+        private void ReadInput()
         {
             if (context.Input.LightAttackPressed)
             {
@@ -126,14 +135,6 @@ namespace FeverDream.Combat
             else if (context.Input.HeavyAttackPressed)
             {
                 Buffer(AttackInput.Heavy);
-            }
-            else
-            {
-                bufferTimer -= dt;
-                if (bufferTimer <= 0f)
-                {
-                    buffered = AttackInput.None;
-                }
             }
         }
 

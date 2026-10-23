@@ -176,7 +176,7 @@ namespace FeverDream.Player
         {
             coyoteTimer = settings.coyoteTime;
 
-            if (TryStartGrapple())
+            if (TryStartGrapple() || TryStartMantle())
             {
                 return;
             }
@@ -300,7 +300,7 @@ namespace FeverDream.Player
                 wallNormal = hit.normal;
                 currentWall = hit.collider;
                 wallSide = side;
-                velocity.y = Mathf.Clamp(velocity.y, 0f, settings.wallRunEntryUpSpeed);
+                velocity.y = Mathf.Clamp(velocity.y, settings.wallRunMinEntryUpSpeed, Mathf.Max(settings.wallRunMinEntryUpSpeed, settings.wallRunEntryUpSpeed));
                 SetState(MovementState.WallRunning);
                 return true;
             }

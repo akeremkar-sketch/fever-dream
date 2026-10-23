@@ -44,6 +44,8 @@ namespace FeverDream.Player
         [Tooltip("Required clearance below the feet before a wall run can start.")]
         [Min(0f)] public float wallRunMinHeight = 0.9f;
         public float wallRunGravity = -2.5f;
+        [Tooltip("Upward speed is clamped into this range when a wall run starts, so running off an edge still carries over a gap.")]
+        [Min(0f)] public float wallRunMinEntryUpSpeed = 2f;
         [Min(0f)] public float wallRunEntryUpSpeed = 2.5f;
         [Min(0f)] public float wallRunMaxDuration = 1.8f;
         [Min(0f)] public float wallStickSpeed = 2f;
