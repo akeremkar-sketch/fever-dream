@@ -41,7 +41,11 @@ namespace FeverDream.EditorTools.Prototype
             set.ToiletLidShield = Prefab($"{PrefabsFolder}/Enemies/PF_Enemy_ToiletLidShield.prefab", overwrite, () => BuildToiletLidShield(palette, data),
                 root => SetReferenceIfMissing(root.GetComponent<EnemyBase>(), "settings", data.ToiletLidShield));
             set.ClownThrower = Prefab($"{PrefabsFolder}/Enemies/PF_Enemy_ClownThrower.prefab", overwrite, () => BuildClownThrower(palette, data, set.Pie),
-                root => SetReferenceIfMissing(root.GetComponent<EnemyBase>(), "settings", data.ClownThrower));
+                root =>
+                {
+                    SetReferenceIfMissing(root.GetComponent<EnemyBase>(), "settings", data.ClownThrower);
+                    SetReferenceIfMissing(root.GetComponent<ClownThrower>(), "projectilePrefab", set.Pie.GetComponent<PieProjectile>());
+                });
             set.GrapplePoint = Prefab($"{PrefabsFolder}/Gameplay/PF_GrapplePoint.prefab", overwrite, () => BuildGrapplePoint(palette), null);
             set.Checkpoint = Prefab($"{PrefabsFolder}/Gameplay/PF_Checkpoint.prefab", overwrite, () => BuildCheckpoint(palette), null);
             set.KillVolume = Prefab($"{PrefabsFolder}/Gameplay/PF_KillVolume.prefab", overwrite, BuildKillVolume, null);
@@ -67,6 +71,10 @@ namespace FeverDream.EditorTools.Prototype
                     PrefabUtility.UnloadPrefabContents(contents);
                 }
                 return existing;
+            }
+            if (existing == null && !overwrite)
+            {
+                RecreatedPrefabs.Add(System.IO.Path.GetFileNameWithoutExtension(path));
             }
             var instance = build();
             var prefab = PrefabUtility.SaveAsPrefabAsset(instance, path);

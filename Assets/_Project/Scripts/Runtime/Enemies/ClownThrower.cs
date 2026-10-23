@@ -68,10 +68,10 @@ namespace FeverDream.Enemies
             aim += lead * (travelTime * Settings.aimLeadFactor);
 
             Vector3 velocity = (aim - origin).normalized * Settings.projectileSpeed;
-            velocity.y += 0.5f * -projectilePrefab.Gravity * travelTime;
+            velocity.y += 0.5f * -Settings.projectileGravity * travelTime;
 
             var pie = Instantiate(projectilePrefab, origin, Quaternion.LookRotation(velocity), RuntimeHierarchy.GetGroup("Projectiles"));
-            pie.Launch(velocity, gameObject, Settings.attackDamage, Settings.attackKnockback);
+            pie.Launch(velocity, gameObject, Settings.attackDamage, Settings.attackKnockback, Settings.projectileGravity, Settings.projectileLifetime);
         }
     }
 }

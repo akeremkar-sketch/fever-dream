@@ -45,4 +45,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.AlterEgo.AlterEgoCommentator
   lines: {fileID: 11400000, guid: 11ad59068ba62e044a62e66403ff4710, type: 2}
-  levelStartDelay: 1

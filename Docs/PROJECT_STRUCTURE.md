@@ -94,8 +94,11 @@ Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları 
 - Dosya başına bir üst seviye tür; dosya adı = tür adı.
 - Ayarlanabilir oynanış değerleri ScriptableObject'lerde (`Data/` altında) tutulur ki tasarımcılar koda dokunmadan ayar
   yapabilsin ve "Rebuild" bunları sıfırlamasın: `SO_PlayerMovement_Default`, `SO_PlayerCamera_Default`,
-  `SO_PlayerCombat_Default`, `SO_Aura_Default`, `SO_Tsunagi_Katana`, `SO_Enemy_*`, `SO_AlterEgo_Pigeon`.
-  Bileşenlerde yalnızca referanslar ve görsel ayarlar (renkler, pozlar) kalır.
+  `SO_PlayerCombat_Default` (can, kaçınma, hasar, yeniden doğma), `SO_Aura_Default`, `SO_Tsunagi_Katana`,
+  `SO_Enemy_*` (palyaço turtasının uçuşu dahil), `SO_AlterEgo_Pigeon`.
+  Prefab bileşenlerinde yalnızca referanslar ve görsel ayarlar (renkler, pozlar) kalır. Sahneye özgü ayarlar
+  (`EnemyArena` üzerindeki saldırgan sınırı ve savaşı bırakma payı) sahnede durur; "Rebuild" sahneyi baştan yazar.
+- Bir ayar dosyası atanmamışsa bileşen konsola hata yazar ve kendini kapatır (sessiz `NullReference` yerine).
 - Veri olarak kaydedilen enum'lara (ör. `AlterEgoEvent`) sabit sayı verilir; yeni değer yeni sayı alır, mevcutlar değişmez.
 - Sahneler arası bağımlılık için `FindObjectOfType` yerine bilinen erişim noktaları kullanılır (`PlayerContext.Current`).
 
@@ -106,7 +109,7 @@ Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları 
 | 6 | Player | Oyuncu kapsülü |
 | 7 | Enemy | Düşman gövdeleri (Tsunagi'nin vurduğu katman) |
 | 8 | Environment | Yürünebilir ve parkur yapılabilir geometri (duvar koşusu, tutunma, görüş hattı) |
-| 9 | GrapplePoint | Zincirli Kama kanca noktaları (hiçbir katmanla çarpışmaz, yalnızca hedefleme sorgusu) |
+| 9 | GrapplePoint | Zincirli Kama kanca noktaları. Çarpıştırıcıları yoktur; hedefleme `GrapplePoint` listesiyle yapılır. Katman, ileride eklenecek tetikleyiciler için ayrılmıştır ve hiçbir katmanla çarpışmaz |
 | 10 | Projectile | Düşman mermileri (yalnızca Player ve Environment ile çarpışır) |
 
 Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındadır. Katman adları ve çarpışma kuralları
@@ -118,8 +121,11 @@ prototip aracı tarafından da ayarlanır; değiştirirseniz bu tabloyu ve arac�
 test sahnesini üretir (menü: **Fever Dream > Prototype**). Play modunda çalışmaz.
 
 - **Build Missing:** yalnızca eksikleri oluşturur, mevcut veri ve prefab'ları ezmez. Var olan prefab'larda boş kalmış
-  veya silinmiş bir veriyi gösteren referansları yeniden bağlar.
+  veya silinmiş bir veriyi (ya da palyaçonun turta prefab'ını) gösteren referansları yeniden bağlar. Eksik bir prefab'ı
+  yeniden oluşturduysa sahnenin hâlâ eskisini gösterdiğini konsolda uyarır.
+- Katman adları yalnızca boşsa yazılır; başka bir ad kullanılıyorsa dokunulmaz ve uyarı verilir.
 - **Rebuild:** prefab'ları ve `L_Proto_Dream` sahnesini baştan yazar; elle yapılan prefab ve sahne düzenlemeleri kaybolur.
   SO verileri ve materyaller korunur.
 - Sahne üretilecekse önce açık sahneleri kaydetmek isteyip istemediğiniz sorulur; açık sahneler kapanır.
-- `L_Proto_Dream`, build ayarlarındaki sahne listesine yoksa eklenir; listedeki diğer sahnelere dokunulmaz.
+- Sahne üretildiğinde `L_Proto_Dream`, build ayarlarındaki sahne listesine yoksa eklenir; listedeki diğer sahnelere
+  dokunulmaz. "Build Missing" sahneyi üretmediği sürece listeye dokunmaz.

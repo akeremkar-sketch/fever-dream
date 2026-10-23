@@ -50,9 +50,12 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
   basılı tutularak gelinen kayma da çalışır. Yavaşken basılı tutmak eğilerek yürümektir.
 - Duvar koşusu: havada, ileri basarken, yeterli hızla yan duvara değince. Süre sınırlı, hafif yerçekimi.
   Girişte küçük bir yukarı hız verilir; kenardan zıplamadan çıkılsa bile boşluk geçilir. Kenardan biraz geç
-  (coyote süresi içinde) zıplanırsa oyuncu duvardan atılmaz, duvar koşusu yükselir.
+  (coyote süresi içinde) zıplanırsa oyuncu duvardan atılmaz, zamanında zıplamış gibi aynı yükselişi alır.
+  Duvar koşusu bir iç köşeye girerse önde tırmanılacak kenar varsa tırmanır, yoksa duvarı bırakır (köşeye yapışmaz).
 - Duvardan sıçrama: duvar koşusunda veya havada bir duvara değerken zıpla. Koşulan veya sıçranan duvar, yere
-  basılana kadar tekrar kullanılamaz (tek duvarda sonsuz tırmanış yok; bacada iki duvar arasında sıçranır).
+  basılana kadar tekrar kullanılamaz. Aynı yöne bakan duvarlar (yan yana bloklar) aynı duvar sayılır; bacada
+  karşılıklı iki duvar arasında sıçranır.
+- Kayma hızlandırması üst sınırlıdır (`slideMaxSpeed`); kayıp zıplayarak sınırsız hız kazanılmaz.
 - Tırmanma: ileri basarken önündeki kenar 0.9-2.4 m yükseklikteyse yerden veya havadan otomatik tırmanır.
 - Kanca: görüş alanındaki en uygun kanca noktası işaretlenir, E ile çekilir. Çekilirken başka bir noktaya bakıp
   tekrar E'ye basmak doğrudan o noktaya zincirler; başka nokta yokken E veya zıpla bırakır.
@@ -72,6 +75,8 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 - En az 2 vuruş gerekir; içinde son an kaçınma olan kombo vuruşsuz da ödenir.
 - Bonuslar: havada vuruş, fırlatma, bitirici, çakılma, öldürme ve son an kaçınma.
 - Hasar almak veya boşluğa düşmek komboyu bozar, biriken puan kaybolur. Hedefe varınca açık kombo hemen ödenir.
+- HUD, en az vuruşa ulaşmamış komboda Aura vaat etmez ("en az 2 vuruş" yazar).
+- Kombo sürerken boşluğa düşürülen düşman da öldürme bonusu verir.
 - Çarpan, kullanılan farklı hamle sayısıyla artar ("nasıl öldürdüğün önemli").
 - Turta kesmek oyuncuyu korur ama kombo vuruşu sayılmaz.
 
@@ -82,17 +87,19 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 | Klozet Kapaklı Kalkan | Önden gelen hafif vuruşları kapakla engeller | Önden ağır saldırı (fırlatma, bitirici, çakılma) kalkanı kırar; arkadan ve havadan hafif vuruşlar geçer |
 | Turta Atan Palyaço | Mesafeyi korur, yan adımlar, turta fırlatır | Az canlı; turtalar kılıçla kesilebilir |
 
-- **Saldırı sırası:** Aynı anda en fazla 2 düşman saldırı hazırlığında olabilir; diğerleri yaklaşıp bekler.
-  Böylece oyuncu kalabalıkta da kombo kurabilir.
-- **Arena:** Her düşman grubu (`Arena_A`, `Arena_B`) bir `EnemyArena` kutusudur. Düşmanlar yalnızca oyuncu kendi
-  arenasının içindeyken savaşır, kutunun dışına çıkmaz; oyuncu arenadan çıkınca durup bekler.
+- **Saldırı sırası:** Bir arenada aynı anda en fazla 2 düşman saldırı hazırlığında olabilir (`EnemyArena`
+  üzerinde ayarlanır); diğerleri yaklaşıp bekler. Böylece oyuncu kalabalıkta da kombo kurabilir.
+- **Arena:** Her düşman grubu (`Arena_A`, `Arena_B`) bir `EnemyArena` kutusudur. Düşmanlar oyuncu kutuya girince
+  savaşa başlar, oyuncu kutunun 4 m yakınında kaldıkça savaşmayı sürdürür (kapı ağzından bedava vuruş yok), kutunun
+  dışına yürümez. Vuruşla kutudan dışarı itilen düşman geri yürür.
 - Düşmanlar kenardan düşmez (önlerinde zemin yoksa durur). Boşluğa düşen düşman yenilmiş sayılır.
 - Düşmana özgü ayarlar (alarm saatinin sersemleme çarpanı, kalkanın kırılma süresi ve ön açısı, palyaçonun yan adım
   ve nişan öngörüsü) `EnemySettings` içindedir.
 
 ### Alter ego (`AlterEgoCommentator`, replikler `SO_AlterEgo_Pigeon`)
 - Olaylara altyazıyla tepki: bölüm başı, küçük/büyük/dev kombo, kombo bozulması, boşluğa düşme, ölüm, son an kaçınma,
-  kontrol noktası, bölüm sonu. Replikler toplam Aura arttıkça alaycıdan paniğe kayar.
+  düşman yenilmesi (boşluğa düşme dahil), kontrol noktası, bölüm sonu. Replikler toplam Aura arttıkça alaycıdan
+  paniğe kayar. Bölüm bitince kombo replikleri bölüm sonu repliğinin üstüne konuşmaz.
 
 ### HUD (`HudView`, `PF_HUD`)
 - Can çubuğu, nişangâh, kanca işaretçisi, kombo sayacı ve süre çubuğu, bekleyen Aura ve çarpan, toplam Aura,
@@ -106,6 +113,7 @@ Tek küçük seviye, her mekaniği sırayla öğretir:
 2. **Parkur 1:** kanepenin altından kayma → boşluk üstünde sağ duvarda koşma → 2.2 m'lik kenara tırmanma.
 3. **Arena A:** 3 alarm saatli ofis çalışanı + 1 klozet kapaklı kalkan.
 4. **Parkur 2:** boşluk üstünde iki kanca noktası → iniş platformu → duvardan sıçrama bacası ve tırmanma.
+   Arena B, platformdan 6 m yukarıdadır: arka duvardan tek sıçrama yetmez, en az bir yan duvar sıçraması gerekir.
 5. **Arena B:** 2 ofis çalışanı, 1 kalkan, kasaların üstünde 2 palyaço; arenanın üstünde kanca noktası.
 6. **Hedef:** rüyadaki tuvalet. Bölüm sonu mesajı ve toplam Aura.
 
@@ -149,8 +157,18 @@ PR #1 incelemesinden sonra (v0.1.1) ayrıca doğrulananlar:
 - Hedefte açık kombo ödeniyor, bölüm sonu mesajı son toplamla kalıyor ve sonradan bozulmuyor.
 - Yalnızca son an kaçınma içeren kombo ödeniyor (40 Aura); turta kesmek kombo vuruşu sayılmıyor.
 
-Henüz elle oynanarak denenmeyenler: fare ile nişan ve vuruş hissi, duvardan sıçrama bacası, iki kanca noktasının
-zincirlenmesi, palyaço turtalarının gerçek isabeti, genel denge ve zorluk.
+Doğrulama turundan sonra (v0.1.2) ayrıca doğrulananlar:
+
+- Bitişik ve aynı yöne bakan duvarlar tek duvar sayılıyor; bacadaki karşılıklı duvarlar ayrı sayılıyor.
+- Kayma hızı 13.5'te sınırlanıyor; coyote içinde geç zıplama zamanında zıplamayla aynı yükselişi veriyor.
+- Köşeye giren duvar koşusu, tırmanılacak kenar yoksa duvarı bırakıyor (yapışmıyor).
+- Yerde atılma 60, 30 ve 5 FPS'te yazılan 0.4 m'yi veriyor.
+- Arenadan itilen düşman geri yürüyor; kapı ağzındaki oyuncuyla düşmanlar savaşmayı sürdürüyor.
+- Tek vuruşlu kombo HUD'da Aura vaat etmiyor ("en az 2 vuruş").
+
+Henüz elle oynanarak denenmeyenler: fare ile nişan ve vuruş hissi, duvardan sıçrama bacası (yeni 6 m yükseklikte),
+köşedeki duvar koşusundan kenara tırmanma, iki kanca noktasının zincirlenmesi, palyaço turtalarının gerçek isabeti,
+genel denge ve zorluk.
 
 ## Oynanış testi kontrol listesi
 

@@ -33,6 +33,10 @@ namespace FeverDream.Player
             context = GetComponent<PlayerContext>();
             spawnPosition = transform.position;
             spawnRotation = transform.rotation;
+            if (settings == null)
+            {
+                Debug.LogError($"{name}: PlayerRespawner has no PlayerCombatSettings assigned.", this);
+            }
         }
 
         private void OnEnable()
@@ -80,7 +84,7 @@ namespace FeverDream.Player
             respawning = true;
             context.Input.enabled = false;
             Downed?.Invoke(RespawnReason.Died);
-            yield return new WaitForSecondsRealtime(settings.deathRespawnDelay);
+            yield return new WaitForSecondsRealtime(settings != null ? settings.deathRespawnDelay : 1f);
             context.Health.Restore();
             Respawn(RespawnReason.Died);
         }

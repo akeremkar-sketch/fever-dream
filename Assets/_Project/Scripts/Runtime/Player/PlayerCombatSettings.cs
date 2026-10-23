@@ -20,9 +20,11 @@ namespace FeverDream.Player
         [Min(0f)] public float perfectSlowMotionDuration = 0.7f;
 
         [Header("Taking Damage")]
+        [Min(1f)] public float maxHealth = 100f;
         [Min(0f)] public float hurtInvulnerability = 0.6f;
         [Min(0f)] public float knockbackUpRatio = 0.3f;
         [Min(0f)] public float hurtCameraShake = 1.6f;
+        [Min(0f)] public float hurtCameraShakeDuration = 0.25f;
 
         [Header("Respawn")]
         [Tooltip("Real-time seconds between dying and respawning at the last checkpoint.")]

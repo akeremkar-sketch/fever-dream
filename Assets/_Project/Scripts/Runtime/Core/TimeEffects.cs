@@ -22,7 +22,9 @@ namespace FeverDream.Core
                 return;
             }
             EnsureRunner();
-            hitStopScale = Mathf.Clamp(scale, 0.01f, 1f);
+            // While an earlier hit stop is still running, the stronger (smaller) scale wins.
+            float clamped = Mathf.Clamp(scale, 0.01f, 1f);
+            hitStopScale = Time.unscaledTime < hitStopUntil ? Mathf.Min(hitStopScale, clamped) : clamped;
             hitStopUntil = Mathf.Max(hitStopUntil, Time.unscaledTime + duration);
         }
 

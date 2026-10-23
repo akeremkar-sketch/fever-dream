@@ -21,11 +21,18 @@ namespace FeverDream.Player
         {
             context = GetComponent<PlayerContext>();
             evade = GetComponent<IEvadeProvider>();
+            if (settings == null)
+            {
+                Debug.LogError($"{name}: PlayerDamageReceiver has no PlayerCombatSettings assigned.", this);
+                enabled = false;
+                return;
+            }
+            context.Health.SetMax(settings.maxHealth);
         }
 
         public DamageResult TakeDamage(in DamageInfo info)
         {
-            if (context.Health.IsDead || Time.time < invulnerableUntil)
+            if (!enabled || context.Health.IsDead || Time.time < invulnerableUntil)
             {
                 return DamageResult.Ignored;
             }
@@ -39,7 +46,7 @@ namespace FeverDream.Player
 
             Vector3 push = new Vector3(info.Direction.x, 0f, info.Direction.z).normalized * info.Knockback;
             context.Movement.AddImpulse(push + Vector3.up * (info.Knockback * settings.knockbackUpRatio));
-            context.Camera.AddShake(settings.hurtCameraShake, 0.25f);
+            context.Camera.AddShake(settings.hurtCameraShake, settings.hurtCameraShakeDuration);
             Damaged?.Invoke(info);
             return killed ? DamageResult.Killed : DamageResult.Hit;
         }

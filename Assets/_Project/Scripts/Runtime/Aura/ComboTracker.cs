@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FeverDream.Combat;
 using FeverDream.Core;
+using FeverDream.Enemies;
 using FeverDream.Player;
 using UnityEngine;
 
@@ -36,6 +37,8 @@ namespace FeverDream.Aura
         public float PendingPoints { get; private set; }
         public int UniqueMoves => uniqueMoves.Count;
         public bool IsActive => Hits > 0 || PendingPoints > 0f;
+        /// <summary>Whether the running combo would pay anything if it ended now (minimum hits, or a perfect dodge).</summary>
+        public bool QualifiesForPayout => Hits >= settings.minHitsToAward || perfectDodges > 0;
         public float Multiplier => Mathf.Min(settings.maxMultiplier, 1f + settings.varietyPerUniqueMove * Mathf.Max(0, uniqueMoves.Count - 1));
         public int PendingAward => Mathf.RoundToInt(PendingPoints * Multiplier);
         public float TimeLeftNormalized => IsActive ? Mathf.Clamp01(1f - (Time.time - lastActivityTime) / settings.comboTimeout) : 0f;
@@ -44,6 +47,11 @@ namespace FeverDream.Aura
         {
             context = GetComponent<PlayerContext>();
             wallet = GetComponent<AuraWallet>();
+            if (settings == null)
+            {
+                Debug.LogError($"{name}: ComboTracker has no AuraSettings assigned.", this);
+                enabled = false;
+            }
         }
 
         private void OnEnable()
@@ -51,6 +59,7 @@ namespace FeverDream.Aura
             context.DamageReceiver.Damaged += HandleDamaged;
             context.Respawner.Downed += HandleDowned;
             LevelGoal.Reached += HandleLevelGoal;
+            EnemyBase.AnyKilled += HandleEnemyKilled;
         }
 
         private void OnDisable()
@@ -58,6 +67,7 @@ namespace FeverDream.Aura
             context.DamageReceiver.Damaged -= HandleDamaged;
             context.Respawner.Downed -= HandleDowned;
             LevelGoal.Reached -= HandleLevelGoal;
+            EnemyBase.AnyKilled -= HandleEnemyKilled;
         }
 
         private void Update()
@@ -99,7 +109,7 @@ namespace FeverDream.Aura
             {
                 return;
             }
-            int lost = PendingAward;
+            int lost = QualifiesForPayout ? PendingAward : 0;
             Clear();
             Broken?.Invoke(reason, lost);
             Changed?.Invoke();
@@ -108,8 +118,7 @@ namespace FeverDream.Aura
         private void End()
         {
             // A perfect dodge is style on its own: it pays out even without the minimum number of hits.
-            bool qualifies = Hits >= settings.minHitsToAward || perfectDodges > 0;
-            int award = qualifies ? PendingAward : 0;
+            int award = QualifiesForPayout ? PendingAward : 0;
             var summary = new ComboSummary(Hits, uniqueMoves.Count, Multiplier, award);
             Clear();
             wallet.Add(award);
@@ -131,6 +140,17 @@ namespace FeverDream.Aura
             if (IsActive)
             {
                 End();
+            }
+        }
+
+        /// <summary>Knocking an enemy into the void during a combo is a kill too (sword kills are counted in RegisterHit).</summary>
+        private void HandleEnemyKilled(EnemyBase enemy)
+        {
+            if (enemy.DiedInVoid && IsActive)
+            {
+                PendingPoints += settings.killBonus;
+                lastActivityTime = Time.time;
+                Changed?.Invoke();
             }
         }
 

@@ -50,6 +50,9 @@ namespace FeverDream.Enemies
         [Header("Ranged (clown)")]
         [Min(0f)] public float preferredDistance = 11f;
         [Min(0f)] public float projectileSpeed = 15f;
+        [Tooltip("Gravity on the thrown pie. The clown compensates for it when aiming.")]
+        public float projectileGravity = -5f;
+        [Min(0.1f)] public float projectileLifetime = 6f;
         [Min(0.1f)] public float strafeSwitchInterval = 1.6f;
         [Tooltip("How much of the player's horizontal velocity is led when aiming.")]
         [Range(0f, 1f)] public float aimLeadFactor = 0.5f;

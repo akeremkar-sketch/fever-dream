@@ -6,6 +6,8 @@ namespace FeverDream.AlterEgo
     public sealed class AlterEgoLines : ScriptableObject
     {
         public string speakerName = "Güvercin";
+        [Tooltip("Seconds after the level starts before the opening line.")]
+        [Min(0f)] public float levelStartDelay = 1f;
         [Min(0.5f)] public float lineDuration = 3.5f;
         [Tooltip("Minimum seconds between two lines (interrupting lines ignore it).")]
         [Min(0f)] public float cooldown = 2.5f;

@@ -27,10 +27,10 @@ namespace FeverDream.Enemies
 
         private const float GroundProbeDistance = 0.35f;
         private const float AttackHeightTolerance = 2.2f;
-        /// <summary>Only this many enemies may be winding up or recovering from an attack at once, so the player can keep a combo going.</summary>
-        private const int MaxSimultaneousAttackers = 2;
+        /// <summary>Attack limit for enemies that are not inside an <see cref="EnemyArena"/> (arenas set their own).</summary>
+        private const int UnassignedMaxAttackers = 2;
 
-        private static int activeAttackers;
+        private static int unassignedAttackers;
 
         [SerializeField] private EnemySettings settings;
         [SerializeField] private LayerMask environmentMask = 1 << 8;
@@ -49,6 +49,8 @@ namespace FeverDream.Enemies
 
         public EnemySettings Settings => settings;
         public bool IsDead => state == State.Dead;
+        /// <summary>True when the enemy was defeated by falling into the void rather than by a hit.</summary>
+        public bool DiedInVoid { get; private set; }
 
         protected Rigidbody Body { get; private set; }
         protected Health Health { get; private set; }
@@ -62,6 +64,12 @@ namespace FeverDream.Enemies
             Body = GetComponent<Rigidbody>();
             Health = GetComponent<Health>();
             arena = GetComponentInParent<EnemyArena>();
+            if (settings == null)
+            {
+                Debug.LogError($"{name}: enemy has no EnemySettings assigned.", this);
+                enabled = false;
+                return;
+            }
             Health.SetMax(settings.maxHealth);
             Body.useGravity = false;
             Body.constraints = RigidbodyConstraints.FreezeRotation;
@@ -87,14 +95,14 @@ namespace FeverDream.Enemies
             switch (state)
             {
                 case State.Idle:
-                    MoveIntent = Vector3.zero;
-                    if (hasTarget && CanEngage(target))
+                    MoveIntent = ReturnToArenaIntent();
+                    if (hasTarget && CanEngage(target, false))
                     {
                         SetState(State.Chase);
                     }
                     break;
                 case State.Chase:
-                    if (hasTarget && CanEngage(target))
+                    if (hasTarget && CanEngage(target, true))
                     {
                         TickChase(target);
                     }
@@ -223,7 +231,12 @@ namespace FeverDream.Enemies
                 return;
             }
             state = State.Dead;
+            DiedInVoid = true;
             ReleaseAttackSlot();
+            if (feedback != null)
+            {
+                feedback.SetTelegraph(false);
+            }
             AnyKilled?.Invoke(this);
             Destroy(gameObject);
         }
@@ -280,11 +293,11 @@ namespace FeverDream.Enemies
         {
             if (!holdsAttackSlot)
             {
-                if (activeAttackers >= MaxSimultaneousAttackers)
+                bool reserved = arena != null ? arena.TryReserveAttacker() : TryReserveUnassignedSlot();
+                if (!reserved)
                 {
                     return false;
                 }
-                activeAttackers++;
                 holdsAttackSlot = true;
             }
             MoveIntent = Vector3.zero;
@@ -354,15 +367,46 @@ namespace FeverDream.Enemies
             SetState(State.Stagger);
         }
 
-        private bool CanEngage(PlayerContext target)
+        /// <summary>Engage when the player enters the arena; once engaged, keep fighting while they stay near it.</summary>
+        private bool CanEngage(PlayerContext target, bool engaged)
         {
             Vector3 targetPosition = target.transform.position;
-            return FlatDistanceTo(targetPosition) <= settings.detectionRange && (arena == null || arena.Contains(targetPosition));
+            if (FlatDistanceTo(targetPosition) > settings.detectionRange)
+            {
+                return false;
+            }
+            return arena == null || arena.Contains(targetPosition, engaged ? arena.DisengageMargin : 0f);
         }
 
         private bool StaysInArena(Vector3 direction)
         {
-            return arena == null || arena.Contains(transform.position + direction * 0.7f + Vector3.up * 0.1f);
+            if (arena == null)
+            {
+                return true;
+            }
+            Vector3 from = transform.position + Vector3.up * 0.1f;
+            return arena.AllowsStep(from, from + direction * 0.7f);
+        }
+
+        /// <summary>An idle enemy that was knocked out of its arena walks back in.</summary>
+        private Vector3 ReturnToArenaIntent()
+        {
+            if (arena == null || arena.Contains(transform.position + Vector3.up * 0.1f))
+            {
+                return Vector3.zero;
+            }
+            Vector3 toCenter = Flat(arena.Center - transform.position);
+            return toCenter.sqrMagnitude > 0.01f ? toCenter.normalized * settings.moveSpeed : Vector3.zero;
+        }
+
+        private static bool TryReserveUnassignedSlot()
+        {
+            if (unassignedAttackers >= UnassignedMaxAttackers)
+            {
+                return false;
+            }
+            unassignedAttackers++;
+            return true;
         }
 
         private void Die()
@@ -402,10 +446,18 @@ namespace FeverDream.Enemies
 
         private void ReleaseAttackSlot()
         {
-            if (holdsAttackSlot)
+            if (!holdsAttackSlot)
             {
-                holdsAttackSlot = false;
-                activeAttackers = Mathf.Max(0, activeAttackers - 1);
+                return;
+            }
+            holdsAttackSlot = false;
+            if (arena != null)
+            {
+                arena.ReleaseAttacker();
+            }
+            else
+            {
+                unassignedAttackers = Mathf.Max(0, unassignedAttackers - 1);
             }
         }
 
@@ -428,7 +480,7 @@ namespace FeverDream.Enemies
         private static void ResetStatics()
         {
             AnyKilled = null;
-            activeAttackers = 0;
+            unassignedAttackers = 0;
         }
     }
 }

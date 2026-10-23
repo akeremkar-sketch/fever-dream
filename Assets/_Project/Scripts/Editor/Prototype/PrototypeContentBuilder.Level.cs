@@ -13,6 +13,12 @@ namespace FeverDream.EditorTools.Prototype
     /// </summary>
     public static partial class PrototypeContentBuilder
     {
+        /// <summary>
+        /// Floor height of arena B and the goal room above the landing platform (top at 1 m). One back-wall kick from a
+        /// jump reaches about 4.1 m, so climbing out of the shaft needs at least one side-wall jump (mantle reach 2.4 m).
+        /// </summary>
+        private const float ArenaBFloor = 7f;
+
         private static void BuildLevel(Palette palette, PrefabSet prefabs, VolumeProfile volumeProfile)
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -39,17 +45,17 @@ namespace FeverDream.EditorTools.Prototype
             Place(prefabs.Checkpoint, checkpoints, "Checkpoint_02_BeforeArenaA", new Vector3(0f, 2.2f, 63f));
             Place(prefabs.Checkpoint, checkpoints, "Checkpoint_03_AfterArenaA", new Vector3(0f, 0f, 101f));
             Place(prefabs.Checkpoint, checkpoints, "Checkpoint_04_Landing", new Vector3(0f, 1f, 130f));
-            Place(prefabs.Checkpoint, checkpoints, "Checkpoint_05_ArenaB", new Vector3(0f, 5.2f, 144f));
+            Place(prefabs.Checkpoint, checkpoints, "Checkpoint_05_ArenaB", new Vector3(0f, ArenaBFloor, 144f));
 
             var grapplePoints = Group("GrapplePoints", gameplay);
             Place(prefabs.GrapplePoint, grapplePoints, "GrapplePoint_01", new Vector3(0f, 6f, 109f));
             Place(prefabs.GrapplePoint, grapplePoints, "GrapplePoint_02", new Vector3(0f, 7.5f, 119f));
-            Place(prefabs.GrapplePoint, grapplePoints, "GrapplePoint_03_ArenaB", new Vector3(0f, 12f, 162f));
+            Place(prefabs.GrapplePoint, grapplePoints, "GrapplePoint_03_ArenaB", new Vector3(0f, ArenaBFloor + 6.8f, 162f));
 
             var killVolumes = Group("KillVolumes", gameplay);
             Place(prefabs.KillVolume, killVolumes, "KillVolume_Void", new Vector3(0f, -15f, 95f)).transform.localScale = new Vector3(300f, 10f, 420f);
 
-            Place(prefabs.Goal, gameplay, "Goal_DreamToilet", new Vector3(0f, 5.2f, 192f));
+            Place(prefabs.Goal, gameplay, "Goal_DreamToilet", new Vector3(0f, ArenaBFloor, 192f));
 
             // Each arena group is also the EnemyArena box: its enemies only fight inside it and never leave it.
             var arenaA = Arena("Arena_A", enemies, new Vector3(0f, 2.5f, 82f), new Vector3(24f, 7f, 32f));
@@ -58,12 +64,12 @@ namespace FeverDream.EditorTools.Prototype
             Place(prefabs.AlarmClockWorker, arenaA, "Enemy_AlarmClockWorker_03", new Vector3(0f, 0f, 90f), 180f);
             Place(prefabs.ToiletLidShield, arenaA, "Enemy_ToiletLidShield_01", new Vector3(0f, 0f, 94f), 180f);
 
-            var arenaB = Arena("Arena_B", enemies, new Vector3(0f, 9f, 161f), new Vector3(26f, 10f, 40f));
-            Place(prefabs.AlarmClockWorker, arenaB, "Enemy_AlarmClockWorker_04", new Vector3(-5f, 5.2f, 158f), 180f);
-            Place(prefabs.AlarmClockWorker, arenaB, "Enemy_AlarmClockWorker_05", new Vector3(5f, 5.2f, 160f), 180f);
-            Place(prefabs.ToiletLidShield, arenaB, "Enemy_ToiletLidShield_02", new Vector3(0f, 5.2f, 166f), 180f);
-            Place(prefabs.ClownThrower, arenaB, "Enemy_ClownThrower_01", new Vector3(-9f, 8.2f, 172f), 180f);
-            Place(prefabs.ClownThrower, arenaB, "Enemy_ClownThrower_02", new Vector3(9f, 8.2f, 172f), 180f);
+            var arenaB = Arena("Arena_B", enemies, new Vector3(0f, ArenaBFloor + 3.8f, 161f), new Vector3(26f, 10f, 40f));
+            Place(prefabs.AlarmClockWorker, arenaB, "Enemy_AlarmClockWorker_04", new Vector3(-5f, ArenaBFloor, 158f), 180f);
+            Place(prefabs.AlarmClockWorker, arenaB, "Enemy_AlarmClockWorker_05", new Vector3(5f, ArenaBFloor, 160f), 180f);
+            Place(prefabs.ToiletLidShield, arenaB, "Enemy_ToiletLidShield_02", new Vector3(0f, ArenaBFloor, 166f), 180f);
+            Place(prefabs.ClownThrower, arenaB, "Enemy_ClownThrower_01", new Vector3(-9f, ArenaBFloor + 3f, 172f), 180f);
+            Place(prefabs.ClownThrower, arenaB, "Enemy_ClownThrower_02", new Vector3(9f, ArenaBFloor + 3f, 172f), 180f);
 
             var hud = Place(prefabs.Hud, ui, "HUD", Vector3.zero);
             SetReference(hud.GetComponent<HudView>(), "commentator", alterEgo.GetComponent<FeverDream.AlterEgo.AlterEgoCommentator>());
@@ -165,35 +171,39 @@ namespace FeverDream.EditorTools.Prototype
         {
             Block(section, "Floor_Bridge", new Vector3(0f, -0.5f, 101f), new Vector3(6f, 1f, 6f), p.Floor);
             Block(section, "Platform_Landing", new Vector3(0f, 0.5f, 133f), new Vector3(8f, 1f, 14f), p.Floor);
-            Block(section, "Shaft_Wall_Left", new Vector3(-2.5f, 4.5f, 138f), new Vector3(1f, 9f, 4f), p.WallRun);
-            Block(section, "Shaft_Wall_Right", new Vector3(2.5f, 4.5f, 138f), new Vector3(1f, 9f, 4f), p.WallRun);
-            Block(section, "Shaft_Wall_Back", new Vector3(0f, 2.6f, 140.5f), new Vector3(6f, 5.2f, 1f), p.Wall);
-            Block(section, "Decal_LedgeEdge_02", new Vector3(0f, 5.215f, 140.15f), new Vector3(4f, 0.02f, 0.25f), p.Ledge, false);
+            // Side walls rise above the arena floor so they can be kicked off all the way up.
+            float shaftWallHeight = ArenaBFloor + 4f;
+            Block(section, "Shaft_Wall_Left", new Vector3(-2.5f, shaftWallHeight * 0.5f, 138f), new Vector3(1f, shaftWallHeight, 4f), p.WallRun);
+            Block(section, "Shaft_Wall_Right", new Vector3(2.5f, shaftWallHeight * 0.5f, 138f), new Vector3(1f, shaftWallHeight, 4f), p.WallRun);
+            Block(section, "Shaft_Wall_Back", new Vector3(0f, ArenaBFloor * 0.5f, 140.5f), new Vector3(6f, ArenaBFloor, 1f), p.Wall);
+            Block(section, "Decal_LedgeEdge_02", new Vector3(0f, ArenaBFloor + 0.015f, 140.15f), new Vector3(4f, 0.02f, 0.25f), p.Ledge, false);
         }
 
-        // Second arena, floor top y = 5.2, z 141..181. Clowns stand on the crate stacks.
+        // Second arena, floor top y = ArenaBFloor, z 141..181. Clowns stand on the crate stacks.
         private static void BuildArenaB(Transform section, Palette p)
         {
-            Block(section, "Floor_ArenaB", new Vector3(0f, 4.7f, 161f), new Vector3(26f, 1f, 40f), p.Floor);
-            Block(section, "Wall_ArenaB_Left", new Vector3(-13.5f, 8.2f, 161f), new Vector3(1f, 6f, 40f), p.Wall);
-            Block(section, "Wall_ArenaB_Right", new Vector3(13.5f, 8.2f, 161f), new Vector3(1f, 6f, 40f), p.Wall);
-            Block(section, "Wall_ArenaB_Entry_Left", new Vector3(-8.25f, 8.2f, 140.5f), new Vector3(10.5f, 6f, 1f), p.Wall);
-            Block(section, "Wall_ArenaB_Entry_Right", new Vector3(8.25f, 8.2f, 140.5f), new Vector3(10.5f, 6f, 1f), p.Wall);
-            Block(section, "Wall_ArenaB_Exit_Left", new Vector3(-8.25f, 8.2f, 181.5f), new Vector3(10.5f, 6f, 1f), p.Wall);
-            Block(section, "Wall_ArenaB_Exit_Right", new Vector3(8.25f, 8.2f, 181.5f), new Vector3(10.5f, 6f, 1f), p.Wall);
-            Block(section, "Prop_CrateStack_Left", new Vector3(-9f, 6.7f, 172f), new Vector3(4f, 3f, 4f), p.Crate);
-            Block(section, "Prop_CrateStack_Right", new Vector3(9f, 6.7f, 172f), new Vector3(4f, 3f, 4f), p.Crate);
-            Block(section, "Prop_WashingMachine_03", new Vector3(7f, 6.45f, 150f), new Vector3(2.5f, 2.5f, 2.5f), p.Appliance);
-            Cylinder(section, "Prop_GiantToiletPaper_01", new Vector3(-6f, 6.7f, 150f), new Vector3(1.5f, 1.5f, 1.5f), p.Appliance, Vector3.zero);
+            float f = ArenaBFloor;
+            Block(section, "Floor_ArenaB", new Vector3(0f, f - 0.5f, 161f), new Vector3(26f, 1f, 40f), p.Floor);
+            Block(section, "Wall_ArenaB_Left", new Vector3(-13.5f, f + 3f, 161f), new Vector3(1f, 6f, 40f), p.Wall);
+            Block(section, "Wall_ArenaB_Right", new Vector3(13.5f, f + 3f, 161f), new Vector3(1f, 6f, 40f), p.Wall);
+            Block(section, "Wall_ArenaB_Entry_Left", new Vector3(-8.25f, f + 3f, 140.5f), new Vector3(10.5f, 6f, 1f), p.Wall);
+            Block(section, "Wall_ArenaB_Entry_Right", new Vector3(8.25f, f + 3f, 140.5f), new Vector3(10.5f, 6f, 1f), p.Wall);
+            Block(section, "Wall_ArenaB_Exit_Left", new Vector3(-8.25f, f + 3f, 181.5f), new Vector3(10.5f, 6f, 1f), p.Wall);
+            Block(section, "Wall_ArenaB_Exit_Right", new Vector3(8.25f, f + 3f, 181.5f), new Vector3(10.5f, 6f, 1f), p.Wall);
+            Block(section, "Prop_CrateStack_Left", new Vector3(-9f, f + 1.5f, 172f), new Vector3(4f, 3f, 4f), p.Crate);
+            Block(section, "Prop_CrateStack_Right", new Vector3(9f, f + 1.5f, 172f), new Vector3(4f, 3f, 4f), p.Crate);
+            Block(section, "Prop_WashingMachine_03", new Vector3(7f, f + 1.25f, 150f), new Vector3(2.5f, 2.5f, 2.5f), p.Appliance);
+            Cylinder(section, "Prop_GiantToiletPaper_01", new Vector3(-6f, f + 1.5f, 150f), new Vector3(1.5f, 1.5f, 1.5f), p.Appliance, Vector3.zero);
         }
 
-        // The dream toilet. Floor top y = 5.2, z 181..196.
+        // The dream toilet. Floor top y = ArenaBFloor, z 181..196.
         private static void BuildGoalRoom(Transform section, Palette p)
         {
-            Block(section, "Floor_Goal", new Vector3(0f, 4.7f, 188.5f), new Vector3(8f, 1f, 15f), p.Floor);
-            Block(section, "Wall_Goal_Left", new Vector3(-4.5f, 8.2f, 188.5f), new Vector3(1f, 6f, 15f), p.Wall);
-            Block(section, "Wall_Goal_Right", new Vector3(4.5f, 8.2f, 188.5f), new Vector3(1f, 6f, 15f), p.Wall);
-            Block(section, "Wall_Goal_Back", new Vector3(0f, 8.2f, 196.5f), new Vector3(10f, 6f, 1f), p.Wall);
+            float f = ArenaBFloor;
+            Block(section, "Floor_Goal", new Vector3(0f, f - 0.5f, 188.5f), new Vector3(8f, 1f, 15f), p.Floor);
+            Block(section, "Wall_Goal_Left", new Vector3(-4.5f, f + 3f, 188.5f), new Vector3(1f, 6f, 15f), p.Wall);
+            Block(section, "Wall_Goal_Right", new Vector3(4.5f, f + 3f, 188.5f), new Vector3(1f, 6f, 15f), p.Wall);
+            Block(section, "Wall_Goal_Back", new Vector3(0f, f + 3f, 196.5f), new Vector3(10f, 6f, 1f), p.Wall);
         }
 
         private static Transform Group(string name, Transform parent)

@@ -14,7 +14,8 @@ namespace FeverDream.Aura
 
         public int Total { get; private set; }
 
-        public AuraTier Tier => Total >= settings.panicThreshold ? AuraTier.Panic
+        public AuraTier Tier => settings == null ? AuraTier.Calm
+            : Total >= settings.panicThreshold ? AuraTier.Panic
             : Total >= settings.uneasyThreshold ? AuraTier.Uneasy
             : AuraTier.Calm;
 

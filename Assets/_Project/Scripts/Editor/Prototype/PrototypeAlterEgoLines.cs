@@ -11,6 +11,7 @@ namespace FeverDream.EditorTools.Prototype
         public static void Fill(AlterEgoLines lines)
         {
             lines.speakerName = "Güvercin";
+            lines.levelStartDelay = 1f;
             lines.lineDuration = 3.5f;
             lines.cooldown = 2.5f;
             lines.bigComboPoints = 150;

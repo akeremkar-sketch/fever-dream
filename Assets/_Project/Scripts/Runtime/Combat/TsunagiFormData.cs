@@ -27,6 +27,8 @@ namespace FeverDream.Combat
         [Header("Feel")]
         [Tooltip("Time scale during hit stop. Each move sets its own hit stop duration.")]
         [Range(0.01f, 1f)] public float hitStopTimeScale = 0.05f;
+        [Tooltip("Seconds the camera shakes on a landed hit. Each move sets its own shake strength.")]
+        [Min(0f)] public float cameraShakeDuration = 0.12f;
         [Tooltip("Seconds over which a move's ground lunge distance is covered.")]
         [Min(0.01f)] public float lungeDuration = 0.08f;
 

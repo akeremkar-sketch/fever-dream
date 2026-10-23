@@ -29,6 +29,11 @@ namespace FeverDream.Combat
         private void Awake()
         {
             context = GetComponent<PlayerContext>();
+            if (settings == null)
+            {
+                Debug.LogError($"{name}: PlayerDodge has no PlayerCombatSettings assigned.", this);
+                enabled = false;
+            }
         }
 
         private void Update()
@@ -52,6 +57,10 @@ namespace FeverDream.Combat
 
         public bool TryEvade()
         {
+            if (!enabled)
+            {
+                return false;
+            }
             float sinceDodge = Time.time - lastDodgeTime;
             if (sinceDodge > settings.dodgeInvulnerability)
             {
@@ -79,6 +88,7 @@ namespace FeverDream.Combat
             }
 
             dashDirection = direction.normalized;
+            context.Movement.CancelLunge();
             lastDodgeTime = Time.time;
             dashEndTime = Time.time + settings.dashDuration;
             perfectUsed = false;

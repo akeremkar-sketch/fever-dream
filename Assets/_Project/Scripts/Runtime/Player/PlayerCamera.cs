@@ -4,7 +4,8 @@ namespace FeverDream.Player
 {
     /// <summary>
     /// First-person look and camera feel: yaw turns the player, pitch tilts the camera root, plus FOV kicks,
-    /// wall-run tilt, crouch height and shake. Runs before movement so movement always uses this frame's yaw.
+    /// wall-run tilt, crouch height and shake. Look runs before movement so movement always uses this frame's yaw;
+    /// the feel runs in LateUpdate, after movement.
     /// Tuning lives in <see cref="PlayerCameraSettings"/>.
     /// </summary>
     [DefaultExecutionOrder(-50)]
@@ -31,6 +32,11 @@ namespace FeverDream.Player
         {
             input = GetComponent<PlayerInputReader>();
             movement = GetComponent<PlayerMovement>();
+            if (settings == null)
+            {
+                Debug.LogError($"{name}: PlayerCamera has no PlayerCameraSettings assigned.", this);
+                enabled = false;
+            }
         }
 
         private void OnEnable()
@@ -53,6 +59,11 @@ namespace FeverDream.Player
             {
                 ApplyLook();
             }
+        }
+
+        private void LateUpdate()
+        {
+            // After movement, so a slide or crouch that shrank the capsule this frame is already respected.
             UpdateFeel(Time.unscaledDeltaTime);
         }
 

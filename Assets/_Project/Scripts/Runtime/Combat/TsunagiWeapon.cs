@@ -247,7 +247,7 @@ namespace FeverDream.Combat
             if (landed)
             {
                 TimeEffects.HitStop(current.hitStop, form.hitStopTimeScale);
-                context.Camera.AddShake(current.cameraShake, 0.12f);
+                context.Camera.AddShake(current.cameraShake, form.cameraShakeDuration);
                 if (currentIsAerial && !slam)
                 {
                     context.Movement.ApplyAirHover();

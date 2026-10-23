@@ -36,6 +36,10 @@ namespace FeverDream.Player
         [Min(0f)] public float slideExitSpeed = 4f;
         [Min(0f)] public float slideMinDuration = 0.25f;
         [Min(0f)] public float slideMaxDuration = 1.1f;
+        [Tooltip("The slide boost never pushes horizontal speed above this (no endless speed from slide-jumping).")]
+        [Min(0f)] public float slideMaxSpeed = 13.5f;
+        [Tooltip("How fast the slide direction turns towards the input, in radians per second.")]
+        [Min(0f)] public float slideSteerRate = 1.5f;
 
         [Header("Wall Run")]
         [Min(0f)] public float wallCheckDistance = 0.8f;
@@ -46,14 +50,18 @@ namespace FeverDream.Player
         public float wallRunGravity = -2.5f;
         [Tooltip("Upward speed is clamped into this range when a wall run starts, so running off an edge still carries over a gap.")]
         [Min(0f)] public float wallRunMinEntryUpSpeed = 2f;
+        [Tooltip("Max upward speed at wall run start. A slightly late edge jump (within coyote time) gets the same lift.")]
         [Min(0f)] public float wallRunEntryUpSpeed = 2.5f;
-        [Tooltip("Upward speed when jump is pressed within coyote time right after a wall run starts (a slightly late edge jump).")]
-        [Min(0f)] public float wallRunCoyoteUpSpeed = 5f;
+        [Tooltip("A wall run only starts when the velocity is no more head-on to the wall than this (dot product).")]
+        [Range(0f, 1f)] public float wallRunMaxEntryDot = 0.8f;
         [Min(0f)] public float wallRunMaxDuration = 1.8f;
         [Min(0f)] public float wallStickSpeed = 2f;
 
         // A wall that was run along or kicked off cannot be used again until the player touches the ground.
+        // Walls facing the same way count as the same wall, so seams between coplanar blocks are not a loophole.
         [Header("Wall Jump")]
+        [Tooltip("Two walls whose normals are closer than this (dot product) count as the same wall for the reuse rule.")]
+        [Range(0f, 1f)] public float sameWallNormalDot = 0.9f;
         [Min(0f)] public float wallJumpUpSpeed = 10f;
         [Min(0f)] public float wallJumpSideSpeed = 6.5f;
         [Range(0f, 1.5f)] public float wallJumpMomentumKeep = 0.9f;
@@ -77,6 +85,12 @@ namespace FeverDream.Player
         [Min(0f)] public float grappleMaxDuration = 2.2f;
         [Min(0f)] public float grappleExitUpBoost = 4f;
         [Range(0f, 1.5f)] public float grappleExitVelocityKeep = 0.65f;
+        [Tooltip("Falling speed is multiplied by this when the grapple fires, so the pull starts cleanly.")]
+        [Range(0f, 1f)] public float grappleFallDamping = 0.3f;
+        [Tooltip("Seconds after firing before pressing grapple again (with no new target) releases it.")]
+        [Min(0f)] public float grappleReleaseGrace = 0.05f;
+        [Tooltip("Seconds after firing before hitting a wall releases the grapple.")]
+        [Min(0f)] public float grappleBlockedGrace = 0.25f;
 
         [Header("Combat Assist")]
         [Tooltip("Upward speed applied on each aerial hit so air combos can continue.")]

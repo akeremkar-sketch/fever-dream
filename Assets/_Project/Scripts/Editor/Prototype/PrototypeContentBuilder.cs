@@ -35,6 +35,9 @@ namespace FeverDream.EditorTools.Prototype
         private const int ProjectileLayer = 10;
         private const int IgnoreRaycastLayer = 2;
 
+        /// <summary>Prefabs that "Build Missing" had to create from scratch in this run.</summary>
+        private static readonly System.Collections.Generic.List<string> RecreatedPrefabs = new System.Collections.Generic.List<string>();
+
         [MenuItem("Fever Dream/Prototype/Build Missing Content", priority = 0)]
         private static void BuildMissingFromMenu() => Build(false);
 
@@ -65,6 +68,7 @@ namespace FeverDream.EditorTools.Prototype
             }
 
             ConfigureLayers();
+            RecreatedPrefabs.Clear();
             var palette = new Palette();
             var data = CreateData();
             bool profileExisted = AssetDatabase.LoadAssetAtPath<VolumeProfile>(VolumeProfilePath) != null;
@@ -73,25 +77,33 @@ namespace FeverDream.EditorTools.Prototype
             if (buildLevel)
             {
                 BuildLevel(palette, prefabs, volumeProfile);
+                AddLevelToBuildSettings();
             }
-            else if (!profileExisted)
+            else
             {
-                Debug.LogWarning($"Prototype content: {VolumeProfilePath} was recreated. Assign it to Volume_Global in L_Proto_Dream or run Rebuild.");
+                if (!profileExisted)
+                {
+                    Debug.LogWarning($"Prototype content: {VolumeProfilePath} was recreated. Assign it to Volume_Global in L_Proto_Dream or run Rebuild.");
+                }
+                if (RecreatedPrefabs.Count > 0)
+                {
+                    Debug.LogWarning("Prototype content: these prefabs were missing and were recreated, so L_Proto_Dream still points at the old ones. "
+                        + "Run Rebuild or replace them in the scene: " + string.Join(", ", RecreatedPrefabs));
+                }
             }
-            AddLevelToBuildSettings();
             AssetDatabase.SaveAssets();
         }
 
-        /// <summary>Layer names and the collision rules documented in Docs/PROJECT_STRUCTURE.md.</summary>
+        /// <summary>Layer names and the collision rules documented in Docs/PROJECT_STRUCTURE.md. Never renames a layer someone else uses.</summary>
         private static void ConfigureLayers()
         {
             var tagManager = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset")[0]);
             var layers = tagManager.FindProperty("layers");
-            layers.GetArrayElementAtIndex(PlayerLayer).stringValue = "Player";
-            layers.GetArrayElementAtIndex(EnemyLayer).stringValue = "Enemy";
-            layers.GetArrayElementAtIndex(EnvironmentLayer).stringValue = "Environment";
-            layers.GetArrayElementAtIndex(GrapplePointLayer).stringValue = "GrapplePoint";
-            layers.GetArrayElementAtIndex(ProjectileLayer).stringValue = "Projectile";
+            NameLayer(layers, PlayerLayer, "Player");
+            NameLayer(layers, EnemyLayer, "Enemy");
+            NameLayer(layers, EnvironmentLayer, "Environment");
+            NameLayer(layers, GrapplePointLayer, "GrapplePoint");
+            NameLayer(layers, ProjectileLayer, "Projectile");
             tagManager.ApplyModifiedPropertiesWithoutUndo();
 
             for (int layer = 0; layer < 32; layer++)
@@ -99,6 +111,20 @@ namespace FeverDream.EditorTools.Prototype
                 // Projectiles only meet the player and the level; grapple points are query-only.
                 Physics.IgnoreLayerCollision(ProjectileLayer, layer, layer != PlayerLayer && layer != EnvironmentLayer);
                 Physics.IgnoreLayerCollision(GrapplePointLayer, layer, true);
+            }
+        }
+
+        private static void NameLayer(SerializedProperty layers, int index, string layerName)
+        {
+            var layer = layers.GetArrayElementAtIndex(index);
+            if (string.IsNullOrEmpty(layer.stringValue))
+            {
+                layer.stringValue = layerName;
+            }
+            else if (layer.stringValue != layerName)
+            {
+                Debug.LogWarning($"Prototype content: layer {index} is named '{layer.stringValue}', expected '{layerName}'. "
+                    + "It was left as it is; the prototype code expects the layer numbers in Docs/PROJECT_STRUCTURE.md.");
             }
         }
 
@@ -204,6 +230,8 @@ namespace FeverDream.EditorTools.Prototype
                     s.attackKnockback = 5f;
                     s.strafeSwitchInterval = 1.6f;
                     s.aimLeadFactor = 0.5f;
+                    s.projectileGravity = -5f;
+                    s.projectileLifetime = 6f;
                 }),
                 AlterEgo = LoadOrCreate<AlterEgoLines>($"{DataFolder}/AlterEgo/SO_AlterEgo_Pigeon.asset", PrototypeAlterEgoLines.Fill),
             };
@@ -348,6 +376,11 @@ namespace FeverDream.EditorTools.Prototype
         /// <summary>Assigns the reference only when it is empty or points at a deleted asset.</summary>
         private static void SetReferenceIfMissing(Object target, string field, Object value)
         {
+            if (target == null)
+            {
+                Debug.LogWarning($"Prototype content: a component expected for '{field}' was removed from a prefab; it was not re-linked.");
+                return;
+            }
             var serialized = new SerializedObject(target);
             var property = FindField(serialized, target, field);
             if (property.objectReferenceValue == null)

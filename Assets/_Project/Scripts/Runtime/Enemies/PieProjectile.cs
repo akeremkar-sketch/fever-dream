@@ -5,21 +5,18 @@ namespace FeverDream.Enemies
 {
     /// <summary>
     /// Clown pie. Lives on the Projectile layer, which only collides with the player and the environment,
-    /// so pies never hit other enemies. Tsunagi can cut it out of the air.
+    /// so pies never hit other enemies. Tsunagi can cut it out of the air. Its flight values come from the
+    /// thrower's <see cref="EnemySettings"/>.
     /// </summary>
     [RequireComponent(typeof(Rigidbody), typeof(Collider))]
     public sealed class PieProjectile : MonoBehaviour, IDamageable
     {
-        [SerializeField] private float gravity = -5f;
-        [SerializeField, Min(0.1f)] private float lifetime = 6f;
-
         private Rigidbody body;
         private GameObject owner;
         private float damage;
         private float knockback;
+        private float gravity;
         private bool spent;
-
-        public float Gravity => gravity;
 
         private void Awake()
         {
@@ -27,11 +24,12 @@ namespace FeverDream.Enemies
             body.useGravity = false;
         }
 
-        public void Launch(Vector3 velocity, GameObject source, float hitDamage, float hitKnockback)
+        public void Launch(Vector3 velocity, GameObject source, float hitDamage, float hitKnockback, float flightGravity, float lifetime)
         {
             owner = source;
             damage = hitDamage;
             knockback = hitKnockback;
+            gravity = flightGravity;
             body.linearVelocity = velocity;
             Destroy(gameObject, lifetime);
         }

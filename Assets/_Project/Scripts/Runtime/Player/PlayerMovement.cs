@@ -34,8 +34,9 @@ namespace FeverDream.Player
 
         private Vector3 wallNormal;
         private Collider currentWall;
-        /// <summary>The wall last run along or kicked off. It cannot be used again until the player touches the ground.</summary>
+        /// <summary>The wall last run along or kicked off. It (and any wall facing the same way) cannot be used again until the player touches the ground.</summary>
         private Collider lastWall;
+        private Vector3 lastWallNormal;
         private int wallSide;
 
         private Vector3 mantleStart;
@@ -47,6 +48,7 @@ namespace FeverDream.Player
         private Vector3 lungeDirection;
         private float lungeSpeed;
         private float lungeTimer;
+        private bool lungeApplied;
 
         public event Action<MovementState, MovementState> StateChanged;
         public event Action Jumped;
@@ -75,6 +77,12 @@ namespace FeverDream.Player
         {
             controller = GetComponent<CharacterController>();
             input = GetComponent<PlayerInputReader>();
+            if (settings == null)
+            {
+                Debug.LogError($"{name}: PlayerMovement has no PlayerMovementSettings assigned.", this);
+                enabled = false;
+                return;
+            }
             ApplyHeight(settings.standHeight);
         }
 
@@ -175,6 +183,13 @@ namespace FeverDream.Player
             lungeTimer = duration;
         }
 
+        /// <summary>Stops a running lunge, e.g. when a dodge takes over the horizontal velocity.</summary>
+        public void CancelLunge()
+        {
+            lungeTimer = 0f;
+            lungeApplied = false;
+        }
+
         /// <summary>Keeps the player floating a little on aerial hits so air combos can continue.</summary>
         public void ApplyAirHover()
         {
@@ -192,7 +207,7 @@ namespace FeverDream.Player
             velocity = Vector3.zero;
             grappleTarget = null;
             lastWall = null;
-            lungeTimer = 0f;
+            CancelLunge();
             ApplyCrouch(false);
             SetState(MovementState.Airborne);
         }
@@ -271,8 +286,11 @@ namespace FeverDream.Player
 
         private void StartSlide()
         {
+            // The boost never lifts speed above slideMaxSpeed, so chaining slide-jumps cannot build speed forever.
             Vector3 horizontal = Flat(velocity);
-            horizontal += horizontal.normalized * settings.slideBoost;
+            float speed = horizontal.magnitude;
+            float boosted = Mathf.Max(speed, Mathf.Min(speed + settings.slideBoost, settings.slideMaxSpeed));
+            horizontal = horizontal.normalized * boosted;
             velocity.x = horizontal.x;
             velocity.z = horizontal.z;
             slideBufferTimer = 0f;
@@ -301,7 +319,7 @@ namespace FeverDream.Player
             Vector3 wish = WishDirection();
             if (wish.sqrMagnitude > 0.01f)
             {
-                direction = Vector3.RotateTowards(direction, wish.normalized, 1.5f * dt, 0f);
+                direction = Vector3.RotateTowards(direction, wish.normalized, settings.slideSteerRate * dt, 0f);
             }
             horizontal = direction * speed;
             velocity.x = horizontal.x;
@@ -324,12 +342,12 @@ namespace FeverDream.Player
 
             for (int side = 1; side >= -1; side -= 2)
             {
-                if (!Probe(transform.right * side, out var hit) || hit.collider == lastWall)
+                if (!Probe(transform.right * side, out var hit) || IsUsedWall(hit))
                 {
                     continue;
                 }
                 // Running straight into a wall is a wall jump or a climb, not a wall run.
-                if (Mathf.Abs(Vector3.Dot(Flat(velocity).normalized, hit.normal)) > 0.8f)
+                if (Mathf.Abs(Vector3.Dot(Flat(velocity).normalized, hit.normal)) > settings.wallRunMaxEntryDot)
                 {
                     continue;
                 }
@@ -354,8 +372,8 @@ namespace FeverDream.Player
             {
                 if (coyoteTimer > 0f)
                 {
-                    // A late jump right after leaving an edge lifts the wall run instead of kicking off the wall.
-                    velocity.y = Mathf.Max(velocity.y, settings.wallRunCoyoteUpSpeed);
+                    // A late jump right after leaving an edge counts like an on-time one: same lift, no kick off the wall.
+                    velocity.y = Mathf.Max(velocity.y, settings.wallRunEntryUpSpeed);
                     jumpBufferTimer = 0f;
                     coyoteTimer = 0f;
                     Jumped?.Invoke();
@@ -384,6 +402,18 @@ namespace FeverDream.Player
             {
                 along = -along;
             }
+
+            // Running into an inside corner: climb it if there is a ledge, otherwise let go instead of pinning to it.
+            Vector3 origin = transform.position + Vector3.up * (controller.height * 0.5f);
+            if (Physics.Raycast(origin, along, controller.radius + 0.25f, settings.environmentMask, QueryTriggerInteraction.Ignore))
+            {
+                if (!TryStartMantle(along))
+                {
+                    ExitWallRun();
+                }
+                return;
+            }
+
             float alongSpeed = Mathf.Max(settings.wallRunSpeed, Vector3.Dot(Flat(velocity), along));
             Vector3 horizontal = along * alongSpeed - wallNormal * settings.wallStickSpeed;
             velocity.x = horizontal.x;
@@ -394,8 +424,15 @@ namespace FeverDream.Player
         private void ExitWallRun()
         {
             lastWall = currentWall;
+            lastWallNormal = wallNormal;
             velocity += wallNormal;
             SetState(MovementState.Airborne);
+        }
+
+        /// <summary>True for the wall last used, and for any wall facing the same way (coplanar blocks of one wall).</summary>
+        private bool IsUsedWall(RaycastHit hit)
+        {
+            return lastWall != null && (hit.collider == lastWall || Vector3.Dot(hit.normal, lastWallNormal) > settings.sameWallNormalDot);
         }
 
         private bool TryWallJump()
@@ -405,7 +442,7 @@ namespace FeverDream.Player
             for (int i = 0; i < 4; i++)
             {
                 Vector3 direction = i switch { 0 => forward, 1 => -forward, 2 => right, _ => -right };
-                if (Probe(direction, out var hit) && hit.collider != lastWall)
+                if (Probe(direction, out var hit) && !IsUsedWall(hit))
                 {
                     WallJump(hit.normal, hit.collider);
                     return true;
@@ -419,20 +456,22 @@ namespace FeverDream.Player
             Vector3 along = Vector3.ProjectOnPlane(Flat(velocity), normal) * settings.wallJumpMomentumKeep;
             velocity = along + normal * settings.wallJumpSideSpeed + Vector3.up * settings.wallJumpUpSpeed;
             lastWall = wall;
+            lastWallNormal = normal;
             jumpBufferTimer = 0f;
             coyoteTimer = 0f;
             SetState(MovementState.Airborne);
             Jumped?.Invoke();
         }
 
-        private bool TryStartMantle()
+        private bool TryStartMantle() => TryStartMantle(Flat(transform.forward).normalized);
+
+        private bool TryStartMantle(Vector3 forward)
         {
             if (!PushingForward)
             {
                 return false;
             }
 
-            Vector3 forward = Flat(transform.forward).normalized;
             Vector3 feet = transform.position;
             Vector3 chest = feet + Vector3.up * (settings.mantleMinHeight * 0.8f);
             if (!Physics.Raycast(chest, forward, out var wallHit, controller.radius + settings.mantleReach, settings.environmentMask, QueryTriggerInteraction.Ignore)
@@ -537,7 +576,7 @@ namespace FeverDream.Player
             lastWall = null;
             if (velocity.y < 0f)
             {
-                velocity.y *= 0.3f;
+                velocity.y *= settings.grappleFallDamping;
             }
             SetState(MovementState.Grappling);
             return true;
@@ -560,8 +599,8 @@ namespace FeverDream.Player
             Vector3 eye = viewPoint != null ? viewPoint.position : transform.position + Vector3.up * EyeHeight;
             Vector3 toPoint = grappleTarget.transform.position - eye;
             float distance = toPoint.magnitude;
-            bool releaseInput = jumpBufferTimer > 0f || (input.GrapplePressed && GrappleCandidate == null && stateTime > 0.05f);
-            bool blocked = stateTime > 0.25f && (lastCollision & CollisionFlags.Sides) != 0;
+            bool releaseInput = jumpBufferTimer > 0f || (input.GrapplePressed && GrappleCandidate == null && stateTime > settings.grappleReleaseGrace);
+            bool blocked = stateTime > settings.grappleBlockedGrace && (lastCollision & CollisionFlags.Sides) != 0;
             if (distance <= settings.grappleReleaseDistance || stateTime > settings.grappleMaxDuration || releaseInput || blocked)
             {
                 ReleaseGrapple();
@@ -643,6 +682,18 @@ namespace FeverDream.Player
                 {
                     horizontal += lungeDirection * (targetAlong - alongLunge);
                 }
+                lungeApplied = true;
+            }
+            else if (lungeApplied)
+            {
+                // The lunge is over: drop the speed it added beyond normal movement, so the step ends at its distance.
+                lungeApplied = false;
+                float alongLunge = Vector3.Dot(horizontal, lungeDirection);
+                float wantedAlong = Mathf.Max(0f, Vector3.Dot(WishDirection() * speed, lungeDirection));
+                if (alongLunge > wantedAlong)
+                {
+                    horizontal -= lungeDirection * (alongLunge - wantedAlong);
+                }
             }
             velocity.x = horizontal.x;
             velocity.z = horizontal.z;
@@ -671,6 +722,7 @@ namespace FeverDream.Player
 
         private void DoJump()
         {
+            CancelLunge();
             velocity.y = JumpSpeed;
             jumpBufferTimer = 0f;
             coyoteTimer = 0f;

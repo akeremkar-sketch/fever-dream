@@ -11,7 +11,7 @@ namespace FeverDream.UI
     [DisallowMultipleComponent]
     public sealed class HudView : MonoBehaviour
     {
-        [Tooltip("The scene's alter ego. Wired on the HUD instance in the level.")]
+        [Tooltip("The scene's alter ego. Optional: when empty the HUD uses AlterEgoCommentator.Current (any loaded scene).")]
         [SerializeField] private AlterEgoCommentator commentator;
 
         [Header("Health")]
@@ -45,6 +45,7 @@ namespace FeverDream.UI
         [SerializeField] private GameObject helpPanel;
 
         private PlayerContext player;
+        private AlterEgoCommentator boundCommentator;
         private float alterEgoHideTime;
         private float auraChangeHideTime;
         private float centerMessageHideTime;
@@ -59,26 +60,17 @@ namespace FeverDream.UI
                 Bind(PlayerContext.Current);
             }
 
-            if (commentator != null)
-            {
-                commentator.LineSpoken += ShowAlterEgoLine;
-                alterEgoNameText.text = $"{commentator.Lines.speakerName.ToUpperInvariant()}  ·  alter ego";
-            }
-            else
-            {
-                Debug.LogWarning($"{name}: no alter ego assigned, subtitles are off.", this);
-            }
+            AlterEgoCommentator.Registered += BindCommentator;
+            BindCommentator(commentator != null ? commentator : AlterEgoCommentator.Current);
         }
 
         private void OnDisable()
         {
             PlayerContext.Registered -= Bind;
             LevelGoal.Reached -= HandleLevelGoal;
+            AlterEgoCommentator.Registered -= BindCommentator;
             Unbind();
-            if (commentator != null)
-            {
-                commentator.LineSpoken -= ShowAlterEgoLine;
-            }
+            UnbindCommentator();
         }
 
         private void Start()
@@ -87,8 +79,34 @@ namespace FeverDream.UI
             alterEgoGroup.alpha = 0f;
             auraChangeText.text = string.Empty;
             centerMessageText.text = string.Empty;
-            auraTotalText.text = "0";
+            auraTotalText.text = player != null ? player.Wallet.Total.ToString() : "0";
             grappleMarker.gameObject.SetActive(false);
+            if (boundCommentator == null)
+            {
+                Debug.LogWarning($"{name}: no alter ego found yet; subtitles start when one is loaded.", this);
+            }
+        }
+
+        private void BindCommentator(AlterEgoCommentator target)
+        {
+            if (target == null || target == boundCommentator)
+            {
+                return;
+            }
+            UnbindCommentator();
+            boundCommentator = target;
+            boundCommentator.LineSpoken += ShowAlterEgoLine;
+            alterEgoNameText.text = $"{boundCommentator.Lines.speakerName.ToUpperInvariant()}  ·  alter ego";
+        }
+
+        private void UnbindCommentator()
+        {
+            if (boundCommentator == null)
+            {
+                return;
+            }
+            boundCommentator.LineSpoken -= ShowAlterEgoLine;
+            boundCommentator = null;
         }
 
         private void Update()
@@ -153,7 +171,10 @@ namespace FeverDream.UI
                 return;
             }
             comboHitsText.text = $"{combo.Hits} VURUŞ";
-            comboPointsText.text = $"+{combo.PendingAward} AURA   x{combo.Multiplier:0.0}";
+            // Below the minimum the combo would pay nothing, so do not promise Aura yet.
+            comboPointsText.text = combo.QualifiesForPayout
+                ? $"+{combo.PendingAward} AURA   x{combo.Multiplier:0.0}"
+                : $"<color=#9AA0A6>en az {combo.Settings.minHitsToAward} vuruş</color>";
             comboTimerFill.localScale = new Vector3(combo.TimeLeftNormalized, 1f, 1f);
         }
 
@@ -185,7 +206,7 @@ namespace FeverDream.UI
                 AuraTier.Uneasy => uneasyColor,
                 _ => calmColor,
             };
-            alterEgoHideTime = Time.unscaledTime + commentator.Lines.lineDuration;
+            alterEgoHideTime = Time.unscaledTime + boundCommentator.Lines.lineDuration;
         }
 
         private void HandleAuraChanged(int total, int delta)

@@ -17,16 +17,41 @@ namespace FeverDream.AlterEgo
     public sealed class AlterEgoCommentator : MonoBehaviour
     {
         [SerializeField] private AlterEgoLines lines;
-        [SerializeField, Min(0f)] private float levelStartDelay = 1f;
 
         private readonly Dictionary<AlterEgoEvent, int> lastLineIndex = new Dictionary<AlterEgoEvent, int>();
         private PlayerContext player;
         private float nextLineTime;
+        private bool levelComplete;
+
+        /// <summary>The active alter ego, so the HUD can find it even when it lives in another (additive) scene.</summary>
+        public static AlterEgoCommentator Current { get; private set; }
+        public static event Action<AlterEgoCommentator> Registered;
 
         /// <summary>Line text and the tier it was spoken in.</summary>
         public event Action<string, AuraTier> LineSpoken;
 
         public AlterEgoLines Lines => lines;
+
+        private void Awake()
+        {
+            Current = this;
+            Registered?.Invoke(this);
+        }
+
+        private void OnDestroy()
+        {
+            if (Current == this)
+            {
+                Current = null;
+            }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetStatics()
+        {
+            Current = null;
+            Registered = null;
+        }
 
         private void OnEnable()
         {
@@ -49,7 +74,7 @@ namespace FeverDream.AlterEgo
 
         private void Start()
         {
-            Invoke(nameof(SayLevelStart), levelStartDelay);
+            Invoke(nameof(SayLevelStart), lines != null ? lines.levelStartDelay : 1f);
         }
 
         public void Say(AlterEgoEvent trigger)
@@ -119,7 +144,8 @@ namespace FeverDream.AlterEgo
 
         private void HandleComboEnded(ComboSummary summary)
         {
-            if (summary.Points <= 0)
+            // The combo paid out at the goal must not talk over the level-complete line.
+            if (summary.Points <= 0 || levelComplete)
             {
                 return;
             }
@@ -146,6 +172,10 @@ namespace FeverDream.AlterEgo
 
         private void HandleEnemyKilled(EnemyBase enemy) => Say(AlterEgoEvent.EnemyKilled);
 
-        private void HandleLevelGoal(LevelGoal goal) => Say(AlterEgoEvent.LevelComplete);
+        private void HandleLevelGoal(LevelGoal goal)
+        {
+            levelComplete = true;
+            Say(AlterEgoEvent.LevelComplete);
+        }
     }
 }
