@@ -41,10 +41,11 @@ MonoBehaviour:
   wallRunSpeed: 11
   wallRunMinHeight: 0.9
   wallRunGravity: -2.5
+  wallRunMinEntryUpSpeed: 2
   wallRunEntryUpSpeed: 2.5
+  wallRunCoyoteUpSpeed: 5
   wallRunMaxDuration: 1.8
   wallStickSpeed: 2
-  wallRunCooldown: 0.35
   wallJumpUpSpeed: 10
   wallJumpSideSpeed: 6.5
   wallJumpMomentumKeep: 0.9

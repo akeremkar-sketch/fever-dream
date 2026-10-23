@@ -8,7 +8,7 @@ namespace FeverDream.Aura
         [Header("Combo")]
         [Tooltip("Seconds without a landed hit before the combo ends and pays out.")]
         [Min(0.1f)] public float comboTimeout = 2.5f;
-        [Tooltip("Combos shorter than this pay nothing.")]
+        [Tooltip("Combos shorter than this pay nothing, unless they include a perfect dodge.")]
         [Min(1)] public int minHitsToAward = 2;
 
         [Header("Bonus Points")]

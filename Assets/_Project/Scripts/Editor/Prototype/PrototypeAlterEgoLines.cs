@@ -1,6 +1,6 @@
 using FeverDream.AlterEgo;
 
-namespace FeverDream.Editor.Prototype
+namespace FeverDream.EditorTools.Prototype
 {
     /// <summary>
     /// First pass of the pigeon's lines, written into SO_AlterEgo_Pigeon when it is created.

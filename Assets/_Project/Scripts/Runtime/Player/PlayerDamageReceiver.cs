@@ -9,9 +9,7 @@ namespace FeverDream.Player
     [RequireComponent(typeof(PlayerContext))]
     public sealed class PlayerDamageReceiver : MonoBehaviour, IDamageable
     {
-        [SerializeField, Min(0f)] private float hurtInvulnerability = 0.6f;
-        [SerializeField, Min(0f)] private float knockbackUpRatio = 0.3f;
-        [SerializeField, Min(0f)] private float hurtShake = 1.6f;
+        [SerializeField] private PlayerCombatSettings settings;
 
         private PlayerContext context;
         private IEvadeProvider evade;
@@ -36,12 +34,12 @@ namespace FeverDream.Player
                 return DamageResult.Ignored;
             }
 
-            invulnerableUntil = Time.time + hurtInvulnerability;
+            invulnerableUntil = Time.time + settings.hurtInvulnerability;
             bool killed = context.Health.ApplyDamage(info.Amount);
 
             Vector3 push = new Vector3(info.Direction.x, 0f, info.Direction.z).normalized * info.Knockback;
-            context.Movement.AddImpulse(push + Vector3.up * (info.Knockback * knockbackUpRatio));
-            context.Camera.AddShake(hurtShake, 0.25f);
+            context.Movement.AddImpulse(push + Vector3.up * (info.Knockback * settings.knockbackUpRatio));
+            context.Camera.AddShake(settings.hurtCameraShake, 0.25f);
             Damaged?.Invoke(info);
             return killed ? DamageResult.Killed : DamageResult.Hit;
         }

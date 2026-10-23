@@ -158,9 +158,9 @@ namespace FeverDream.Combat
                 return airMove;
             }
 
-            if (attack == AttackInput.Heavy)
+            if (attack == AttackInput.Heavy || form.groundChain.Length == 0)
             {
-                bool finisher = lightHitsInChain >= form.finisherAfterLightHits;
+                bool finisher = attack == AttackInput.Heavy && lightHitsInChain >= form.finisherAfterLightHits;
                 groundIndex = 0;
                 lightHitsInChain = 0;
                 return finisher ? form.finisher : form.launcher;
@@ -180,21 +180,15 @@ namespace FeverDream.Combat
             phaseTimer = move.startup;
             struck.Clear();
 
+            // In the air only landed hits keep the player floating (see PerformHit), so swinging at nothing never glides.
             bool slam = (move.flags & AttackFlags.Slam) != 0;
             if (slam && currentIsAerial)
             {
                 context.Movement.SetVerticalVelocity(-form.slamDiveSpeed);
             }
-            else
+            else if (!currentIsAerial)
             {
-                if (move.lunge > 0f)
-                {
-                    context.Movement.AddImpulse(Flat(aimOrigin.forward).normalized * move.lunge);
-                }
-                if (currentIsAerial)
-                {
-                    context.Movement.ApplyAirHover();
-                }
+                context.Movement.Lunge(aimOrigin.forward, move.lunge, form.lungeDuration);
             }
             MoveStarted?.Invoke(move);
         }
@@ -224,10 +218,11 @@ namespace FeverDream.Combat
                     continue;
                 }
 
-                Vector3 direction = slam ? Flat(point - transform.position) : Flat(forward);
+                // Always from the player towards the target, so block arcs and knockback follow real positions, not the view.
+                Vector3 direction = Flat(point - transform.position);
                 if (direction.sqrMagnitude < 0.0001f)
                 {
-                    direction = Flat(transform.forward);
+                    direction = Flat(forward);
                 }
 
                 var info = new DamageInfo
@@ -251,7 +246,7 @@ namespace FeverDream.Combat
 
             if (landed)
             {
-                TimeEffects.HitStop(current.hitStop);
+                TimeEffects.HitStop(current.hitStop, form.hitStopTimeScale);
                 context.Camera.AddShake(current.cameraShake, 0.12f);
                 if (currentIsAerial && !slam)
                 {

@@ -7,22 +7,13 @@ namespace FeverDream.Combat
 {
     /// <summary>
     /// Short dash with invulnerability. Evading a hit within the first moments of the dash is a
-    /// "son an kaçınma" (perfect dodge): slow motion and an Aura bonus.
+    /// "son an kaçınma" (perfect dodge): slow motion and an Aura bonus. Tuning lives in <see cref="PlayerCombatSettings"/>.
     /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(PlayerContext))]
     public sealed class PlayerDodge : MonoBehaviour, IEvadeProvider
     {
-        [SerializeField, Min(0f)] private float dashSpeed = 17f;
-        [SerializeField, Min(0f)] private float dashDuration = 0.16f;
-        [SerializeField, Min(0f)] private float cooldown = 0.45f;
-        [SerializeField, Min(0f)] private float invulnerability = 0.3f;
-
-        [Header("Perfect Dodge")]
-        [SerializeField, Min(0f)] private float perfectWindow = 0.15f;
-        [SerializeField, Range(0.05f, 1f)] private float perfectSlowMotionScale = 0.3f;
-        [Tooltip("Real-time seconds.")]
-        [SerializeField, Min(0f)] private float perfectSlowMotionDuration = 0.7f;
+        [SerializeField] private PlayerCombatSettings settings;
 
         private PlayerContext context;
         private float lastDodgeTime = float.NegativeInfinity;
@@ -49,28 +40,28 @@ namespace FeverDream.Combat
 
             var state = context.Movement.State;
             bool canDodge = state != MovementState.Mantling && state != MovementState.Grappling;
-            if (context.Input.DodgePressed && canDodge && Time.time >= lastDodgeTime + cooldown)
+            if (context.Input.DodgePressed && canDodge && Time.time >= lastDodgeTime + settings.dodgeCooldown)
             {
                 Begin();
             }
             if (IsDashing)
             {
-                context.Movement.SetHorizontalVelocity(dashDirection * dashSpeed);
+                context.Movement.SetHorizontalVelocity(dashDirection * settings.dashSpeed);
             }
         }
 
         public bool TryEvade()
         {
             float sinceDodge = Time.time - lastDodgeTime;
-            if (sinceDodge > invulnerability)
+            if (sinceDodge > settings.dodgeInvulnerability)
             {
                 return false;
             }
 
-            if (sinceDodge <= perfectWindow && !perfectUsed)
+            if (sinceDodge <= settings.perfectWindow && !perfectUsed)
             {
                 perfectUsed = true;
-                TimeEffects.SlowMotion(perfectSlowMotionScale, perfectSlowMotionDuration);
+                TimeEffects.SlowMotion(settings.perfectSlowMotionScale, settings.perfectSlowMotionDuration);
                 context.Combo.RegisterPerfectDodge();
                 PerfectDodged?.Invoke();
             }
@@ -89,7 +80,7 @@ namespace FeverDream.Combat
 
             dashDirection = direction.normalized;
             lastDodgeTime = Time.time;
-            dashEndTime = Time.time + dashDuration;
+            dashEndTime = Time.time + settings.dashDuration;
             perfectUsed = false;
             if (!context.Movement.IsGrounded)
             {

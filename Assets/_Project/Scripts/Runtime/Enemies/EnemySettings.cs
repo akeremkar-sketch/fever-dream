@@ -39,8 +39,19 @@ namespace FeverDream.Enemies
         [Min(0f)] public float airHoldDuration = 0.6f;
         [Range(0f, 1f)] public float airHoldGravityScale = 0.1f;
 
-        [Header("Ranged")]
+        [Tooltip("Stagger multiplier when a hit interrupts the attack telegraph (the alarm clock's weak point).")]
+        [Min(1f)] public float windupInterruptStaggerMultiplier = 1f;
+
+        [Header("Guard (toilet lid shield)")]
+        [Min(0f)] public float guardBreakDuration = 2.5f;
+        [Tooltip("Dot product threshold for a hit to count as coming from the front.")]
+        [Range(-1f, 1f)] public float guardFrontArc = 0.3f;
+
+        [Header("Ranged (clown)")]
         [Min(0f)] public float preferredDistance = 11f;
         [Min(0f)] public float projectileSpeed = 15f;
+        [Min(0.1f)] public float strafeSwitchInterval = 1.6f;
+        [Tooltip("How much of the player's horizontal velocity is led when aiming.")]
+        [Range(0f, 1f)] public float aimLeadFactor = 0.5f;
     }
 }

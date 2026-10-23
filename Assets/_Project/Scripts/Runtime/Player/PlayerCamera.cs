@@ -5,32 +5,16 @@ namespace FeverDream.Player
     /// <summary>
     /// First-person look and camera feel: yaw turns the player, pitch tilts the camera root, plus FOV kicks,
     /// wall-run tilt, crouch height and shake. Runs before movement so movement always uses this frame's yaw.
+    /// Tuning lives in <see cref="PlayerCameraSettings"/>.
     /// </summary>
     [DefaultExecutionOrder(-50)]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(PlayerInputReader), typeof(PlayerMovement))]
     public sealed class PlayerCamera : MonoBehaviour
     {
+        [SerializeField] private PlayerCameraSettings settings;
         [SerializeField] private Transform cameraRoot;
         [SerializeField] private Camera viewCamera;
-
-        [Header("Look")]
-        [SerializeField, Min(0f)] private float mouseSensitivity = 0.1f;
-        [SerializeField, Min(0f)] private float gamepadSensitivity = 200f;
-        [SerializeField, Range(10f, 89f)] private float pitchLimit = 85f;
-
-        [Header("Field of View")]
-        [SerializeField, Range(50f, 110f)] private float baseFieldOfView = 80f;
-        [SerializeField] private float sprintFovBoost = 6f;
-        [SerializeField] private float slideFovBoost = 10f;
-        [SerializeField] private float wallRunFovBoost = 8f;
-        [SerializeField] private float grappleFovBoost = 14f;
-        [SerializeField, Min(0f)] private float fovSharpness = 8f;
-
-        [Header("Motion")]
-        [SerializeField] private float wallRunTilt = 10f;
-        [SerializeField, Min(0f)] private float tiltSharpness = 10f;
-        [SerializeField, Min(0f)] private float eyeHeightSharpness = 14f;
 
         private PlayerInputReader input;
         private PlayerMovement movement;
@@ -93,27 +77,29 @@ namespace FeverDream.Player
         private void ApplyLook()
         {
             Vector2 delta = input.Look;
-            delta *= input.LookFromMouse ? mouseSensitivity : gamepadSensitivity * Time.unscaledDeltaTime;
+            delta *= input.LookFromMouse ? settings.mouseSensitivity : settings.gamepadSensitivity * Time.unscaledDeltaTime;
             transform.Rotate(0f, delta.x, 0f, Space.Self);
-            pitch = Mathf.Clamp(pitch - delta.y, -pitchLimit, pitchLimit);
+            pitch = Mathf.Clamp(pitch - delta.y, -settings.pitchLimit, settings.pitchLimit);
         }
 
         private void UpdateFeel(float dt)
         {
-            float targetFov = baseFieldOfView;
+            float targetFov = settings.baseFieldOfView;
             switch (movement.State)
             {
-                case MovementState.Sliding: targetFov += slideFovBoost; break;
-                case MovementState.WallRunning: targetFov += wallRunFovBoost; break;
-                case MovementState.Grappling: targetFov += grappleFovBoost; break;
-                case MovementState.Grounded when movement.IsSprinting: targetFov += sprintFovBoost; break;
+                case MovementState.Sliding: targetFov += settings.slideFovBoost; break;
+                case MovementState.WallRunning: targetFov += settings.wallRunFovBoost; break;
+                case MovementState.Grappling: targetFov += settings.grappleFovBoost; break;
+                case MovementState.Grounded when movement.IsSprinting: targetFov += settings.sprintFovBoost; break;
             }
-            viewCamera.fieldOfView = Mathf.Lerp(viewCamera.fieldOfView, targetFov, Sharpness(fovSharpness, dt));
+            viewCamera.fieldOfView = Mathf.Lerp(viewCamera.fieldOfView, targetFov, Sharpness(settings.fovSharpness, dt));
 
-            roll = Mathf.Lerp(roll, movement.WallSide * wallRunTilt, Sharpness(tiltSharpness, dt));
+            roll = Mathf.Lerp(roll, movement.WallSide * settings.wallRunTilt, Sharpness(settings.tiltSharpness, dt));
 
+            // Ease towards the eye height, but never above the capsule: the capsule shrinks instantly when sliding.
             Vector3 rootPosition = cameraRoot.localPosition;
-            rootPosition.y = Mathf.Lerp(rootPosition.y, movement.EyeHeight, Sharpness(eyeHeightSharpness, dt));
+            rootPosition.y = Mathf.Lerp(rootPosition.y, movement.EyeHeight, Sharpness(settings.eyeHeightSharpness, dt));
+            rootPosition.y = Mathf.Min(rootPosition.y, movement.CapsuleHeight - settings.ceilingMargin);
             cameraRoot.localPosition = rootPosition;
 
             Vector2 shake = Vector2.zero;

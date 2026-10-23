@@ -5,22 +5,24 @@ namespace FeverDream.Core
     /// <summary>Hit stop and slow motion. All requests are merged so overlapping effects never fight over Time.timeScale.</summary>
     public static class TimeEffects
     {
-        private const float HitStopScale = 0.05f;
-
         private static TimeEffectsRunner runner;
         private static float hitStopUntil;
+        private static float hitStopScale = 1f;
         private static float slowMotionUntil;
         private static float slowMotionScale = 1f;
 
         public static bool IsSlowMotion => Time.unscaledTime < slowMotionUntil;
 
-        public static void HitStop(float duration)
+        /// <param name="duration">Real-time seconds.</param>
+        /// <param name="scale">Time scale while the hit stop lasts (close to zero freezes the action).</param>
+        public static void HitStop(float duration, float scale)
         {
             if (duration <= 0f)
             {
                 return;
             }
             EnsureRunner();
+            hitStopScale = Mathf.Clamp(scale, 0.01f, 1f);
             hitStopUntil = Mathf.Max(hitStopUntil, Time.unscaledTime + duration);
         }
 
@@ -41,7 +43,7 @@ namespace FeverDream.Core
             float scale = now < slowMotionUntil ? slowMotionScale : 1f;
             if (now < hitStopUntil)
             {
-                scale = Mathf.Min(scale, HitStopScale);
+                scale = Mathf.Min(scale, hitStopScale);
             }
             return scale;
         }
@@ -62,6 +64,7 @@ namespace FeverDream.Core
         {
             runner = null;
             hitStopUntil = 0f;
+            hitStopScale = 1f;
             slowMotionUntil = 0f;
             slowMotionScale = 1f;
             Time.timeScale = 1f;

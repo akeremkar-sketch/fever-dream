@@ -73,7 +73,8 @@ namespace FeverDream.Enemies
                 return DamageResult.Ignored;
             }
             Splat();
-            return DamageResult.Hit;
+            // Cutting a pie protects the player but is not a combo hit (no Aura farming on projectiles).
+            return DamageResult.Deflected;
         }
 
         private void Splat()

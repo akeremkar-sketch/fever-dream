@@ -646,20 +646,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8650695c8b23aed4eb7a59578e75acd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.Player.PlayerCamera
+  settings: {fileID: 11400000, guid: e652abb969482974ea116d52f44ff9b4, type: 2}
   cameraRoot: {fileID: 9126431324282857828}
   viewCamera: {fileID: 8383841795040378581}
-  mouseSensitivity: 0.1
-  gamepadSensitivity: 200
-  pitchLimit: 85
-  baseFieldOfView: 80
-  sprintFovBoost: 6
-  slideFovBoost: 10
-  wallRunFovBoost: 8
-  grappleFovBoost: 14
-  fovSharpness: 8
-  wallRunTilt: 10
-  tiltSharpness: 10
-  eyeHeightSharpness: 14
 --- !u!114 &4316673066070860428
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -685,9 +674,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44aaaa88ab9a73b4abfb49eaf93b7ae2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.Player.PlayerDamageReceiver
-  hurtInvulnerability: 0.6
-  knockbackUpRatio: 0.3
-  hurtShake: 1.6
+  settings: {fileID: 11400000, guid: ff6440e30bcb74e45b7201f78a783850, type: 2}
 --- !u!114 &1037184517691895952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -700,7 +687,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97c11ee94b1ea2c4ba97ca9b8e266751, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.Player.PlayerRespawner
-  deathRespawnDelay: 1.2
+  settings: {fileID: 11400000, guid: ff6440e30bcb74e45b7201f78a783850, type: 2}
 --- !u!114 &3009600385117433378
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -759,13 +746,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bf5e4dd7e229a844ae9133a6bf7fc0f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.Combat.PlayerDodge
-  dashSpeed: 17
-  dashDuration: 0.16
-  cooldown: 0.45
-  invulnerability: 0.3
-  perfectWindow: 0.15
-  perfectSlowMotionScale: 0.3
-  perfectSlowMotionDuration: 0.7
+  settings: {fileID: 11400000, guid: ff6440e30bcb74e45b7201f78a783850, type: 2}
 --- !u!1 &5697537694670691418
 GameObject:
   m_ObjectHideFlags: 0

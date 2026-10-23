@@ -45,35 +45,50 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 ### Parkur (`PlayerMovement`, ayarlar `SO_PlayerMovement_Default`)
 - CharacterController tabanlı durum makinesi: Yerde, Havada, Kayma, Duvar koşusu, Tırmanma, Kanca.
 - Coyote time ve zıplama tamponu; havada momentum korunur (kayma, sıçrama ve kancadan gelen hız düşmez).
-- Kayma: sprint hızında eğil tuşu ile; alçak engellerin altından geçirir. Yavaşken basılı tutmak eğilerek yürümektir.
+  Duvara çarpınca duvara doğru olan hız sıfırlanır (köşelere yapışma ve yerinde duvar koşusu olmaz).
+- Kayma: sprint hızında eğil tuşu ile; alçak engellerin altından geçirir. İnişten hemen önce basılan veya inişe
+  basılı tutularak gelinen kayma da çalışır. Yavaşken basılı tutmak eğilerek yürümektir.
 - Duvar koşusu: havada, ileri basarken, yeterli hızla yan duvara değince. Süre sınırlı, hafif yerçekimi.
-  Girişte küçük bir yukarı hız verilir; kenardan zıplamadan çıkılsa bile boşluk geçilir, zıplayınca daha yüksekten gidilir.
-- Duvardan sıçrama: duvar koşusunda veya havada bir duvara değerken zıpla.
+  Girişte küçük bir yukarı hız verilir; kenardan zıplamadan çıkılsa bile boşluk geçilir. Kenardan biraz geç
+  (coyote süresi içinde) zıplanırsa oyuncu duvardan atılmaz, duvar koşusu yükselir.
+- Duvardan sıçrama: duvar koşusunda veya havada bir duvara değerken zıpla. Koşulan veya sıçranan duvar, yere
+  basılana kadar tekrar kullanılamaz (tek duvarda sonsuz tırmanış yok; bacada iki duvar arasında sıçranır).
 - Tırmanma: ileri basarken önündeki kenar 0.9-2.4 m yükseklikteyse yerden veya havadan otomatik tırmanır.
-- Kanca: görüş alanındaki en uygun kanca noktası işaretlenir, E ile çekilir. Zıpla veya tekrar E ile bırakılır.
+- Kanca: görüş alanındaki en uygun kanca noktası işaretlenir, E ile çekilir. Çekilirken başka bir noktaya bakıp
+  tekrar E'ye basmak doğrudan o noktaya zincirler; başka nokta yokken E veya zıpla bırakır.
+- Ölüm ve boşluk: seviyenin altındaki ölüm alanı (y≈-15) son kontrol noktasına döndürür. Ölünce 1.2 sn kontrol yoktur.
 
 ### Dövüş (`TsunagiWeapon`, veri `SO_Tsunagi_Katana`)
 - Yer: hafif zincir (3 vuruş). Ağır = **Fırlatma** (düşmanı havaya kaldırır). 3 hafiften sonra ağır = **Bitirici**.
-- Hava: hafif zincir (3 vuruş, oyuncuyu ve düşmanı havada tutar). Ağır = **Çakılma** (alan hasarı).
-- Girdi tamponu, kısa ileri atılma (lunge), vuruş duraklaması (hit stop), kamera sarsıntısı.
+- Hava: hafif zincir (3 vuruş). Yalnızca **isabet eden** hava vuruşları oyuncuyu ve düşmanı havada tutar; boşa
+  sallamak süzülme sağlamaz. Ağır = **Çakılma** (alan hasarı).
+- Girdi tamponu, yerde kısa ileri atılma (lunge, metre cinsinden; havada yok), vuruş duraklaması (hit stop), kamera sarsıntısı.
+- Vuruş yönü her zaman oyuncudan hedefe doğrudur (kalkanın önden bloğu ve geri itme gerçek konuma göre çalışır).
 - **Kaçınma:** kısa dash, dokunulmazlık penceresi. Saldırı son anda (ilk 0.15 sn) savuşturulursa **son an kaçınma**:
-  kısa ağır çekim ve Aura bonusu.
+  kısa ağır çekim ve Aura bonusu. Kaçınma ve hasar ayarları `SO_PlayerCombat_Default`, kamera ayarları `SO_PlayerCamera_Default`.
 
 ### Aura (`ComboTracker`, `AuraWallet`, ayarlar `SO_Aura_Default`)
 - Her başarılı vuruş komboyu uzatır; 2.5 sn vuruş olmazsa kombo biter ve puan çarpanla birlikte verilir.
-- Hasar almak veya boşluğa düşmek komboyu bozar, biriken puan kaybolur.
+- En az 2 vuruş gerekir; içinde son an kaçınma olan kombo vuruşsuz da ödenir.
+- Bonuslar: havada vuruş, fırlatma, bitirici, çakılma, öldürme ve son an kaçınma.
+- Hasar almak veya boşluğa düşmek komboyu bozar, biriken puan kaybolur. Hedefe varınca açık kombo hemen ödenir.
 - Çarpan, kullanılan farklı hamle sayısıyla artar ("nasıl öldürdüğün önemli").
+- Turta kesmek oyuncuyu korur ama kombo vuruşu sayılmaz.
 
 ### Düşmanlar (`EnemyBase` ve alt sınıflar, veriler `Data/Enemies/`)
 | Düşman | Davranış | Zayıf nokta |
 | --- | --- | --- |
 | Alarm Saatli Ofis Çalışanı | Yakın dövüş, saldırmadan önce "çalar" (kırmızı uyarı) | Çalarken vurulursa uzun süre sersemler |
-| Klozet Kapaklı Kalkan | Önden gelen hafif vuruşları kapakla engeller | Ağır saldırı, fırlatma veya bitirici kalkanı kırar; arkadan ve havadan vuruşlar geçer |
+| Klozet Kapaklı Kalkan | Önden gelen hafif vuruşları kapakla engeller | Önden ağır saldırı (fırlatma, bitirici, çakılma) kalkanı kırar; arkadan ve havadan hafif vuruşlar geçer |
 | Turta Atan Palyaço | Mesafeyi korur, yan adımlar, turta fırlatır | Az canlı; turtalar kılıçla kesilebilir |
 
 - **Saldırı sırası:** Aynı anda en fazla 2 düşman saldırı hazırlığında olabilir; diğerleri yaklaşıp bekler.
   Böylece oyuncu kalabalıkta da kombo kurabilir.
-- Düşmanlar kenardan düşmez (önlerinde zemin yoksa durur), arenadan çıkamaz.
+- **Arena:** Her düşman grubu (`Arena_A`, `Arena_B`) bir `EnemyArena` kutusudur. Düşmanlar yalnızca oyuncu kendi
+  arenasının içindeyken savaşır, kutunun dışına çıkmaz; oyuncu arenadan çıkınca durup bekler.
+- Düşmanlar kenardan düşmez (önlerinde zemin yoksa durur). Boşluğa düşen düşman yenilmiş sayılır.
+- Düşmana özgü ayarlar (alarm saatinin sersemleme çarpanı, kalkanın kırılma süresi ve ön açısı, palyaçonun yan adım
+  ve nişan öngörüsü) `EnemySettings` içindedir.
 
 ### Alter ego (`AlterEgoCommentator`, replikler `SO_AlterEgo_Pigeon`)
 - Olaylara altyazıyla tepki: bölüm başı, küçük/büyük/dev kombo, kombo bozulması, boşluğa düşme, ölüm, son an kaçınma,
@@ -122,8 +137,20 @@ Editörde Play modunda, girdi simülasyonu ve doğrudan çağrılarla doğrulana
 - Son an kaçınma: hasar iptal, ağır çekim, +40 bonus, alter ego tepkisi.
 - Düşman yapay zekası saldırıyor, saldırı sırası en fazla 2 saldırgana izin veriyor.
 
+PR #1 incelemesinden sonra (v0.1.1) ayrıca doğrulananlar:
+
+- Kenarda coyote içinde geç zıplama duvar koşusunu yükseltiyor, oyuncuyu duvardan atmıyor; normal duvar zıplaması
+  çalışıyor ve aynı duvarı yere basılana kadar kilitliyor.
+- İnişe Ctrl basılı tutularak gelindiğinde kayma başlıyor.
+- Boşa sallanan hava saldırısı süzdürmüyor ve ileri atmıyor; yerde atılma uygulanıyor ve uzun karelerde mesafeyi aşmıyor.
+- Kalkan: önden hafif vuruş bloklanıyor, arkadan geçiyor, Çakılma kalkanı kırıyor, kırıktan sonra önden vuruş işliyor.
+- Arena: oyuncu dışarı çıkınca düşmanlar duruyor ve arenada kalıyor, saldırı sıraları boşalıyor.
+- Ölüyken kontrol kapalı ve hedef tetiklenmiyor; yeniden doğunca kontrol geri geliyor.
+- Hedefte açık kombo ödeniyor, bölüm sonu mesajı son toplamla kalıyor ve sonradan bozulmuyor.
+- Yalnızca son an kaçınma içeren kombo ödeniyor (40 Aura); turta kesmek kombo vuruşu sayılmıyor.
+
 Henüz elle oynanarak denenmeyenler: fare ile nişan ve vuruş hissi, duvardan sıçrama bacası, iki kanca noktasının
-zincirlenmesi, palyaço turtaları, kalkanlı düşmanın blok/kırılma davranışı, bölüm sonu, genel denge ve zorluk.
+zincirlenmesi, palyaço turtalarının gerçek isabeti, genel denge ve zorluk.
 
 ## Oynanış testi kontrol listesi
 

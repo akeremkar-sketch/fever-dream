@@ -96,7 +96,7 @@ namespace FeverDream.Combat
             {
                 float t = Smooth(elapsed / windup);
                 position = Vector3.Lerp(idlePosition, from.Position, t);
-                euler = Vector3.Lerp(idleEuler, from.Euler, t);
+                euler = Vector3.Lerp(Nearest(from.Euler, idleEuler), from.Euler, t);
                 SetTrail(false);
             }
             else if (elapsed < windup + sweep)
@@ -110,7 +110,8 @@ namespace FeverDream.Combat
             {
                 float t = Smooth((elapsed - windup - sweep) / settle);
                 position = Vector3.Lerp(to.Position, restPosition, t);
-                euler = Vector3.Lerp(to.Euler, idleEuler, t);
+                // Settle by the shortest way round, so a 360° spin does not unwind backwards.
+                euler = Vector3.Lerp(to.Euler, Nearest(to.Euler, idleEuler), t);
                 SetTrail(t < 0.3f);
             }
             else
@@ -179,5 +180,14 @@ namespace FeverDream.Combat
         }
 
         private static float Smooth(float t) => t * t * (3f - 2f * t);
+
+        /// <summary>The Euler angles equal to <paramref name="target"/> that lie closest to <paramref name="reference"/> on every axis.</summary>
+        private static Vector3 Nearest(Vector3 reference, Vector3 target)
+        {
+            return reference + new Vector3(
+                Mathf.DeltaAngle(reference.x, target.x),
+                Mathf.DeltaAngle(reference.y, target.y),
+                Mathf.DeltaAngle(reference.z, target.z));
+        }
     }
 }

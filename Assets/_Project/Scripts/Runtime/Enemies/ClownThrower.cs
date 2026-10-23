@@ -12,9 +12,6 @@ namespace FeverDream.Enemies
     {
         [SerializeField] private PieProjectile projectilePrefab;
         [SerializeField] private Transform throwPoint;
-        [SerializeField, Min(0.1f)] private float strafeSwitchInterval = 1.6f;
-        [Tooltip("How much of the player's velocity is led when aiming.")]
-        [SerializeField, Range(0f, 1f)] private float leadFactor = 0.5f;
 
         private float strafeSign = 1f;
         private float nextStrafeSwitch;
@@ -30,7 +27,7 @@ namespace FeverDream.Enemies
             if (Time.time >= nextStrafeSwitch)
             {
                 strafeSign = Random.value < 0.5f ? -1f : 1f;
-                nextStrafeSwitch = Time.time + strafeSwitchInterval;
+                nextStrafeSwitch = Time.time + Settings.strafeSwitchInterval;
             }
 
             float preferred = Settings.preferredDistance;
@@ -65,7 +62,10 @@ namespace FeverDream.Enemies
             Vector3 origin = throwPoint != null ? throwPoint.position : transform.position + Vector3.up * 1.6f;
             Vector3 aim = target.transform.position + Vector3.up * 1.2f;
             float travelTime = Vector3.Distance(origin, aim) / Settings.projectileSpeed;
-            aim += target.Movement.Velocity * (travelTime * leadFactor);
+            // Lead only the horizontal motion: vertical speed (ground stick, jumps) would send pies into the floor or overhead.
+            Vector3 lead = target.Movement.Velocity;
+            lead.y = 0f;
+            aim += lead * (travelTime * Settings.aimLeadFactor);
 
             Vector3 velocity = (aim - origin).normalized * Settings.projectileSpeed;
             velocity.y += 0.5f * -projectilePrefab.Gravity * travelTime;

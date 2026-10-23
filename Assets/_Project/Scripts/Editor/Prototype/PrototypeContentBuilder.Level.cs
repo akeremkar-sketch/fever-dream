@@ -1,9 +1,11 @@
+using FeverDream.Enemies;
+using FeverDream.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace FeverDream.Editor.Prototype
+namespace FeverDream.EditorTools.Prototype
 {
     /// <summary>
     /// L_Proto_Dream: one small level that teaches every mechanic in order (Docs/PROTOTYPE_PLAN.md).
@@ -30,7 +32,7 @@ namespace FeverDream.Editor.Prototype
             BuildGoalRoom(Group("Section_06_Goal", environment), palette);
 
             Place(prefabs.Player, gameplay, "Player", new Vector3(0f, 0f, -3f));
-            Place(prefabs.AlterEgo, gameplay, "AlterEgo_Pigeon", Vector3.zero);
+            var alterEgo = Place(prefabs.AlterEgo, gameplay, "AlterEgo_Pigeon", Vector3.zero);
 
             var checkpoints = Group("Checkpoints", gameplay);
             Place(prefabs.Checkpoint, checkpoints, "Checkpoint_01_AfterWallRun", new Vector3(0f, 0f, 52f));
@@ -49,28 +51,42 @@ namespace FeverDream.Editor.Prototype
 
             Place(prefabs.Goal, gameplay, "Goal_DreamToilet", new Vector3(0f, 5.2f, 192f));
 
-            var arenaA = Group("Arena_A", enemies);
+            // Each arena group is also the EnemyArena box: its enemies only fight inside it and never leave it.
+            var arenaA = Arena("Arena_A", enemies, new Vector3(0f, 2.5f, 82f), new Vector3(24f, 7f, 32f));
             Place(prefabs.AlarmClockWorker, arenaA, "Enemy_AlarmClockWorker_01", new Vector3(-4f, 0f, 84f), 180f);
             Place(prefabs.AlarmClockWorker, arenaA, "Enemy_AlarmClockWorker_02", new Vector3(4f, 0f, 86f), 180f);
             Place(prefabs.AlarmClockWorker, arenaA, "Enemy_AlarmClockWorker_03", new Vector3(0f, 0f, 90f), 180f);
             Place(prefabs.ToiletLidShield, arenaA, "Enemy_ToiletLidShield_01", new Vector3(0f, 0f, 94f), 180f);
 
-            var arenaB = Group("Arena_B", enemies);
+            var arenaB = Arena("Arena_B", enemies, new Vector3(0f, 9f, 161f), new Vector3(26f, 10f, 40f));
             Place(prefabs.AlarmClockWorker, arenaB, "Enemy_AlarmClockWorker_04", new Vector3(-5f, 5.2f, 158f), 180f);
             Place(prefabs.AlarmClockWorker, arenaB, "Enemy_AlarmClockWorker_05", new Vector3(5f, 5.2f, 160f), 180f);
             Place(prefabs.ToiletLidShield, arenaB, "Enemy_ToiletLidShield_02", new Vector3(0f, 5.2f, 166f), 180f);
             Place(prefabs.ClownThrower, arenaB, "Enemy_ClownThrower_01", new Vector3(-9f, 8.2f, 172f), 180f);
             Place(prefabs.ClownThrower, arenaB, "Enemy_ClownThrower_02", new Vector3(9f, 8.2f, 172f), 180f);
 
-            Place(prefabs.Hud, ui, "HUD", Vector3.zero);
+            var hud = Place(prefabs.Hud, ui, "HUD", Vector3.zero);
+            SetReference(hud.GetComponent<HudView>(), "commentator", alterEgo.GetComponent<FeverDream.AlterEgo.AlterEgoCommentator>());
 
             EditorSceneManager.SaveScene(scene, LevelScenePath);
-            EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(LevelScenePath, true) };
+        }
+
+        private static Transform Arena(string name, Transform parent, Vector3 center, Vector3 size)
+        {
+            // The group transform stays at the origin (hierarchy rule); the box itself is offset to the arena.
+            var arena = Group(name, parent);
+            arena.gameObject.layer = IgnoreRaycastLayer;
+            var box = arena.gameObject.AddComponent<BoxCollider>();
+            box.isTrigger = true;
+            box.center = center;
+            box.size = size;
+            arena.gameObject.AddComponent<EnemyArena>();
+            return arena;
         }
 
         private static void BuildSetup(Transform setup, VolumeProfile volumeProfile)
         {
-            var sun = new GameObject("Directional Light").AddComponent<Light>();
+            var sun = new GameObject("Light_Sun").AddComponent<Light>();
             sun.transform.SetParent(setup, false);
             sun.transform.rotation = Quaternion.Euler(48f, -30f, 0f);
             sun.type = LightType.Directional;
@@ -78,7 +94,7 @@ namespace FeverDream.Editor.Prototype
             sun.intensity = 1.3f;
             sun.shadows = LightShadows.Soft;
 
-            var volume = new GameObject("Global Volume").AddComponent<Volume>();
+            var volume = new GameObject("Volume_Global").AddComponent<Volume>();
             volume.transform.SetParent(setup, false);
             volume.isGlobal = true;
             volume.sharedProfile = volumeProfile;
@@ -206,6 +222,9 @@ namespace FeverDream.Editor.Prototype
         private static GameObject Cylinder(Transform parent, string name, Vector3 center, Vector3 scale, Material material, Vector3 euler)
         {
             var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            // The primitive's CapsuleCollider has domed ends and turns flat discs into spheres; collide with the real shape.
+            Object.DestroyImmediate(cylinder.GetComponent<Collider>());
+            cylinder.AddComponent<MeshCollider>().sharedMesh = cylinder.GetComponent<MeshFilter>().sharedMesh;
             ConfigureLevelPiece(cylinder, parent, name, center, scale, euler, material, true);
             return cylinder;
         }

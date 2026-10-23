@@ -79,16 +79,24 @@ Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları 
 ```
 
 - Sahne nesneleri önek almaz, açıklayıcı PascalCase ad ve gerekirse numara alır: `Wall_Corridor_Left`,
-  `Prop_GiantFridge_01`, `Enemy_AlarmClockWorker_02`.
-- `GameObject (1)`, `Cube (3)` gibi varsayılan adlar bırakılmaz.
+  `Prop_GiantFridge_01`, `Enemy_AlarmClockWorker_02`, `Light_Sun`, `Volume_Global`.
+- `GameObject (1)`, `Cube (3)`, `Directional Light` gibi boşluklu varsayılan adlar bırakılmaz.
+- `--- ENEMIES ---` altındaki her arena grubu bir `EnemyArena` bileşeni ve tetikleyici kutu taşır. Grubun transform'u
+  orijinde kalır, kutunun `center` ve `size` değerleri arenayı kaplar. Düşmanlar bu kutudan çıkmaz ve yalnızca oyuncu
+  içerideyken savaşır.
 - Tekrar kullanılan her şey prefab'dır. Büyük bölümler ileride ekip paralel çalışabilsin diye additive alt sahnelere bölünür.
 
 ## Kod
 
 - Namespace klasörle eşleşir: `FeverDream.Core`, `FeverDream.Player`, `FeverDream.Combat`, `FeverDream.Aura`,
-  `FeverDream.Enemies`, `FeverDream.AlterEgo`, `FeverDream.UI`, editör araçları `FeverDream.Editor.*`.
+  `FeverDream.Enemies`, `FeverDream.AlterEgo`, `FeverDream.UI`, editör araçları `FeverDream.EditorTools.*`
+  (`FeverDream.Editor` kullanılmaz: Unity'nin `UnityEditor.Editor` türünü gölgeler).
 - Dosya başına bir üst seviye tür; dosya adı = tür adı.
-- Ayarlanabilir değerler ScriptableObject'lerde (`Data/` altında) tutulur ki tasarımcılar koda dokunmadan ayar yapabilsin.
+- Ayarlanabilir oynanış değerleri ScriptableObject'lerde (`Data/` altında) tutulur ki tasarımcılar koda dokunmadan ayar
+  yapabilsin ve "Rebuild" bunları sıfırlamasın: `SO_PlayerMovement_Default`, `SO_PlayerCamera_Default`,
+  `SO_PlayerCombat_Default`, `SO_Aura_Default`, `SO_Tsunagi_Katana`, `SO_Enemy_*`, `SO_AlterEgo_Pigeon`.
+  Bileşenlerde yalnızca referanslar ve görsel ayarlar (renkler, pozlar) kalır.
+- Veri olarak kaydedilen enum'lara (ör. `AlterEgoEvent`) sabit sayı verilir; yeni değer yeni sayı alır, mevcutlar değişmez.
 - Sahneler arası bağımlılık için `FindObjectOfType` yerine bilinen erişim noktaları kullanılır (`PlayerContext.Current`).
 
 ## Katmanlar (Layers)
@@ -98,11 +106,20 @@ Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları 
 | 6 | Player | Oyuncu kapsülü |
 | 7 | Enemy | Düşman gövdeleri (Tsunagi'nin vurduğu katman) |
 | 8 | Environment | Yürünebilir ve parkur yapılabilir geometri (duvar koşusu, tutunma, görüş hattı) |
-| 9 | GrapplePoint | Zincirli Kama kanca noktaları (tetikleyici) |
+| 9 | GrapplePoint | Zincirli Kama kanca noktaları (hiçbir katmanla çarpışmaz, yalnızca hedefleme sorgusu) |
 | 10 | Projectile | Düşman mermileri (yalnızca Player ve Environment ile çarpışır) |
+
+Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındadır. Katman adları ve çarpışma kuralları
+prototip aracı tarafından da ayarlanır; değiştirirseniz bu tabloyu ve aracı birlikte güncelleyin.
 
 ## Prototip araçları
 
-`Scripts/Editor/Prototype/PrototypeContentBuilder.cs`, prototipin yer tutucu materyal, veri, prefab ve test sahnesini
-üretir (menü: **Fever Dream > Prototype**). "Build Missing" yalnızca eksikleri oluşturur, ayarlarınızı ezmez.
-"Rebuild" prefab'ları ve `L_Proto_Dream` sahnesini baştan yazar; elle yapılan sahne düzenlemeleri kaybolur.
+`Scripts/Editor/Prototype/PrototypeContentBuilder.cs`, prototipin katmanlarını, yer tutucu materyal, veri, prefab ve
+test sahnesini üretir (menü: **Fever Dream > Prototype**). Play modunda çalışmaz.
+
+- **Build Missing:** yalnızca eksikleri oluşturur, mevcut veri ve prefab'ları ezmez. Var olan prefab'larda boş kalmış
+  veya silinmiş bir veriyi gösteren referansları yeniden bağlar.
+- **Rebuild:** prefab'ları ve `L_Proto_Dream` sahnesini baştan yazar; elle yapılan prefab ve sahne düzenlemeleri kaybolur.
+  SO verileri ve materyaller korunur.
+- Sahne üretilecekse önce açık sahneleri kaydetmek isteyip istemediğiniz sorulur; açık sahneler kapanır.
+- `L_Proto_Dream`, build ayarlarındaki sahne listesine yoksa eklenir; listedeki diğer sahnelere dokunulmaz.

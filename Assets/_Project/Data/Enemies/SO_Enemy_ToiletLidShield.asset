@@ -33,5 +33,10 @@ MonoBehaviour:
   juggleUpSpeed: 2.5
   airHoldDuration: 0.6
   airHoldGravityScale: 0.1
+  windupInterruptStaggerMultiplier: 1
+  guardBreakDuration: 2.5
+  guardFrontArc: 0.3
   preferredDistance: 11
   projectileSpeed: 15
+  strafeSwitchInterval: 1.6
+  aimLeadFactor: 0.5

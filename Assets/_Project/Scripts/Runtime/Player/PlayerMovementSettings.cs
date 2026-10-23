@@ -47,10 +47,12 @@ namespace FeverDream.Player
         [Tooltip("Upward speed is clamped into this range when a wall run starts, so running off an edge still carries over a gap.")]
         [Min(0f)] public float wallRunMinEntryUpSpeed = 2f;
         [Min(0f)] public float wallRunEntryUpSpeed = 2.5f;
+        [Tooltip("Upward speed when jump is pressed within coyote time right after a wall run starts (a slightly late edge jump).")]
+        [Min(0f)] public float wallRunCoyoteUpSpeed = 5f;
         [Min(0f)] public float wallRunMaxDuration = 1.8f;
         [Min(0f)] public float wallStickSpeed = 2f;
-        [Min(0f)] public float wallRunCooldown = 0.35f;
 
+        // A wall that was run along or kicked off cannot be used again until the player touches the ground.
         [Header("Wall Jump")]
         [Min(0f)] public float wallJumpUpSpeed = 10f;
         [Min(0f)] public float wallJumpSideSpeed = 6.5f;

@@ -5,18 +5,15 @@ using UnityEngine;
 
 namespace FeverDream.Player
 {
-    public enum RespawnReason
-    {
-        Died,
-        FellIntoVoid,
-    }
-
-    /// <summary>Remembers the last checkpoint and brings the player back after death or a fall into the void.</summary>
+    /// <summary>
+    /// Remembers the last checkpoint and brings the player back after death or a fall into the void.
+    /// While dead the player has no control and cannot trigger checkpoints.
+    /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(PlayerContext))]
     public sealed class PlayerRespawner : MonoBehaviour, ICheckpointReceiver, IVoidListener
     {
-        [SerializeField, Min(0f)] private float deathRespawnDelay = 1.2f;
+        [SerializeField] private PlayerCombatSettings settings;
 
         private PlayerContext context;
         private Vector3 spawnPosition;
@@ -29,6 +26,7 @@ namespace FeverDream.Player
         public event Action<Checkpoint> CheckpointReached;
 
         public Checkpoint CurrentCheckpoint { get; private set; }
+        public bool IsRespawning => respawning;
 
         private void Awake()
         {
@@ -49,7 +47,7 @@ namespace FeverDream.Player
 
         public void SetCheckpoint(Checkpoint checkpoint)
         {
-            if (checkpoint == null || checkpoint == CurrentCheckpoint)
+            if (respawning || checkpoint == null || checkpoint == CurrentCheckpoint)
             {
                 return;
             }
@@ -80,8 +78,9 @@ namespace FeverDream.Player
         private IEnumerator RespawnAfterDeath()
         {
             respawning = true;
+            context.Input.enabled = false;
             Downed?.Invoke(RespawnReason.Died);
-            yield return new WaitForSecondsRealtime(deathRespawnDelay);
+            yield return new WaitForSecondsRealtime(settings.deathRespawnDelay);
             context.Health.Restore();
             Respawn(RespawnReason.Died);
         }
@@ -90,6 +89,7 @@ namespace FeverDream.Player
         {
             context.Movement.TeleportTo(spawnPosition, spawnRotation);
             context.Camera.ResetView();
+            context.Input.enabled = true;
             respawning = false;
             Respawned?.Invoke(reason);
         }

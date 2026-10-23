@@ -23,6 +23,7 @@ namespace FeverDream.Aura
         private PlayerContext context;
         private AuraWallet wallet;
         private float lastActivityTime;
+        private int perfectDodges;
 
         /// <summary>Hits or pending points changed.</summary>
         public event Action Changed;
@@ -49,12 +50,14 @@ namespace FeverDream.Aura
         {
             context.DamageReceiver.Damaged += HandleDamaged;
             context.Respawner.Downed += HandleDowned;
+            LevelGoal.Reached += HandleLevelGoal;
         }
 
         private void OnDisable()
         {
             context.DamageReceiver.Damaged -= HandleDamaged;
             context.Respawner.Downed -= HandleDowned;
+            LevelGoal.Reached -= HandleLevelGoal;
         }
 
         private void Update()
@@ -83,6 +86,7 @@ namespace FeverDream.Aura
 
         public void RegisterPerfectDodge()
         {
+            perfectDodges++;
             uniqueMoves.Add(PerfectDodgeId);
             PendingPoints += settings.perfectDodgeBonus;
             lastActivityTime = Time.time;
@@ -103,7 +107,9 @@ namespace FeverDream.Aura
 
         private void End()
         {
-            int award = Hits >= settings.minHitsToAward ? PendingAward : 0;
+            // A perfect dodge is style on its own: it pays out even without the minimum number of hits.
+            bool qualifies = Hits >= settings.minHitsToAward || perfectDodges > 0;
+            int award = qualifies ? PendingAward : 0;
             var summary = new ComboSummary(Hits, uniqueMoves.Count, Multiplier, award);
             Clear();
             wallet.Add(award);
@@ -115,7 +121,17 @@ namespace FeverDream.Aura
         {
             Hits = 0;
             PendingPoints = 0f;
+            perfectDodges = 0;
             uniqueMoves.Clear();
+        }
+
+        /// <summary>Reaching the goal pays out the running combo right away, so the level total is final.</summary>
+        private void HandleLevelGoal(LevelGoal goal)
+        {
+            if (IsActive)
+            {
+                End();
+            }
         }
 
         private static float Bonus(AttackFlags flags, AttackFlags flag, float bonus) => (flags & flag) != 0 ? bonus : 0f;

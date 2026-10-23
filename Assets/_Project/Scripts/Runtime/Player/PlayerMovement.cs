@@ -3,16 +3,6 @@ using UnityEngine;
 
 namespace FeverDream.Player
 {
-    public enum MovementState
-    {
-        Grounded,
-        Airborne,
-        Sliding,
-        WallRunning,
-        Mantling,
-        Grappling,
-    }
-
     /// <summary>
     /// First-person parkour movement on a CharacterController: walk, sprint, crouch, slide, jump, wall run,
     /// wall jump, ledge climb (mantle) and the Zincirli Kama grapple. All tuning lives in <see cref="PlayerMovementSettings"/>.
@@ -37,13 +27,15 @@ namespace FeverDream.Player
         private float stateTime;
         private float coyoteTimer;
         private float jumpBufferTimer;
+        private float slideBufferTimer;
+        private bool justLanded;
         private bool isCrouched;
         private CollisionFlags lastCollision;
 
         private Vector3 wallNormal;
         private Collider currentWall;
+        /// <summary>The wall last run along or kicked off. It cannot be used again until the player touches the ground.</summary>
         private Collider lastWall;
-        private float lastWallCooldown;
         private int wallSide;
 
         private Vector3 mantleStart;
@@ -51,6 +43,10 @@ namespace FeverDream.Player
         private Vector3 mantleEnd;
 
         private GrapplePoint grappleTarget;
+
+        private Vector3 lungeDirection;
+        private float lungeSpeed;
+        private float lungeTimer;
 
         public event Action<MovementState, MovementState> StateChanged;
         public event Action Jumped;
@@ -66,6 +62,8 @@ namespace FeverDream.Player
         /// <summary>+1 when running along a wall on the right, -1 on the left, 0 otherwise.</summary>
         public int WallSide => state == MovementState.WallRunning ? wallSide : 0;
         public float EyeHeight => isCrouched || state == MovementState.Sliding ? settings.crouchEyeHeight : settings.standEyeHeight;
+        /// <summary>Current capsule height. The camera never rises above it, so crouching never clips the view into a ceiling.</summary>
+        public float CapsuleHeight => controller != null ? controller.height : settings.standHeight;
         public GrapplePoint GrappleCandidate { get; private set; }
         public GrapplePoint ActiveGrapple => state == MovementState.Grappling ? grappleTarget : null;
 
@@ -90,8 +88,8 @@ namespace FeverDream.Player
 
             stateTime += dt;
             coyoteTimer -= dt;
-            lastWallCooldown -= dt;
             jumpBufferTimer = input.JumpPressed ? settings.jumpBufferTime : jumpBufferTimer - dt;
+            slideBufferTimer = input.SlidePressed ? settings.jumpBufferTime : slideBufferTimer - dt;
             UpdateGrappleCandidate();
 
             switch (state)
@@ -107,6 +105,23 @@ namespace FeverDream.Player
             if (state != MovementState.Mantling)
             {
                 Move(dt);
+            }
+            // Aged after use, so a lunge started this frame is applied at least once even on a long frame.
+            lungeTimer -= dt;
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            // Drop the part of the velocity that pushes into a wall, so speed checks (wall run, slide) see real motion.
+            if (Mathf.Abs(hit.normal.y) > WallNormalMaxY)
+            {
+                return;
+            }
+            Vector3 normal = Flat(hit.normal).normalized;
+            float intoWall = Vector3.Dot(velocity, normal);
+            if (intoWall < 0f)
+            {
+                velocity -= normal * intoWall;
             }
         }
 
@@ -148,6 +163,18 @@ namespace FeverDream.Player
             }
         }
 
+        /// <summary>Short forward step on the ground: holds at least the lunge speed for its duration, on top of normal movement.</summary>
+        public void Lunge(Vector3 direction, float distance, float duration)
+        {
+            if (state == MovementState.Mantling || state == MovementState.Grappling || distance <= 0f || duration <= 0f)
+            {
+                return;
+            }
+            lungeDirection = Flat(direction).normalized;
+            lungeSpeed = distance / duration;
+            lungeTimer = duration;
+        }
+
         /// <summary>Keeps the player floating a little on aerial hits so air combos can continue.</summary>
         public void ApplyAirHover()
         {
@@ -164,6 +191,8 @@ namespace FeverDream.Player
             controller.enabled = true;
             velocity = Vector3.zero;
             grappleTarget = null;
+            lastWall = null;
+            lungeTimer = 0f;
             ApplyCrouch(false);
             SetState(MovementState.Airborne);
         }
@@ -175,12 +204,18 @@ namespace FeverDream.Player
         private void TickGrounded(float dt)
         {
             coyoteTimer = settings.coyoteTime;
+            lastWall = null;
+            bool landedThisFrame = justLanded;
+            justLanded = false;
 
             if (TryStartGrapple() || TryStartMantle())
             {
                 return;
             }
-            if (input.SlidePressed && HorizontalSpeed >= settings.slideMinSpeed)
+
+            // A slide pressed just before landing, or held through the landing, still becomes a slide.
+            bool slideRequested = slideBufferTimer > 0f || (landedThisFrame && input.SlideHeld);
+            if (slideRequested && !isCrouched && HorizontalSpeed >= settings.slideMinSpeed)
             {
                 StartSlide();
                 return;
@@ -240,6 +275,7 @@ namespace FeverDream.Player
             horizontal += horizontal.normalized * settings.slideBoost;
             velocity.x = horizontal.x;
             velocity.z = horizontal.z;
+            slideBufferTimer = 0f;
             isCrouched = false;
             ApplyHeight(settings.crouchHeight);
             SetState(MovementState.Sliding);
@@ -247,6 +283,7 @@ namespace FeverDream.Player
 
         private void TickSliding(float dt)
         {
+            justLanded = false;
             if (TryStartGrapple())
             {
                 return;
@@ -287,7 +324,7 @@ namespace FeverDream.Player
 
             for (int side = 1; side >= -1; side -= 2)
             {
-                if (!Probe(transform.right * side, out var hit) || IsOnCooldown(hit.collider))
+                if (!Probe(transform.right * side, out var hit) || hit.collider == lastWall)
                 {
                     continue;
                 }
@@ -315,8 +352,19 @@ namespace FeverDream.Player
             }
             if (jumpBufferTimer > 0f)
             {
-                WallJump(wallNormal, currentWall);
-                return;
+                if (coyoteTimer > 0f)
+                {
+                    // A late jump right after leaving an edge lifts the wall run instead of kicking off the wall.
+                    velocity.y = Mathf.Max(velocity.y, settings.wallRunCoyoteUpSpeed);
+                    jumpBufferTimer = 0f;
+                    coyoteTimer = 0f;
+                    Jumped?.Invoke();
+                }
+                else
+                {
+                    WallJump(wallNormal, currentWall);
+                    return;
+                }
             }
 
             bool onWall = Probe(-wallNormal, out var hit);
@@ -346,7 +394,6 @@ namespace FeverDream.Player
         private void ExitWallRun()
         {
             lastWall = currentWall;
-            lastWallCooldown = settings.wallRunCooldown;
             velocity += wallNormal;
             SetState(MovementState.Airborne);
         }
@@ -358,7 +405,7 @@ namespace FeverDream.Player
             for (int i = 0; i < 4; i++)
             {
                 Vector3 direction = i switch { 0 => forward, 1 => -forward, 2 => right, _ => -right };
-                if (Probe(direction, out var hit) && !IsOnCooldown(hit.collider))
+                if (Probe(direction, out var hit) && hit.collider != lastWall)
                 {
                     WallJump(hit.normal, hit.collider);
                     return true;
@@ -372,7 +419,6 @@ namespace FeverDream.Player
             Vector3 along = Vector3.ProjectOnPlane(Flat(velocity), normal) * settings.wallJumpMomentumKeep;
             velocity = along + normal * settings.wallJumpSideSpeed + Vector3.up * settings.wallJumpUpSpeed;
             lastWall = wall;
-            lastWallCooldown = settings.wallRunCooldown;
             jumpBufferTimer = 0f;
             coyoteTimer = 0f;
             SetState(MovementState.Airborne);
@@ -488,6 +534,7 @@ namespace FeverDream.Player
 
             grappleTarget = GrappleCandidate;
             jumpBufferTimer = 0f;
+            lastWall = null;
             if (velocity.y < 0f)
             {
                 velocity.y *= 0.3f;
@@ -551,8 +598,7 @@ namespace FeverDream.Player
                 case MovementState.Airborne:
                     if (grounded && velocity.y <= 0f)
                     {
-                        SetState(MovementState.Grounded);
-                        Landed?.Invoke();
+                        Land();
                     }
                     break;
                 case MovementState.Grounded:
@@ -571,16 +617,33 @@ namespace FeverDream.Player
                     if (grounded)
                     {
                         ExitWallRun();
-                        SetState(MovementState.Grounded);
-                        Landed?.Invoke();
+                        Land();
                     }
                     break;
             }
         }
 
+        private void Land()
+        {
+            justLanded = true;
+            lastWall = null;
+            SetState(MovementState.Grounded);
+            Landed?.Invoke();
+        }
+
         private void ApplyGroundMovement(float dt, float speed)
         {
             Vector3 horizontal = Vector3.MoveTowards(Flat(velocity), WishDirection() * speed, settings.groundAcceleration * dt);
+            if (lungeTimer > 0f)
+            {
+                // Only the lunge time left in this frame counts, so a long frame never overshoots the lunge distance.
+                float targetAlong = lungeSpeed * Mathf.Min(1f, lungeTimer / dt);
+                float alongLunge = Vector3.Dot(horizontal, lungeDirection);
+                if (alongLunge < targetAlong)
+                {
+                    horizontal += lungeDirection * (targetAlong - alongLunge);
+                }
+            }
             velocity.x = horizontal.x;
             velocity.z = horizontal.z;
         }
@@ -629,8 +692,6 @@ namespace FeverDream.Player
             return Physics.Raycast(origin, direction, out hit, controller.radius + settings.wallCheckDistance, settings.environmentMask, QueryTriggerInteraction.Ignore)
                 && Mathf.Abs(hit.normal.y) < WallNormalMaxY;
         }
-
-        private bool IsOnCooldown(Collider wall) => wall == lastWall && lastWallCooldown > 0f;
 
         private bool HasGroundWithin(float distance)
         {

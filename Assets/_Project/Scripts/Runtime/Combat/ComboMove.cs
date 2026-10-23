@@ -29,8 +29,8 @@ namespace FeverDream.Combat
         [Header("Reach")]
         [Min(0f)] public float range = 2.6f;
         [Min(0f)] public float radius = 0.9f;
-        [Tooltip("Short forward step when the move starts.")]
-        [Min(0f)] public float lunge = 3f;
+        [Tooltip("Forward step in metres when the move starts on the ground (approximate). Air moves never lunge.")]
+        [Min(0f)] public float lunge = 0.4f;
 
         [Header("Feel")]
         [Min(0f)] public float hitStop = 0.05f;

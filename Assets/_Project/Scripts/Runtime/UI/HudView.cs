@@ -11,6 +11,9 @@ namespace FeverDream.UI
     [DisallowMultipleComponent]
     public sealed class HudView : MonoBehaviour
     {
+        [Tooltip("The scene's alter ego. Wired on the HUD instance in the level.")]
+        [SerializeField] private AlterEgoCommentator commentator;
+
         [Header("Health")]
         [SerializeField] private RectTransform healthFill;
 
@@ -42,10 +45,10 @@ namespace FeverDream.UI
         [SerializeField] private GameObject helpPanel;
 
         private PlayerContext player;
-        private AlterEgoCommentator commentator;
         private float alterEgoHideTime;
         private float auraChangeHideTime;
         private float centerMessageHideTime;
+        private bool levelComplete;
 
         private void OnEnable()
         {
@@ -54,6 +57,16 @@ namespace FeverDream.UI
             if (PlayerContext.Current != null)
             {
                 Bind(PlayerContext.Current);
+            }
+
+            if (commentator != null)
+            {
+                commentator.LineSpoken += ShowAlterEgoLine;
+                alterEgoNameText.text = $"{commentator.Lines.speakerName.ToUpperInvariant()}  ·  alter ego";
+            }
+            else
+            {
+                Debug.LogWarning($"{name}: no alter ego assigned, subtitles are off.", this);
             }
         }
 
@@ -70,12 +83,6 @@ namespace FeverDream.UI
 
         private void Start()
         {
-            commentator = FindAnyObjectByType<AlterEgoCommentator>();
-            if (commentator != null)
-            {
-                commentator.LineSpoken += ShowAlterEgoLine;
-                alterEgoNameText.text = $"{commentator.Lines.speakerName.ToUpperInvariant()}  ·  alter ego";
-            }
             comboGroup.alpha = 0f;
             alterEgoGroup.alpha = 0f;
             auraChangeText.text = string.Empty;
@@ -185,6 +192,10 @@ namespace FeverDream.UI
         {
             auraTotalText.text = total.ToString();
             ShowAuraChange($"+{delta}", auraGainColor);
+            if (levelComplete)
+            {
+                ShowLevelComplete();
+            }
         }
 
         private void HandleComboBroken(ComboBreakReason reason, int lostPoints)
@@ -204,11 +215,22 @@ namespace FeverDream.UI
 
         private void HandleDowned(RespawnReason reason)
         {
+            if (levelComplete)
+            {
+                return;
+            }
             centerMessageText.text = reason == RespawnReason.FellIntoVoid ? "BOŞLUĞA DÜŞTÜN" : "UYANMAK YOK, DEVAM";
             centerMessageHideTime = Time.unscaledTime + 1.6f;
         }
 
         private void HandleLevelGoal(LevelGoal goal)
+        {
+            levelComplete = true;
+            ShowLevelComplete();
+        }
+
+        /// <summary>Stays on screen and follows the wallet, so the running combo paid out at the goal is included.</summary>
+        private void ShowLevelComplete()
         {
             int total = player != null ? player.Wallet.Total : 0;
             centerMessageText.text = $"TUVALET BULUNDU!\nToplam Aura: {total}";

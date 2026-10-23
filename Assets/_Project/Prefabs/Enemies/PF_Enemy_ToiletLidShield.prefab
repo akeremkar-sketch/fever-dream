@@ -208,8 +208,6 @@ MonoBehaviour:
     m_Bits: 256
   feedback: {fileID: 1286196739022966132}
   lid: {fileID: 6414290228483768414}
-  guardBreakDuration: 2.5
-  frontArc: 0.3
   lidGuardEuler: {x: 0, y: 0, z: 0}
   lidBrokenEuler: {x: -110, y: 0, z: 0}
 --- !u!114 &1286196739022966132

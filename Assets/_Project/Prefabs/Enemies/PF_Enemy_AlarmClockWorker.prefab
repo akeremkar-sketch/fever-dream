@@ -512,7 +512,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   feedback: {fileID: 478445800984930475}
-  ringingInterruptStagger: 3
 --- !u!114 &478445800984930475
 MonoBehaviour:
   m_ObjectHideFlags: 0

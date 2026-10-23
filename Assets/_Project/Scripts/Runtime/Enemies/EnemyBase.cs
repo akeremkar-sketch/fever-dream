@@ -43,6 +43,7 @@ namespace FeverDream.Enemies
         private bool grounded;
         private bool holdsAttackSlot;
         private Quaternion desiredRotation;
+        private EnemyArena arena;
 
         public static event Action<EnemyBase> AnyKilled;
 
@@ -55,13 +56,12 @@ namespace FeverDream.Enemies
         protected float NextAttackTime { get; set; }
         protected State CurrentState => state;
         protected LayerMask EnvironmentMask => environmentMask;
-        /// <summary>Stagger multiplier when an attack wind-up is interrupted by a hit.</summary>
-        protected virtual float WindupInterruptStaggerMultiplier => 1f;
 
         protected virtual void Awake()
         {
             Body = GetComponent<Rigidbody>();
             Health = GetComponent<Health>();
+            arena = GetComponentInParent<EnemyArena>();
             Health.SetMax(settings.maxHealth);
             Body.useGravity = false;
             Body.constraints = RigidbodyConstraints.FreezeRotation;
@@ -88,19 +88,20 @@ namespace FeverDream.Enemies
             {
                 case State.Idle:
                     MoveIntent = Vector3.zero;
-                    if (hasTarget && FlatDistanceTo(target.transform.position) <= settings.detectionRange)
+                    if (hasTarget && CanEngage(target))
                     {
                         SetState(State.Chase);
                     }
                     break;
                 case State.Chase:
-                    if (hasTarget)
+                    if (hasTarget && CanEngage(target))
                     {
                         TickChase(target);
                     }
                     else
                     {
                         MoveIntent = Vector3.zero;
+                        SetState(State.Idle);
                     }
                     break;
                 case State.Windup:
@@ -169,7 +170,7 @@ namespace FeverDream.Enemies
             if (grounded && state != State.Airborne)
             {
                 Vector3 intent = MoveIntent;
-                if (intent.sqrMagnitude > 0.01f && !HasGroundAhead(intent.normalized))
+                if (intent.sqrMagnitude > 0.01f && (!HasGroundAhead(intent.normalized) || !StaysInArena(intent.normalized)))
                 {
                     intent = Vector3.zero;
                 }
@@ -214,6 +215,7 @@ namespace FeverDream.Enemies
             return DamageResult.Hit;
         }
 
+        /// <summary>Falling into the void counts as a defeat: listeners get <see cref="AnyKilled"/> like any other kill.</summary>
         public void OnFellIntoVoid()
         {
             if (state == State.Dead)
@@ -221,6 +223,8 @@ namespace FeverDream.Enemies
                 return;
             }
             state = State.Dead;
+            ReleaseAttackSlot();
+            AnyKilled?.Invoke(this);
             Destroy(gameObject);
         }
 
@@ -232,7 +236,8 @@ namespace FeverDream.Enemies
             float distance = toTarget.magnitude;
             Face(targetPosition);
 
-            if (distance <= settings.attackRange && Time.time >= NextAttackTime && IsFacing(targetPosition, 40f) && TryBeginWindup())
+            bool inReach = distance <= settings.attackRange && Mathf.Abs(targetPosition.y - transform.position.y) <= AttackHeightTolerance;
+            if (inReach && Time.time >= NextAttackTime && IsFacing(targetPosition, 40f) && TryBeginWindup())
             {
                 return;
             }
@@ -336,15 +341,28 @@ namespace FeverDream.Enemies
             {
                 velocity.x = push.x;
                 velocity.z = push.z;
-                BeginStagger(settings.staggerDuration * (interruptedWindup ? WindupInterruptStaggerMultiplier : 1f));
+                BeginStagger(settings.staggerDuration * (interruptedWindup ? settings.windupInterruptStaggerMultiplier : 1f));
             }
             Body.linearVelocity = velocity;
         }
 
+        /// <summary>Never shortens a stun that is already running (the alarm clock's long weak-point stun survives follow-up hits).</summary>
         private void BeginStagger(float duration)
         {
-            staggerDuration = duration;
+            float remaining = state == State.Stagger ? staggerDuration - stateTime : 0f;
+            staggerDuration = Mathf.Max(duration, remaining);
             SetState(State.Stagger);
+        }
+
+        private bool CanEngage(PlayerContext target)
+        {
+            Vector3 targetPosition = target.transform.position;
+            return FlatDistanceTo(targetPosition) <= settings.detectionRange && (arena == null || arena.Contains(targetPosition));
+        }
+
+        private bool StaysInArena(Vector3 direction)
+        {
+            return arena == null || arena.Contains(transform.position + direction * 0.7f + Vector3.up * 0.1f);
         }
 
         private void Die()
@@ -389,6 +407,16 @@ namespace FeverDream.Enemies
                 holdsAttackSlot = false;
                 activeAttackers = Mathf.Max(0, activeAttackers - 1);
             }
+        }
+
+        protected virtual void OnDisable()
+        {
+            // A disabled enemy must not keep its attack slot (or attack from a stale wind-up when re-enabled).
+            if (state == State.Windup || state == State.Recover)
+            {
+                SetState(State.Idle);
+            }
+            ReleaseAttackSlot();
         }
 
         protected virtual void OnDestroy()

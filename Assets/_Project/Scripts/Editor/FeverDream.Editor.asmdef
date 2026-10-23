@@ -1,6 +1,6 @@
 {
     "name": "FeverDream.Editor",
-    "rootNamespace": "FeverDream.Editor",
+    "rootNamespace": "FeverDream.EditorTools",
     "references": [
         "FeverDream.Runtime",
         "Unity.InputSystem",

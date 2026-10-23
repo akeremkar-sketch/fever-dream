@@ -2,7 +2,7 @@ using FeverDream.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace FeverDream.Editor.Prototype
+namespace FeverDream.EditorTools.Prototype
 {
     public static partial class PrototypeContentBuilder
     {

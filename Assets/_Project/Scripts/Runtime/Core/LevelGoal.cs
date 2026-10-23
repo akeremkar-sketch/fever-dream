@@ -24,6 +24,12 @@ namespace FeverDream.Core
             {
                 return;
             }
+            // A player carried in by knockback while dead does not finish the level.
+            var health = other.GetComponentInParent<Health>();
+            if (health != null && health.IsDead)
+            {
+                return;
+            }
             IsReached = true;
             Reached?.Invoke(this);
         }

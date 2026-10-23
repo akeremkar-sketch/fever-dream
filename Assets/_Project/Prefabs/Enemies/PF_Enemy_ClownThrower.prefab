@@ -637,8 +637,6 @@ MonoBehaviour:
   feedback: {fileID: 3236796593837757751}
   projectilePrefab: {fileID: 3366915114782293810, guid: fc191f4da16deae4088d3f287d61b385, type: 3}
   throwPoint: {fileID: 6682369322010020418}
-  strafeSwitchInterval: 1.6
-  leadFactor: 0.5
 --- !u!114 &3236796593837757751
 MonoBehaviour:
   m_ObjectHideFlags: 0

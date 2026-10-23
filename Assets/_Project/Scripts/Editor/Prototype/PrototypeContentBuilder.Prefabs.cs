@@ -10,7 +10,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-namespace FeverDream.Editor.Prototype
+namespace FeverDream.EditorTools.Prototype
 {
     public static partial class PrototypeContentBuilder
     {
@@ -32,31 +32,61 @@ namespace FeverDream.Editor.Prototype
         private static PrefabSet CreatePrefabs(Palette palette, DataSet data, bool overwrite)
         {
             var set = new PrefabSet();
-            set.Pie = Prefab($"{PrefabsFolder}/Enemies/PF_Projectile_Pie.prefab", overwrite, () => BuildPie(palette));
-            set.Player = Prefab($"{PrefabsFolder}/Characters/PF_Player.prefab", overwrite, () => BuildPlayer(palette, data));
-            set.AlterEgo = Prefab($"{PrefabsFolder}/Characters/PF_AlterEgo_Pigeon.prefab", overwrite, () => BuildAlterEgo(data));
-            set.AlarmClockWorker = Prefab($"{PrefabsFolder}/Enemies/PF_Enemy_AlarmClockWorker.prefab", overwrite, () => BuildAlarmClockWorker(palette, data));
-            set.ToiletLidShield = Prefab($"{PrefabsFolder}/Enemies/PF_Enemy_ToiletLidShield.prefab", overwrite, () => BuildToiletLidShield(palette, data));
-            set.ClownThrower = Prefab($"{PrefabsFolder}/Enemies/PF_Enemy_ClownThrower.prefab", overwrite, () => BuildClownThrower(palette, data, set.Pie));
-            set.GrapplePoint = Prefab($"{PrefabsFolder}/Gameplay/PF_GrapplePoint.prefab", overwrite, () => BuildGrapplePoint(palette));
-            set.Checkpoint = Prefab($"{PrefabsFolder}/Gameplay/PF_Checkpoint.prefab", overwrite, () => BuildCheckpoint(palette));
-            set.KillVolume = Prefab($"{PrefabsFolder}/Gameplay/PF_KillVolume.prefab", overwrite, BuildKillVolume);
-            set.Goal = Prefab($"{PrefabsFolder}/Gameplay/PF_Goal_DreamToilet.prefab", overwrite, () => BuildGoal(palette));
-            set.Hud = Prefab($"{PrefabsFolder}/UI/PF_HUD.prefab", overwrite, BuildHud);
+            set.Pie = Prefab($"{PrefabsFolder}/Enemies/PF_Projectile_Pie.prefab", overwrite, () => BuildPie(palette), null);
+            set.Player = Prefab($"{PrefabsFolder}/Characters/PF_Player.prefab", overwrite, () => BuildPlayer(palette, data), root => LinkPlayerData(root, data, false));
+            set.AlterEgo = Prefab($"{PrefabsFolder}/Characters/PF_AlterEgo_Pigeon.prefab", overwrite, () => BuildAlterEgo(data),
+                root => SetReferenceIfMissing(root.GetComponent<AlterEgoCommentator>(), "lines", data.AlterEgo));
+            set.AlarmClockWorker = Prefab($"{PrefabsFolder}/Enemies/PF_Enemy_AlarmClockWorker.prefab", overwrite, () => BuildAlarmClockWorker(palette, data),
+                root => SetReferenceIfMissing(root.GetComponent<EnemyBase>(), "settings", data.AlarmClockWorker));
+            set.ToiletLidShield = Prefab($"{PrefabsFolder}/Enemies/PF_Enemy_ToiletLidShield.prefab", overwrite, () => BuildToiletLidShield(palette, data),
+                root => SetReferenceIfMissing(root.GetComponent<EnemyBase>(), "settings", data.ToiletLidShield));
+            set.ClownThrower = Prefab($"{PrefabsFolder}/Enemies/PF_Enemy_ClownThrower.prefab", overwrite, () => BuildClownThrower(palette, data, set.Pie),
+                root => SetReferenceIfMissing(root.GetComponent<EnemyBase>(), "settings", data.ClownThrower));
+            set.GrapplePoint = Prefab($"{PrefabsFolder}/Gameplay/PF_GrapplePoint.prefab", overwrite, () => BuildGrapplePoint(palette), null);
+            set.Checkpoint = Prefab($"{PrefabsFolder}/Gameplay/PF_Checkpoint.prefab", overwrite, () => BuildCheckpoint(palette), null);
+            set.KillVolume = Prefab($"{PrefabsFolder}/Gameplay/PF_KillVolume.prefab", overwrite, BuildKillVolume, null);
+            set.Goal = Prefab($"{PrefabsFolder}/Gameplay/PF_Goal_DreamToilet.prefab", overwrite, () => BuildGoal(palette), null);
+            set.Hud = Prefab($"{PrefabsFolder}/UI/PF_HUD.prefab", overwrite, BuildHud, null);
             return set;
         }
 
-        private static GameObject Prefab(string path, bool overwrite, System.Func<GameObject> build)
+        /// <summary>
+        /// Builds the prefab when it is missing or when overwriting. An existing prefab is kept as it is, except that
+        /// <paramref name="relink"/> re-assigns data references that are empty or point at a deleted asset.
+        /// </summary>
+        private static GameObject Prefab(string path, bool overwrite, System.Func<GameObject> build, System.Action<GameObject> relink)
         {
             var existing = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             if (existing != null && !overwrite)
             {
+                if (relink != null)
+                {
+                    var contents = PrefabUtility.LoadPrefabContents(path);
+                    relink(contents);
+                    PrefabUtility.SaveAsPrefabAsset(contents, path);
+                    PrefabUtility.UnloadPrefabContents(contents);
+                }
                 return existing;
             }
             var instance = build();
             var prefab = PrefabUtility.SaveAsPrefabAsset(instance, path);
             Object.DestroyImmediate(instance);
             return prefab;
+        }
+
+        /// <summary>Data references of the player. With <paramref name="force"/> they are always set, otherwise only when missing.</summary>
+        private static void LinkPlayerData(GameObject root, DataSet data, bool force)
+        {
+            System.Action<Object, string, Object> link = force ? SetReference : SetReferenceIfMissing;
+            link(root.GetComponent<PlayerInputReader>(), "actions", AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath));
+            link(root.GetComponent<PlayerMovement>(), "settings", data.Movement);
+            link(root.GetComponent<PlayerCamera>(), "settings", data.Camera);
+            link(root.GetComponent<PlayerDamageReceiver>(), "settings", data.Combat);
+            link(root.GetComponent<PlayerRespawner>(), "settings", data.Combat);
+            link(root.GetComponent<PlayerDodge>(), "settings", data.Combat);
+            link(root.GetComponent<AuraWallet>(), "settings", data.Aura);
+            link(root.GetComponent<ComboTracker>(), "settings", data.Aura);
+            link(root.GetComponent<TsunagiWeapon>(), "form", data.Katana);
         }
 
         private static GameObject BuildPlayer(Palette palette, DataSet data)
@@ -109,25 +139,21 @@ namespace FeverDream.Editor.Prototype
             var rope = ropeObject.AddComponent<GrappleRope>();
 
             root.AddComponent<PlayerContext>();
-            var input = root.AddComponent<PlayerInputReader>();
+            root.AddComponent<PlayerInputReader>();
             var movement = root.AddComponent<PlayerMovement>();
             var playerCamera = root.AddComponent<PlayerCamera>();
             root.AddComponent<Health>();
             root.AddComponent<PlayerDamageReceiver>();
             root.AddComponent<PlayerRespawner>();
-            var wallet = root.AddComponent<AuraWallet>();
-            var combo = root.AddComponent<ComboTracker>();
+            root.AddComponent<AuraWallet>();
+            root.AddComponent<ComboTracker>();
             var weapon = root.AddComponent<TsunagiWeapon>();
             root.AddComponent<PlayerDodge>();
 
-            SetReference(input, "actions", AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath));
-            SetReference(movement, "settings", data.Movement);
+            LinkPlayerData(root, data, true);
             SetReference(movement, "viewPoint", cameraRoot);
             SetReference(playerCamera, "cameraRoot", cameraRoot);
             SetReference(playerCamera, "viewCamera", viewCamera);
-            SetReference(wallet, "settings", data.Aura);
-            SetReference(combo, "settings", data.Aura);
-            SetReference(weapon, "form", data.Katana);
             SetReference(weapon, "aimOrigin", cameraObject.transform);
             SetMask(weapon, "hitMask", (1 << EnemyLayer) | (1 << ProjectileLayer));
             SetMask(weapon, "obstacleMask", 1 << EnvironmentLayer);
