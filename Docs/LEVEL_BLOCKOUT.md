@@ -49,17 +49,19 @@ kurallar ve oyuncunun gerçek ölçüleri var.
 ## Oyuncunun ölçüleri
 
 Değerler `Data/Player/SO_PlayerMovement_Default`'tan ve `PF_Player`'daki CharacterController'dan (yarıçap, basamak)
-gelir; bunlardan biri değişirse bu bölüm de güncellenir. Mesafeler kapsülün merkezine göredir ve kare hızına göre biraz
-değişir. **"Rahat" değerlerle tasarla**, "en fazla" değerleri yalnızca bilerek zor yapılan geçişlerde kullan.
+gelir; bunlardan biri değişirse bu bölüm de güncellenir. Mesafeler kapsülün merkezine göredir. Zıplama, duvar koşusu
+ve kanca yayları kare hızından bağımsızdır (30, 60 ve 144 FPS'te aynı); yalnızca karede bir yapılan kontroller (kenara
+tutunma, duvardan sıçrama) 30 FPS'te ~0.2 m'ye kadar erken kalabilir, aşağıdaki değerler bunu hesaba katar.
+**"Rahat" değerlerle tasarla**, "en fazla" değerleri yalnızca bilerek zor yapılan geçişlerde kullan.
 
 | | Değer |
 | --- | --- |
 | Boy / genişlik | 1.8 m / 0.7 m. Ayakta geçmek için ~1.9 m yükseklik ve ~0.8 m genişlik gerekir; çömelip kayarak 1.1 m |
 | Basamak | 0.35 m'ye kadar yürüyerek çıkılır, daha yükseği zıplanarak |
 | Hız | Yürüme 6.5 m/s, koşu (Shift) 10.5 m/s, çömelme 3.5 m/s |
-| Zıplama | ~1.4 m |
-| Aynı yükseklikteki boşluk | Yürüyerek rahat 3 m (en fazla ~4 m), koşarak rahat 5 m (en fazla ~6.5 m), kayıp zıplayarak rahat 6.5 m (en fazla ~8.3 m) |
-| 1 m yukarıdaki platforma | Koşarak en fazla ~5 m |
+| Zıplama | 1.4 m |
+| Aynı yükseklikteki boşluk | Yürüyerek rahat 3 m (en fazla ~4 m), koşarak rahat 5 m (en fazla ~6.4 m), kayıp zıplayarak rahat 6.5 m (en fazla ~8.2 m) |
+| 1 m yukarıdaki platforma | Koşarak en fazla ~4.9 m |
 
 Bunlar platformun **üstüne inme** mesafesidir. Karşı tarafın dik ve dolu bir ön yüzü varsa kısa kalan oyuncu havada
 kenara tutunup tırmanır: aynı yükseklikte koşarak ~9 m, kayıp zıplayarak ~11 m, 1 m yukarıya koşarak ~8 m geçilir. Bir
@@ -89,7 +91,7 @@ boşluğun yalnızca duvar koşusu veya kancayla geçilmesini istiyorsan onu bun
   0.8 m uzakta). Hareket yönüyle duvar arasındaki açı ~50°'den küçük olmalı; dümdüz duvara koşmak duvar koşusu değil,
   sıçrama veya tırmanmadır. Yerden en az 0.9 m yüksekte olmak gerekir, yani önce zıplanır.
 - 11 m/s ile en fazla 1.8 sn sürer: duvar boyunca ~20 m. Koşu yolu bundan uzunsa oyuncu yolun sonunda düşer.
-- Koşu sırasında oyuncu girişe göre ~1.3 m'ye (kenardan geç zıplayınca ~1.5 m'ye) kadar yükselir, sona doğru ~0.5 m
+- Koşu sırasında oyuncu girişe göre ~1.25 m'ye (kenardan geç zıplayınca ~1.4 m'ye) kadar yükselir, sona doğru ~0.5 m
   alçalabilir. Duvar, kalkış zemininin altından başlayıp en az 4 m yukarı çıkmalı. Örnek: `WallRun_Right_01`, 18 m
   uzunluk, 16 m'lik boşluğun üstünde, zeminin 6 m altından 6 m üstüne.
 - Az önce koşulan veya sıçranan duvar, ve ona aynı yöne bakan her duvar (yan yana bloklar), bir sonraki koşu ya da
