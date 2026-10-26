@@ -105,7 +105,7 @@ namespace FeverDream.Player
                 case MovementState.Grounded: TickGrounded(dt); break;
                 case MovementState.Airborne: TickAirborne(dt); break;
                 case MovementState.Sliding: TickSliding(dt); break;
-                case MovementState.WallRunning: TickWallRun(dt); break;
+                case MovementState.WallRunning: TickWallRun(); break;
                 case MovementState.Mantling: TickMantle(); break;
                 case MovementState.Grappling: TickGrapple(dt); break;
             }
@@ -281,7 +281,6 @@ namespace FeverDream.Player
             }
 
             ApplyAirMovement(dt);
-            ApplyGravity(settings.gravity, dt);
         }
 
         private void StartSlide()
@@ -362,7 +361,7 @@ namespace FeverDream.Player
             return false;
         }
 
-        private void TickWallRun(float dt)
+        private void TickWallRun()
         {
             if (TryStartGrapple())
             {
@@ -418,7 +417,6 @@ namespace FeverDream.Player
             Vector3 horizontal = along * alongSpeed - wallNormal * settings.wallStickSpeed;
             velocity.x = horizontal.x;
             velocity.z = horizontal.z;
-            ApplyGravity(settings.wallRunGravity, dt);
         }
 
         private void ExitWallRun()
@@ -625,7 +623,14 @@ namespace FeverDream.Player
 
         private void Move(float dt)
         {
-            lastCollision = controller.Move(velocity * dt);
+            // Gravity runs here, after the state tick, so it also acts on the frame of a jump, wall jump or grapple
+            // release, and the frame moves with the average of its start and end vertical speed. Together that traces
+            // the exact arc, so jump heights and distances are the same at every frame rate.
+            float startVerticalSpeed = velocity.y;
+            ApplyGravity(dt);
+            Vector3 step = velocity * dt;
+            step.y = (startVerticalSpeed + velocity.y) * 0.5f * dt;
+            lastCollision = controller.Move(step);
             if ((lastCollision & CollisionFlags.Above) != 0 && velocity.y > 0f)
             {
                 velocity.y = 0f;
@@ -715,9 +720,19 @@ namespace FeverDream.Player
             velocity.z = horizontal.z;
         }
 
-        private void ApplyGravity(float gravity, float dt)
+        /// <summary>Only the airborne and wall-run states fall. Grounded states stick to the floor; the grapple drives the whole velocity.</summary>
+        private void ApplyGravity(float dt)
         {
-            velocity.y = Mathf.Max(velocity.y + gravity * dt, -settings.terminalFallSpeed);
+            float gravity = state switch
+            {
+                MovementState.Airborne => settings.gravity,
+                MovementState.WallRunning => settings.wallRunGravity,
+                _ => 0f,
+            };
+            if (gravity != 0f)
+            {
+                velocity.y = Mathf.Max(velocity.y + gravity * dt, -settings.terminalFallSpeed);
+            }
         }
 
         private void DoJump()
