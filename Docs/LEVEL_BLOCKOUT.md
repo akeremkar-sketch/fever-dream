@@ -50,8 +50,9 @@ kurallar ve oyuncunun gerçek ölçüleri var.
 
 Değerler `Data/Player/SO_PlayerMovement_Default`'tan ve `PF_Player`'daki CharacterController'dan (yarıçap, basamak)
 gelir; bunlardan biri değişirse bu bölüm de güncellenir. Mesafeler kapsülün merkezine göredir. Zıplama, duvar koşusu
-ve kanca yayları kare hızından bağımsızdır (30, 60 ve 144 FPS'te aynı); yalnızca karede bir yapılan kontroller (kenara
-tutunma, duvardan sıçrama) 30 FPS'te ~0.2 m'ye kadar erken kalabilir, aşağıdaki değerler bunu hesaba katar.
+ve kanca yayları kare hızından bağımsızdır (30, 60 ve 144 FPS'te aynı). Yalnızca her karede bir kez yapılan kontroller
+(kenara tutunma, duvardan sıçrama) 30 FPS'te bir kare geç tetiklenip ~0.2 m'ye kadar kısa kalabilir; aşağıdaki
+değerler bunu hesaba katar.
 **"Rahat" değerlerle tasarla**, "en fazla" değerleri yalnızca bilerek zor yapılan geçişlerde kullan.
 
 | | Değer |
