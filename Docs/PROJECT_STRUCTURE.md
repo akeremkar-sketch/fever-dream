@@ -38,7 +38,7 @@ Assets/
     UI/                     UI sprite ve fontları (UI_)
   ThirdParty/
   Settings/                 URP (Unity'nin kendi ayarları)
-Docs/                       GDD, yapı ve plan belgeleri (Assets dışında)
+Docs/                       GDD, yapı, plan ve blockout belgeleri (Assets dışında)
 ```
 
 **Kurallar**
@@ -129,3 +129,5 @@ test sahnesini üretir (menü: **Fever Dream > Prototype**). Play modunda çalı
 - Sahne üretilecekse önce açık sahneleri kaydetmek isteyip istemediğiniz sorulur; açık sahneler kapanır.
 - Sahne üretildiğinde `L_Proto_Dream`, build ayarlarındaki sahne listesine yoksa eklenir; listedeki diğer sahnelere
   dokunulmaz. "Build Missing" sahneyi üretmediği sürece listeye dokunmaz.
+
+Bölüm blockout'u ProBuilder ile yapılır. Kurallar ve oyuncunun ölçüleri `Docs/LEVEL_BLOCKOUT.md`'dedir.
