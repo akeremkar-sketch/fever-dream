@@ -141,6 +141,12 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
   kök dönüşü korunur, üstüne eklenir.
 - Dekor prefab'ları `Prefabs/Environment/PF_Prop_...` adını taşır: kök `Environment` katmanındadır, model görsel olarak
   durur, oynanışa giren yüzeyler `Collider_...` adlı kutu çarpıştırıcılardadır (çıkıntılar duvar koşusunu bozmasın diye).
+  Çarpıştırıcı modelin görünen sınırını aşmaz; oyuncu görmediği bir şeye takılmamalıdır. Eğik bir kutunun ucu
+  eğimine dik olduğu için ileri taşar: eğik kutu modelin içinde başlatılır, başlangıcı dik bir kutuyla kapatılır
+  (`PF_Prop_StairRailing`'deki `Collider_RailPost` ve `Collider_RailStart` gibi). Modeldeki küçük bir boşluğu kapatan
+  görsel parça `Patch_...` adını alır (`PF_Prop_BedroomSet` > `Patch_HeadboardGap`).
+- `PF_Prop_BathroomDoor`'daki ışık parçası (`BathroomDoor_Light`) kitin opak `M_FD_BladeGlow` materyali yerine
+  `Art/Materials/VFX/M_FX_DoorGlow` (saydam, toplamalı) kullanır: kapı parlar ama içerisi görünür.
 - Sanatçıya not: Blender'dan FBX alırken "Apply Transform" kapalı olsun. Açıkken bazı alt parçaların dönüşü iki kez
   uygulanıyor (`SM_Prop_ApartmentDoor`'daki kapılar, `SM_Prop_BathroomDoor`'daki havlu askısı); bu parçalar şimdilik
   prefab'da düzeltildi.
@@ -149,6 +155,8 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
   modelin normalleri Unity'de yeniden hesaplanıyor (Model sekmesi: Normals = Calculate, Smoothing Angle = 45, Smoothing
   Source = From Angle): iki yüzey aynı ışığı aldığı için bant görünmüyor. Kalıcı çözüm modeldedir: parçalar tahtayla
   birleştirilmeli ya da birkaç milimetre öne alınmalı. Yeni bir modelde aynı bant görülürse önce modele bakılır.
+  Aynı başlıkta ortadaki iki bulut parçasının arasında 11×14 cm'lik bir boşluk da var (arkası görünüyordu); prefab'da
+  `Patch_HeadboardGap` ile kapatıldı, modelde de kapatılmalı.
 
 ## Dünya görseli
 
