@@ -143,6 +143,10 @@ Tek seviye, her mekaniği sırayla öğretir. v0.2'de rüyadaki dev bir apartman
 
 Her parkur bölümünden sonra kontrol noktası var; boşluğa düşen oyuncu son kontrol noktasına döner.
 
+Görsel: rüya gecesi. Odaların tavanı yoktur; üstte yıldızlı mor gökyüzü, pembe ufuk ve hilal ay görünür (ay ana ışığın
+yönündedir). Zemin dama desenli, duvarlar çizgili duvar kâğıdı, duvar koşusu yüzeyleri parlayan camgöbeği çizgilidir.
+Havada ışık zerrecikleri süzülür. Ayrıntılar `Docs/PROJECT_STRUCTURE.md` > "Dünya görseli" bölümündedir.
+
 ## Adımlar
 
 1. Belgeler: GDD kopyası, yapı belgesi, bu plan.
@@ -213,11 +217,17 @@ Play modunda doğrulananlar:
 - Menü açıldığında duran imleç seçimi değiştirmiyor, fare oynayınca altındaki düğme seçiliyor. Bölüm sonu menüsü kendi
   açıldığında 0.5 sn girdi almıyor.
 - Oyun duraklayınca HUD gizleniyor; can çubuğu %25'te 2.5 bölme gösterip yanıp sönüyor.
+- Rüya gecesi görseli gerçek oyun ekranından alınan görüntülerle kontrol edildi: yatak odası, duvar koşusu, iki arena,
+  merdiven holü, banyo, ana menü. Ay ana ışığın yönünde duruyor, gölgeler ona uyuyor.
+- Banyo aynası rüya gökyüzünü yansıtıyor (ortam yansıması `T_Env_L_Proto_Dream`).
+- Zerrecikler: ışınlanma ve yeniden doğmadan sonra bulut yeni yerde hemen doluyor; parçacık sayısı sınırın altında
+  kalıyor (yaklaşık 2700 / 3300).
+- Kontroller kartındaki ekran tonu kartın içinde kesiliyor; keskin kenar kalmadı.
 - Konsol temiz (hata ve uyarı yok).
 
 Henüz elle oynanarak denenmeyenler: yeni dekorun parkur hissi (kanepe, tezgâh ve makinelerin üstüne çıkış), merdiven
 holü ve banyo bölümlerinin akışı, menülerin gerçek klavye, fare ve gamepad ile gezilmesi (menü akışı kod üzerinden
-tetiklenerek denendi).
+tetiklenerek denendi), yeni ışıkta dövüşün okunabilirliği (düşmanların ve turtaların hareket halindeyken seçilmesi).
 
 ## Oynanış testi kontrol listesi
 

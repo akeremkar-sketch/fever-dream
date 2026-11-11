@@ -45,6 +45,13 @@ kurallar ve oyuncunun gerçek ölçüleri var.
 | `M_Proto_Ledge` (sarı) | Tırmanılacak kenarın üstüne ince şerit (`Decal_`, çarpıştırıcısız) |
 | `M_Proto_SlideUnder` (turuncu) | Altından kayılacak engel |
 
+- Blockout oynanır hale gelince zemin, duvar ve duvar koşusu yüzeyleri `Art/Materials/World/` altındaki
+  `M_World_Floor`, `M_World_Wall` ve `M_World_WallRun` ile değiştirilir (`L_Proto_Dream` böyledir; istersen baştan
+  bunlarla da çalışabilirsin). Desenleri dünya konumundan hesaplanır: UV açmak gerekmez, şekli ölçeklemek deseni
+  bozmaz. Parlayan camgöbeği çizgiler "bu duvarda koşulur" demektir. Sarı ve turuncu işaretler `M_Proto_` olarak kalır.
+- Ayı (`--- SETUP ---/Light_Moon`) döndürürsen veya gökyüzünü değiştirirsen **Fever Dream > Setup > Bake Sky
+  Reflection** komutunu çalıştırıp sahneyi kaydet; ayna ve metal yüzeyler gökyüzünü bu dokudan yansıtır.
+
 ## Oyuncunun ölçüleri
 
 Değerler `Data/Player/SO_PlayerMovement_Default`'tan ve `PF_Player`'daki CharacterController'dan (yarıçap, basamak)
@@ -190,6 +197,7 @@ Perde ve çamaşır ipinin pivotu tepededir; asıldıkları yükseklikten aşağ
 
 - Play'e bas ve bölümü baştan sona oyna. Kontrol listesini F1 (gamepad: Select) açar; Esc duraklatma menüsüdür.
   Konsolda hata olmamalı.
-- Sahneyi ve `.meta` dosyasını birlikte commit et, dalını push edip `main`'e PR aç.
+- Sahneyi ve `.meta` dosyasını birlikte commit et; Bake Sky Reflection çalıştırdıysan `Art/Textures/T_Env_<Sahne>.exr`
+  ve `.meta` dosyasını da ekle. Dalını push edip `main`'e PR aç.
 - Bölüm oynanabilir hale gelince build profile'ın sahne listesine eklenmesi için haber ver. Menüler sahneleri adıyla
   yükler; listede olmayan bir sahneye geçilemez.

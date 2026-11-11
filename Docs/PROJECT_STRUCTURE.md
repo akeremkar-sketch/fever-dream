@@ -16,12 +16,15 @@ Assets/
       Materials/            M_
         Palette/            modellerin ortak renk paleti (M_FD_...)
         Prototype/          blockout ve oynanış renk dili (M_Proto_...), modeli henüz olmayanların yer tutucuları
+        World/              dünya yüzeyleri ve gökyüzü (M_World_..., M_Sky_...)
+        VFX/                efekt materyalleri (M_FX_...)
       Models/               SM_ (statik), SK_ (iskeletli)
         Characters/  Props/  Weapons/
-      Textures/             T_
+      Textures/             T_ (T_FX_... efekt dokusu, T_Env_<Sahne> o sahnenin gökyüzü yansıması)
       Animations/           A_ (klip), AC_ (animator controller)
-      VFX/                  FX_
+      VFX/                  FX_ (parçacık prefab'ları)
       PostProcessing/       VP_ (volume profile)
+      Shaders/              SH_
     Audio/
       Music/                MUS_
       SFX/                  SFX_
@@ -37,7 +40,7 @@ Assets/
       Sandbox/              SB_ (deneme sahneleri, build'e girmez)
     Scripts/
       Runtime/              FeverDream.Runtime assembly
-        Core/  Player/  Combat/  Aura/  Enemies/  AlterEgo/  UI/
+        Core/  Player/  Combat/  Aura/  Enemies/  AlterEgo/  UI/  VFX/
       Editor/               FeverDream.Editor assembly
         Import/  Setup/
     UI/                     UI sprite ve fontları (UI_)
@@ -85,11 +88,11 @@ Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları 
 --- RUNTIME ---       yalnızca oyun sırasında kod tarafından oluşturulur (mermiler vb.)
 ```
 
-- Bir bölüme ait ışıklar (`Light_Kitchen` gibi) o bölümün grubunda durur; `--- SETUP ---` yalnızca sahne geneli ışığı,
-  volume'u ve gerekirse kamerayı tutar.
+- Bir bölüme ait ışıklar (`Light_Kitchen` gibi) o bölümün grubunda durur; `--- SETUP ---` yalnızca sahne geneli ışıkları
+  (`Light_Moon`, `Light_Fill`), volume'u ve gerekirse kamerayı tutar.
 
 - Sahne nesneleri önek almaz, açıklayıcı PascalCase ad ve gerekirse numara alır: `Wall_Corridor_Left`,
-  `Prop_GiantFridge_01`, `Enemy_AlarmClockWorker_02`, `Light_Sun`, `Volume_Global`.
+  `Prop_GiantFridge_01`, `Enemy_AlarmClockWorker_02`, `Light_Moon`, `Volume_Global`.
 - `GameObject (1)`, `Cube (3)`, `Directional Light` gibi boşluklu varsayılan adlar bırakılmaz.
 - `--- ENEMIES ---` altındaki her arena grubu bir `EnemyArena` bileşeni ve tetikleyici kutu taşır. Grubun transform'u
   orijinde kalır, kutunun `center` ve `size` değerleri arenayı kaplar. Düşmanlar bu kutudan çıkmaz ve yalnızca oyuncu
@@ -99,7 +102,7 @@ Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları 
 ## Kod
 
 - Namespace klasörle eşleşir: `FeverDream.Core`, `FeverDream.Player`, `FeverDream.Combat`, `FeverDream.Aura`,
-  `FeverDream.Enemies`, `FeverDream.AlterEgo`, `FeverDream.UI`, editör araçları `FeverDream.EditorTools.*`
+  `FeverDream.Enemies`, `FeverDream.AlterEgo`, `FeverDream.UI`, `FeverDream.VFX`, editör araçları `FeverDream.EditorTools.*`
   (`FeverDream.Editor` kullanılmaz: Unity'nin `UnityEditor.Editor` türünü gölgeler).
 - Dosya başına bir üst seviye tür; dosya adı = tür adı.
 - Ayarlanabilir oynanış değerleri ScriptableObject'lerde (`Data/` altında) tutulur ki tasarımcılar koda dokunmadan ayar
@@ -142,6 +145,40 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
   uygulanıyor (`SM_Prop_ApartmentDoor`'daki kapılar, `SM_Prop_BathroomDoor`'daki havlu askısı); bu parçalar şimdilik
   prefab'da düzeltildi.
 
+## Dünya görseli
+
+Rüya gecesi: mor-mavi tonlar, pembe ufuk, hilal ay. Yeni bir sahne aynı parçaları kullanır; en kolayı `L_Proto_Dream`'i
+çoğaltmaktır.
+
+- **Gökyüzü:** `Art/Materials/World/M_Sky_Dream` (`SH_Sky_Dream`, "FeverDream/Dream Sky"); Lighting > Environment >
+  Skybox Material'a atanır. Renk geçişi, yıldızlar, bulutsu ve hilal ay shader'da üretilir, doku yoktur. Ay, sahnenin ana
+  yönlü ışığının geldiği yönde çizilir: ayı taşımak için `Light_Moon` döndürülür, gölgeler kendiliğinden uyar.
+- **Yüzeyler:** blockout küpleri `SH_WorldSurface` ("FeverDream/World Surface") kullanan materyalleri alır:
+  `M_World_Floor` (dama zemin, hafif parlaklık), `M_World_Wall` (çizgili duvar kâğıdı), `M_World_WallRun` (parlayan
+  camgöbeği çizgiler: üstünde koşulan duvar). Desen dünya konumundan hesaplanır: UV gerekmez, küp ölçeklenince desen
+  uzamaz, ProBuilder şekillerinde de çalışır. Yüzey, en çok baktığı dünya eksenine göre izdüşürülür (kutu eşlemesi):
+  eksenlere dik yüzeylerde ölçü tamdır, 45° döndürülmüş bir duvarda desen en fazla 1.4 kat uzar, eğri şekillerde
+  izdüşüm ekseninin değiştiği yerde dikiş görünür. Aynı shader'dan yeni materyal türetilebilir (desen: yok, ızgara,
+  dama, çizgi; boyut metre, açı derece). Shader yalnızca dünya uzayını kullanır: statik batching nesne uzayını yok
+  ettiği için nesnenin kendi konumuna bağlı efekt eklenmez.
+- **Işık:** `--- SETUP ---` altında `Light_Moon` (soğuk lavanta, yumuşak gölge) ve `Light_Fill` (pembe, gölgesiz dolgu,
+  ayın karşı tarafından). Ortam ışığı Trilight (mavi-mor), sis üsteldir ve rengi ufka yakın mor-pembedir. Bölüm ışıkları
+  (`Light_Kitchen` gibi) gölgesiz nokta ışıktır.
+- **Yansımalar:** parlak yüzeyler (ayna, metal) gökyüzünü `Art/Textures/T_Env_<Sahne>.exr` dokusundan yansıtır
+  (Lighting > Environment > Environment Reflections: Custom). Dokuyu **Fever Dream > Setup > Bake Sky Reflection** açık
+  sahne için üretir ve sahneye atar. Gökyüzü materyali ya da `Light_Moon`'un yönü değişince yeniden çalıştırılır.
+  `M_Sky_Dream` sahneler arasında ortaktır, doku ise sahneye özeldir: materyal değişince komut onu kullanan her
+  sahnede (`L_Proto_Dream`, `MENU_Main`, çoğaltılan bölümler) ayrı ayrı çalıştırılır. Üretilen `T_Env_<Sahne>.exr` ve
+  `.meta` dosyası sahneyle aynı commit'e girer. Çoğaltılan bir sahne, kendi dokusu üretilene kadar kaynağının dokusunu
+  kullanır; sıfırdan kurulan bir sahnede komut çalıştırılmazsa yansımalarda Unity'nin varsayılan gündüz gökyüzü görünür.
+- **Post-processing:** `Art/PostProcessing/VP_Dream` (bloom, vinyet, renk, split toning, hafif renk sapması, ACES).
+  Değerler değişirse `ProjectDataSetup.CreateVolumeProfile` içindeki ilk değerler de güncellenir.
+- **Zerrecikler:** `Art/VFX/FX_DreamMotes` (materyal `M_FX_Mote`, doku `T_FX_SoftDot`) havada süzülen ışık noktalarıdır.
+  `PF_Player`'ın içindedir ve dünya uzayında simüle edilir (zerrecikler doğdukları yerde kalır). Doğma kutusu oyuncunun
+  çevresinde 80 m'lik bir karedir: oyuncu nereye dönerse dönsün ve koşarken de çevresi dolu kalır. `AmbientParticles`
+  bileşeni ışınlanmadan (yeniden doğma) sonra bulutu yeni yerde yeniden doldurur. Oyuncusu olmayan sahnelere (menü)
+  elle konur.
+
 ## Arayüz stili
 
 Arayüz manga/anime aksiyon stilindedir: eğik paneller, kalın koyu dış çizgi, sert ofset gölge, ekran tonu noktaları,
@@ -162,7 +199,10 @@ kombo için patlama, alter ego için konuşma balonu. Yeni bir ekran eklerken ay
   - Renkleri gömülü ikonlar, Image rengi beyaz kalır: `UI_Icon_Heart`, `UI_Icon_Sparkle`.
 - **Ekran tonu kuralı:** `UI_Halftone` yalnızca bir panelin içinde, panelle aynı eğimde ve kenarlarından içeride
   kullanılır. Ekran köşelerinde `UI_Halftone_Corner` kullanılır; kenarlara varmadan söner, dikdörtgen izi bırakmaz. Başka
-  köşeler için ölçek -1 ile çevrilir (pivot ortada kalmalı, yoksa görüntü panelin dışına taşar).
+  köşeler için ölçek -1 ile çevrilir (pivot ortada kalmalı, yoksa görüntü panelin dışına taşar). Bir kartın köşesinde
+  kullanılacaksa kartın içine sığmayan kısmı kesilmelidir: ton, kartla aynı sprite ve eğimde, grafiği gizli bir `Mask`
+  taşıyan `ToneClip` nesnesinin altına konur (`PF_ControlsPanel`'deki gibi). Kesilmeyen ton kartın dışında keskin bir
+  kenarla biter.
 - **Efekt bileşenleri (`Scripts/Runtime/UI/`):** `UiSkew` (eğim), `UiGradient` (dikey renk geçişi),
   `UiPunchOnChange` (izlediği metin değişince zıplatır), `UiIdleFloat` (yavaş süzülme; LayoutGroup içindeki öğelerde
   kullanılmaz, düzeni bozar), `UiPulse` (nabız ve dönme), `UiSegmentedBar` (bölmeli çubuk: değer düşünce sarsılır, azken
@@ -184,6 +224,9 @@ kombo için patlama, alter ego için konuşma balonu. Yeni bir ekran eklerken ay
 - **Fever Dream > Setup > Create Missing Data** (`Scripts/Editor/Setup/ProjectDataSetup.cs`): katman adlarını ve çarpışma
   kurallarını, eksik `SO_` veri dosyalarını ilk değerleriyle ve `VP_Dream` volume profile'ını oluşturur. Var olan hiçbir
   asset'e, prefab'a veya sahneye dokunmaz. Katman adları yalnızca boşsa yazılır; başka bir ad kullanılıyorsa uyarır.
+- **Fever Dream > Setup > Bake Sky Reflection** (`Scripts/Editor/Setup/SkyReflectionBaker.cs`): açık sahnenin
+  gökyüzünü `Art/Textures/T_Env_<Sahne>.exr` küp dokusuna çizer ve sahnenin ortam yansıması yapar. Yalnızca gökyüzü
+  çizilir; ışık haritası ya da başka bir şey üretilmez. Sonrasında sahne kaydedilir.
 - Prefab'lar ve sahneler elle düzenlenir; artık kodla üretilmezler.
 - Yeni bir sahne oynanabilir olunca build profile'ın sahne listesine eklenir. `MENU_Main` listede ilk sahnedir; menüler
   sahneleri adlarıyla yükler (`SceneFlow`).
