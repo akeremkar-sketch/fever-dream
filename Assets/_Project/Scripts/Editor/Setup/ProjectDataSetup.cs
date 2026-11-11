@@ -193,14 +193,20 @@ namespace FeverDream.EditorTools.Setup
             bloom.intensity.Override(0.9f);
             bloom.threshold.Override(0.85f);
             bloom.scatter.Override(0.7f);
+            bloom.tint.Override(new Color(0.9f, 0.86f, 1f));
             var vignette = profile.Add<Vignette>(true);
-            vignette.intensity.Override(0.32f);
-            vignette.color.Override(new Color(0.2f, 0.05f, 0.3f));
+            vignette.intensity.Override(0.34f);
+            vignette.smoothness.Override(0.45f);
+            vignette.color.Override(new Color(0.12f, 0.04f, 0.28f));
             var colors = profile.Add<ColorAdjustments>(true);
             colors.saturation.Override(18f);
             colors.contrast.Override(8f);
             var aberration = profile.Add<ChromaticAberration>(true);
-            aberration.intensity.Override(0.18f);
+            aberration.intensity.Override(0.08f);
+            var splitToning = profile.Add<SplitToning>(true);
+            splitToning.shadows.Override(new Color(0.4f, 0.43f, 0.64f));
+            splitToning.highlights.Override(new Color(0.62f, 0.5f, 0.57f));
+            splitToning.balance.Override(-10f);
             var tonemapping = profile.Add<Tonemapping>(true);
             tonemapping.mode.Override(TonemappingMode.ACES);
 
