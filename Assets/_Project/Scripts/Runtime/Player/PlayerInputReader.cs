@@ -25,6 +25,8 @@ namespace FeverDream.Player
         private InputAction grapple;
         private InputAction pause;
         private InputAction toggleHelp;
+        /// <summary>Gamepad B closes the pause menu and is also Slide: a button still down from the menu must be released before it counts.</summary>
+        private bool slideHeldFromMenu;
 
         public Vector2 Move => GameplayBlocked ? Vector2.zero : move.ReadValue<Vector2>();
         public Vector2 Look => GameplayBlocked ? Vector2.zero : look.ReadValue<Vector2>();
@@ -33,7 +35,23 @@ namespace FeverDream.Player
         public bool JumpPressed => !GameplayBlocked && jump.WasPressedThisFrame();
         public bool SprintHeld => !GameplayBlocked && sprint.IsPressed();
         public bool SlidePressed => !GameplayBlocked && slide.WasPressedThisFrame();
-        public bool SlideHeld => !GameplayBlocked && slide.IsPressed();
+        public bool SlideHeld
+        {
+            get
+            {
+                if (GameplayBlocked)
+                {
+                    return false;
+                }
+                bool pressed = slide.IsPressed();
+                if (slideHeldFromMenu)
+                {
+                    slideHeldFromMenu = pressed;
+                    return false;
+                }
+                return pressed;
+            }
+        }
         public bool LightAttackPressed => !GameplayBlocked && lightAttack.WasPressedThisFrame();
         public bool HeavyAttackPressed => !GameplayBlocked && heavyAttack.WasPressedThisFrame();
         public bool DodgePressed => !GameplayBlocked && dodge.WasPressedThisFrame();
@@ -62,11 +80,21 @@ namespace FeverDream.Player
         private void OnEnable()
         {
             actions.FindActionMap(actionMapName, true).Enable();
+            GamePause.Changed += HandlePauseChanged;
         }
 
         private void OnDisable()
         {
+            GamePause.Changed -= HandlePauseChanged;
             actions.FindActionMap(actionMapName, true).Disable();
+        }
+
+        private void HandlePauseChanged(bool paused)
+        {
+            if (!paused)
+            {
+                slideHeldFromMenu = slide.IsPressed();
+            }
         }
     }
 }
