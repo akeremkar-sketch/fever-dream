@@ -1,12 +1,12 @@
 using FeverDream.AlterEgo;
 
-namespace FeverDream.EditorTools.Prototype
+namespace FeverDream.EditorTools.Setup
 {
     /// <summary>
     /// First pass of the pigeon's lines, written into SO_AlterEgo_Pigeon when it is created.
     /// The writers own the asset from then on; edit the lines there, not here.
     /// </summary>
-    public static class PrototypeAlterEgoLines
+    public static class DefaultAlterEgoLines
     {
         public static void Fill(AlterEgoLines lines)
         {
