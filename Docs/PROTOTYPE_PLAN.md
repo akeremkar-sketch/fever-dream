@@ -108,7 +108,10 @@ duraklatma menüsü eklendi. Ses yok. Yapı baştan üretim temizliğindedir (bk
 - Görünüm manga/anime aksiyon stilindedir (bkz. `PROJECT_STRUCTURE.md`, "Arayüz stili"):
   - Can: atan bir kalp ve eğik çerçevede 10 bölme. Hasar alınca çubuk sarsılır, can %30'un altındayken bölmeler
     kırmızıya yanıp söner.
-  - Aura: eğik plaka, "AURA" etiketi, toplam değişince dönen yıldız ve temiz çizgili sayı.
+  - Aura: eğik plaka (macenta ve camgöbeği çift gölge), "AURA" etiketi, yıldız ve hane hane dönen sayı. Kombo ödenince
+    "+N" sayıya uçar, sayı döner ve oturur; oturduğu anda sayı, yıldız ve ekran tonu ödemenin büyüklüğüyle orantılı
+    tepki verir, büyük ödemede plakanın arkasında patlama çıkar. Toplam 600 ve 1500'e ulaşınca etiketin üstüne kademe
+    damgası basılır ("ALEV ALDI!", "AURA TAŞTI!").
   - Kombo sayacı bir patlamanın üstünde her vuruşta zıplar; alter ego konuşma balonunda isim etiketiyle konuşur.
   - Nişangâh ve kanca işaretçisi çizilmiş ikonlardır; kanca işaretçisi hedefin üstünde döner.
 - Oyun duraklayınca HUD gizlenir; menünün arkasından görünmez.

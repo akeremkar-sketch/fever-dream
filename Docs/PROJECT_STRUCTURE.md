@@ -198,7 +198,8 @@ kombo için patlama, alter ego için konuşma balonu. Yeni bir ekran eklerken ay
   kullanılmaz. Bileşen sırası: `UiGradient`, `UiSkew`, `UiStickerOutline`.
 - **Sprite'lar (`UI/Sprites/`):**
   - Beyaz dolgu ve gömülü koyu çizgi; Image rengi yalnızca dolguyu boyar: `UI_Panel_Sticker` (panel ve düğme, 9-slice),
-    `UI_SpeechBubble` (kuyruk sol altta, 9-slice), `UI_Burst` (kombo patlaması), `UI_Crosshair`, `UI_GrappleMarker`.
+    `UI_SpeechBubble` (kuyruk sol altta, 9-slice), `UI_Burst` (kombo patlaması), `UI_Burst_Wide` (Aura plakasının
+    arkasından taşan geniş patlama; büyük ödemede görünür), `UI_Crosshair`, `UI_GrappleMarker`.
   - Çizgisiz, boyanır: `UI_Bar_Chip` (can bölmesi, üstünde parlaklık bandı), `UI_Halftone` (soldan sağa sönen ekran tonu),
     `UI_Halftone_Corner` (sol alt köşeden dışa doğru sönen ekran tonu).
   - Renkleri gömülü ikonlar, Image rengi beyaz kalır: `UI_Icon_Heart`, `UI_Icon_Sparkle`.
@@ -213,6 +214,26 @@ kombo için patlama, alter ego için konuşma balonu. Yeni bir ekran eklerken ay
   kullanılmaz, düzeni bozar), `UiPulse` (nabız ve dönme), `UiSegmentedBar` (bölmeli çubuk: değer düşünce sarsılır, azken
   yanıp söner), `UiMenuButton` (fareyle üstüne gelmek düğmeyi seçer; seçili düğme büyür ve işaretçisini gösterir).
   `UiPulse` ile `UiPunchOnChange` aynı nesnede birlikte kullanılmaz; ikisi de ölçeği yazar.
+  `UiRollingCounter` (hane hane dönen sayaç: dönerken yalnızca değişen haneler parlar ve zıplar; haneler dönerken sabit
+  ızgarada, dururken yazı tipinin kendi aralığında durur), `UiFlyInLabel` (yerinde belirip kısa bir an bekleyen, sonra
+  hedefine uçup kaybolan etiket), `UiImpact` (tek seferlik vuruş: `Play` ile başlangıç pozuna atlar ve prefab'daki
+  pozuna oturur; `CanvasGroup` verilirse çalınana kadar gizlidir, bekler ve söner; güç değeri vuruşu küçültür).
+  `UiImpact` ölçeği ve dönüşü yazar; `UiPulse` ve `UiPunchOnChange` ile aynı nesnede kullanılmaz. `UiRollingCounter`
+  hanelerinin, `UiFlyInLabel` kendi nesnesinin konumunu ve ölçeğini yazar; bu nesnelere başka hareket efekti konmaz.
+  Üçü de tuvali (Canvas) kapalıyken bekler: oyun duraklayınca HUD gizlenir, yarım kalan animasyon menüden dönünce
+  kaldığı yerden sürer. Uzun süren tek bir kare (takılma) animasyonu yutmaz; adım 0.1 sn ile sınırlıdır.
+- **Aura sayacı (`PF_HUD` > `Aura`):** toplam tek bir metin değildir; `Total` altındaki `Digit_01` (birler) …
+  `Digit_06` hanelerinde durur. Her hane tek karakterlik Bangers metnidir (`UiSkew`, `UiStickerOutline`); soldaki hane
+  hiyerarşide önce gelir. Kombo ödenince "+N" plakanın altında belirir ve sayıya uçar, sayı ödemenin büyüklüğüne göre
+  0.35-0.8 sn döner. Sayı oturduğu anda `HudView` iniş efektlerini ödemenin gücüyle çalar: sayı ve yıldız zıplar, ekran
+  tonu pembe parlar (`ToneHeat`), yaklaşık 95 Aura'dan büyük ödemede plakanın arkasında patlama (`Burst`) görünür.
+  Toplam yeni bir alter ego kademesine (600, 1500) ulaşınca "AURA" etiketinin üstüne pembe bir damga basılır
+  (`TierStamp`; yazıları `HudView` üzerindeki "Aura Tier Callouts" listesindedir). Boştayken sayaçta hiçbir şey
+  kıpırdamaz. Gizli duran efekt nesnelerinin (`Burst`, `ToneHeat`, `TierStamp`) `CanvasGroup` alfası prefab'da 1'dir;
+  `UiImpact` oyun başlarken gizler.
+- **Çift sert gölge:** Aura plakasında macenta gölgenin arkasında camgöbeği ikinci bir `Shadow` vardır. İkinci `Shadow`
+  birincisiyle aynı mesafede (7, -7) olmalıdır: `Shadow` sprite'ın gömülü koyu çizgisini de kopyalar, daha kısa
+  mesafede camgöbeği bu çizginin altında kalır ve görünmez.
 - **Menü düğmeleri:** her zaman tek bir düğme vurguludur. Fare, klavye ve gamepad aynı seçimi paylaşır (`UiMenuButton`):
   - Fare bir düğmenin üstünde oynayınca o düğme seçilir. Menü duran imlecin altında açılırsa seçim değişmez.
   - Düğmelerde Highlighted rengi Normal ile aynıdır; vurguyu yalnızca seçim gösterir.
