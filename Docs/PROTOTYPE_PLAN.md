@@ -38,6 +38,7 @@ duraklatma menüsü eklendi. Ses yok. Yapı baştan üretim temizliğindedir (bk
 | Ağır saldırı (fırlatma, bitirici, havada çakılma) | Sağ tık | Y |
 | Kaçınma (dash) | Q | RB |
 | Zincirli Kama kancası | E | LB |
+| Silahı incele (yalnızca gösteriş; basılı tutunca döngü) | Y | D-pad yukarı |
 | Duraklat / menü | Esc | Start |
 | Kontrol listesi (duraklatır) | F1 | Select |
 
@@ -70,6 +71,13 @@ duraklatma menüsü eklendi. Ses yok. Yapı baştan üretim temizliğindedir (bk
 - Vuruş yönü her zaman oyuncudan hedefe doğrudur (kalkanın önden bloğu ve geri itme gerçek konuma göre çalışır).
 - **Kaçınma:** kısa dash, dokunulmazlık penceresi. Saldırı son anda (ilk 0.15 sn) savuşturulursa **son an kaçınma**:
   kısa ağır çekim ve Aura bonusu. Kaçınma ve hasar ayarları `SO_PlayerCombat_Default`, kamera ayarları `SO_PlayerCamera_Default`.
+- **Silah inceleme:** Y (gamepad D-pad yukarı) ile Tsunagi 2.9 sn'lik bir gösteri yapar: fırıldak gibi döner, dik
+  yakalanır, iki yüzünü gösterir, savrulup yerine oturur. Yalnızca görseldir (`WeaponInspect`; pozlar ve süreler
+  `PF_Player` içindeki `WeaponHolder` üzerindedir). Silahı tek bir bileşen (`WeaponSwingAnimator`) hareket ettirir;
+  inceleme ona yalnızca poz verir. Saldırı, kaçınma, kanca, tırmanma, hasar ve ölüm incelemeyi anında keser, ilk
+  saldırı gecikmez. Oyun duraklatılmışken başlamaz; sürerken tekrar Y'ye basmak yok sayılır. Tuş basılı tutulursa
+  gösteri bitince baştan başlar (Counter-Strike'taki gibi döngü); tuş bırakılınca o tur tamamlanır ve biter. Kesilen
+  inceleme tuş basılı kalsa da kendiliğinden geri gelmez, yeniden basmak gerekir.
 
 ### Aura (`ComboTracker`, `AuraWallet`, ayarlar `SO_Aura_Default`)
 - Her başarılı vuruş komboyu uzatır; 2.5 sn vuruş olmazsa kombo biter ve puan çarpanla birlikte verilir.
@@ -243,6 +251,8 @@ tetiklenerek denendi), yeni ışıkta dövüşün okunabilirliği (düşmanları
 - [ ] İki kanca noktasıyla boşluk geçilebiliyor.
 - [ ] Bacada duvardan sıçrayıp tırmanarak Arena B'ye çıkılabiliyor.
 - [ ] Palyaço turtaları kaçınma ile savuşturulabiliyor veya kesilebiliyor; son an kaçınma ağır çekim veriyor.
+- [ ] Y ile silah incelemesi oynuyor, Y basılı tutulunca döngüye giriyor; saldırı, kaçınma, kanca ve hasar onu anında
+  kesiyor, ilk vuruş gecikmiyor.
 - [ ] Kombo bitince Aura toplu ekleniyor, hasar alınca kombo bozuluyor.
 - [ ] Alter ego olaylara tepki veriyor, Aura arttıkça tonu değişiyor.
 - [ ] Tuvalete ulaşınca bölüm sonu mesajı çıkıyor.

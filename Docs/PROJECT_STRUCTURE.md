@@ -154,6 +154,9 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
 - Duvar paneli olan dekor (`PF_Prop_ApartmentDoor`) blockout duvarının içine değil önüne konur: panelin yüzü duvar
   yüzünün birkaç santim önünde durur, yoksa kapılar duvarın içinde kalır. Panelin ucu başka bir duvarın yüzeyiyle aynı
   düzlemde bırakılmaz (iki yüzey titreşir); uç, o duvarın içine sokulur.
+- `PF_Prop_ApartmentDoor`'daki camgöbeği şerit yalnızca duvarda sürer. Kit'te kapı kanatlarının da kendi
+  `M_FD_CyanGlow` yuvası vardı ve çizgi kapıların üstünden geçiyordu; prefab'da o yuva kanadın kendi rengiyle
+  değiştirildi.
 - Sanatçıya not: Blender'dan FBX alırken "Apply Transform" kapalı olsun. Açıkken bazı alt parçaların dönüşü iki kez
   uygulanıyor (`SM_Prop_ApartmentDoor`'daki kapılar, `SM_Prop_BathroomDoor`'daki havlu askısı); bu parçalar şimdilik
   prefab'da düzeltildi.

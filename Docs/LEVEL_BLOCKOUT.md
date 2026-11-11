@@ -66,7 +66,7 @@ değerler bunu hesaba katar.
 | | Değer |
 | --- | --- |
 | Boy / genişlik | 1.8 m / 0.7 m. Ayakta geçmek için ~1.9 m yükseklik ve ~0.8 m genişlik gerekir; çömelip kayarak 1.1 m |
-| Basamak | 0.35 m'ye kadar yürüyerek çıkılır, daha yükseği zıplanarak |
+| Basamak | 0.35 m'ye kadar yürüyerek çıkılır, daha yükseği zıplanarak. Çömelirken ve kayarken yalnızca 0.05 m |
 | Hız | Yürüme 6.5 m/s, koşu (Shift) 10.5 m/s, çömelme 3.5 m/s |
 | Zıplama | 1.4 m |
 | Aynı yükseklikteki boşluk | Yürüyerek rahat 3 m (en fazla ~4 m), koşarak rahat 5 m (en fazla ~6.4 m), kayıp zıplayarak rahat 6.5 m (en fazla ~8.2 m) |
@@ -92,6 +92,9 @@ boşluğun yalnızca duvar koşusu veya kancayla geçilmesini istiyorsan onu bun
 - Altından kayılacak engelin alt kenarı yerden 1.1-1.7 m yukarıda olsun; ayakta geçilemez. Örnek: `L_Proto_Dream`'deki
   kanepe, 1.1 m.
 - Alçak geçidi 8 m'den uzun yapma: kayma bitince oyuncu kalanını çömelerek, yavaş yürür.
+- Alçak geçidin zemini düz olsun: çömelmiş ve kayan oyuncu 5 cm'den yüksek eşiği aşamaz
+  (`SO_PlayerMovement_Default` > `crouchStepOffset`). Bu değer bilerek küçüktür: kontrolcü her adımda basamak payı
+  kadar yükselir, ayaktaki 0.35 m ile 1.1 m'lik boşluğun kenarına takılır ve geçemez.
 
 ### Duvar koşusu
 
