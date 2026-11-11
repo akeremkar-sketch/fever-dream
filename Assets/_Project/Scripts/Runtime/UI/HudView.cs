@@ -106,7 +106,7 @@ namespace FeverDream.UI
             UnbindCommentator();
             boundCommentator = target;
             boundCommentator.LineSpoken += ShowAlterEgoLine;
-            alterEgoNameText.text = $"{boundCommentator.Lines.speakerName.ToUpperInvariant()}  ·  alter ego";
+            alterEgoNameText.text = TurkishUpper(boundCommentator.Lines.speakerName);
         }
 
         private void UnbindCommentator()
@@ -237,9 +237,12 @@ namespace FeverDream.UI
             }
         }
 
+        /// <summary>The HUD lettering font only has capitals; Turkish needs İ for i and I for ı, which ToUpperInvariant gets wrong.</summary>
+        private static string TurkishUpper(string text) => text.Replace('i', 'İ').Replace('ı', 'I').ToUpperInvariant();
+
         private void ShowAuraChange(string text, Color color)
         {
-            auraChangeText.text = text;
+            auraChangeText.text = TurkishUpper(text);
             auraChangeText.color = color;
             auraChangeHideTime = Time.unscaledTime + 1.8f;
         }

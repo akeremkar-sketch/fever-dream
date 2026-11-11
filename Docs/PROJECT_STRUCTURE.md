@@ -41,6 +41,7 @@ Assets/
       Editor/               FeverDream.Editor assembly
         Import/  Setup/
     UI/                     UI sprite ve fontları (UI_)
+      Fonts/  Sprites/
   ThirdParty/
   Settings/                 URP (Unity'nin kendi ayarları)
 Docs/                       GDD, yapı, plan ve blockout belgeleri (Assets dışında)
@@ -140,6 +141,24 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
 - Sanatçıya not: Blender'dan FBX alırken "Apply Transform" kapalı olsun. Açıkken bazı alt parçaların dönüşü iki kez
   uygulanıyor (`SM_Prop_ApartmentDoor`'daki kapılar, `SM_Prop_BathroomDoor`'daki havlu askısı); bu parçalar şimdilik
   prefab'da düzeltildi.
+
+## Arayüz stili
+
+Arayüz manga/anime aksiyon stilindedir: eğik paneller, kalın koyu dış çizgi, sert ofset gölge, ekran tonu noktaları,
+kombo için patlama, alter ego için konuşma balonu. Yeni bir ekran eklerken aynı parçalar kullanılır.
+
+- **Yazı tipi:** başlık, düğme ve sayılar `UI/Fonts/UI_Font_Bangers` (Google Fonts, SIL OFL 1.1; lisans dosyası yanında).
+  Türkçe harflerin hepsi var, ama yalnızca büyük harf çizer: Türkçe metin elle büyük harfle yazılır (`BİR`, `BEKLİYOR`),
+  koddan gelen metin `HudView.TurkishUpper` gibi i→İ, ı→I dönüşümünden geçer. Uzun metin (kontrol listesi, alter ego
+  repliği) Unity'nin yerleşik yazı tipiyle kalır. Bangers satırları eski yazı tipinden uzundur; metinlerde dikey taşma açık.
+- **Sprite'lar (`UI/Sprites/`):** `UI_Panel_Sticker` (panel ve düğme, 9-slice), `UI_SpeechBubble` (kuyruk sol altta,
+  9-slice), `UI_Burst` (kombo patlaması), `UI_Halftone` (ekran tonu), `UI_Bar_Segments` (bar bölmeleri, Tiled). Hepsi beyaz
+  dolgu ve gömülü koyu çizgidir: Image rengi yalnızca dolguyu boyar, çizgi koyu kalır.
+- **Efekt bileşenleri (`Scripts/Runtime/UI/`):** `UiSkew` (eğim), `UiGradient` (dikey renk geçişi; Outline ve Shadow'un
+  üstünde durur), `UiPunchOnChange` (izlediği metin değişince zıplatır), `UiIdleFloat` (yavaş süzülme; LayoutGroup
+  içindeki öğelerde kullanılmaz, düzeni bozar).
+- **Renkler:** mürekkep `#1F1238` (panel), erik `#5C339E` (düğme), pembe `#FF6BAD` (vurgu, can, seçili düğme), macenta
+  `#D12485` (sert gölge), camgöbeği `#4DEBFF` (Aura, ikinci gölge), krem `#FAF2FF` (yazı), koyu `#120821` (dış çizgi).
 
 ## Editör araçları
 

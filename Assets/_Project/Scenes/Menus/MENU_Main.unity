@@ -130,6 +130,8 @@ GameObject:
   - component: {fileID: 12478077}
   - component: {fileID: 12478079}
   - component: {fileID: 12478078}
+  - component: {fileID: 12478081}
+  - component: {fileID: 12478080}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -169,7 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.98, g: 0.95, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -177,17 +179,17 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 34
+    m_Font: {fileID: 12800000, guid: 54d7a3f4c58815a489b7be4630fa5240, type: 3}
+    m_FontSize: 42
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 42
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: "GER\u0130"
 --- !u!222 &12478079
@@ -198,6 +200,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 12478076}
   m_CullTransparentMesh: 1
+--- !u!114 &12478080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 12478076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -8
+--- !u!114 &12478081
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 12478076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1 &49408837
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,6 +271,8 @@ GameObject:
   - component: {fileID: 151668954}
   - component: {fileID: 151668956}
   - component: {fileID: 151668955}
+  - component: {fileID: 151668958}
+  - component: {fileID: 151668957}
   m_Layer: 0
   m_Name: ControlsPanel
   m_TagString: Untagged
@@ -260,6 +292,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1932744699}
   - {fileID: 1246315809}
   - {fileID: 968313325}
   - {fileID: 465586470}
@@ -283,15 +316,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.06, g: 0.03, b: 0.12, a: 0.85}
+  m_Color: {r: 0.12, g: 0.07, b: 0.22, a: 0.96}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 7e7bd97f0f258794cbacbcaadf50d65b, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -299,7 +332,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 0.7
 --- !u!222 &151668956
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -308,6 +341,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 151668953}
   m_CullTransparentMesh: 1
+--- !u!114 &151668957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151668953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -4
+--- !u!114 &151668958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 151668953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.82, g: 0.14, b: 0.52, a: 1}
+  m_EffectDistance: {x: 14, y: -14}
+  m_UseGraphicAlpha: 1
 --- !u!1 &203288798
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,6 +382,8 @@ GameObject:
   - component: {fileID: 203288802}
   - component: {fileID: 203288801}
   - component: {fileID: 203288800}
+  - component: {fileID: 203288805}
+  - component: {fileID: 203288804}
   m_Layer: 0
   m_Name: Button_Play
   m_TagString: Untagged
@@ -389,13 +452,13 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.16, g: 0.09, b: 0.3, a: 0.88}
-    m_HighlightedColor: {r: 0.42, g: 0.24, b: 0.72, a: 1}
-    m_PressedColor: {r: 0.25, g: 0.8, b: 0.95, a: 1}
-    m_SelectedColor: {r: 0.42, g: 0.24, b: 0.72, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_NormalColor: {r: 0.36, g: 0.2, b: 0.62, a: 1}
+    m_HighlightedColor: {r: 1, g: 0.42, b: 0.68, a: 1}
+    m_PressedColor: {r: 0.3, g: 0.92, b: 1, a: 1}
+    m_SelectedColor: {r: 1, g: 0.42, b: 0.68, a: 1}
+    m_DisabledColor: {r: 0.3, g: 0.28, b: 0.36, a: 0.6}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.06
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -432,8 +495,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 7e7bd97f0f258794cbacbcaadf50d65b, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -441,7 +504,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 1.5
 --- !u!222 &203288803
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -450,6 +513,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 203288798}
   m_CullTransparentMesh: 1
+--- !u!114 &203288804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203288798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -8
+--- !u!114 &203288805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 203288798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &230966453
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,6 +554,8 @@ GameObject:
   - component: {fileID: 230966457}
   - component: {fileID: 230966456}
   - component: {fileID: 230966455}
+  - component: {fileID: 230966460}
+  - component: {fileID: 230966459}
   m_Layer: 0
   m_Name: Button_Controls
   m_TagString: Untagged
@@ -531,13 +624,13 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.16, g: 0.09, b: 0.3, a: 0.88}
-    m_HighlightedColor: {r: 0.42, g: 0.24, b: 0.72, a: 1}
-    m_PressedColor: {r: 0.25, g: 0.8, b: 0.95, a: 1}
-    m_SelectedColor: {r: 0.42, g: 0.24, b: 0.72, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_NormalColor: {r: 0.36, g: 0.2, b: 0.62, a: 1}
+    m_HighlightedColor: {r: 1, g: 0.42, b: 0.68, a: 1}
+    m_PressedColor: {r: 0.3, g: 0.92, b: 1, a: 1}
+    m_SelectedColor: {r: 1, g: 0.42, b: 0.68, a: 1}
+    m_DisabledColor: {r: 0.3, g: 0.28, b: 0.36, a: 0.6}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.06
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -574,8 +667,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 7e7bd97f0f258794cbacbcaadf50d65b, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -583,7 +676,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 1.5
 --- !u!222 &230966458
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -592,6 +685,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 230966453}
   m_CullTransparentMesh: 1
+--- !u!114 &230966459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 230966453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -8
+--- !u!114 &230966460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 230966453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &270184892
 GameObject:
   m_ObjectHideFlags: 0
@@ -603,6 +724,7 @@ GameObject:
   - component: {fileID: 270184893}
   - component: {fileID: 270184895}
   - component: {fileID: 270184894}
+  - component: {fileID: 270184896}
   m_Layer: 0
   m_Name: Footer
   m_TagString: Untagged
@@ -642,7 +764,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.55}
+  m_Color: {r: 0.85, g: 0.78, b: 1, a: 0.8}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -671,6 +793,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 270184892}
   m_CullTransparentMesh: 1
+--- !u!114 &270184896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270184892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 1.5, y: -1.5}
+  m_UseGraphicAlpha: 1
 --- !u!1 &287735415
 GameObject:
   m_ObjectHideFlags: 0
@@ -890,6 +1027,8 @@ GameObject:
   - component: {fileID: 318854519}
   - component: {fileID: 318854518}
   - component: {fileID: 318854517}
+  - component: {fileID: 318854522}
+  - component: {fileID: 318854521}
   m_Layer: 0
   m_Name: Button_Quit
   m_TagString: Untagged
@@ -958,13 +1097,13 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.16, g: 0.09, b: 0.3, a: 0.88}
-    m_HighlightedColor: {r: 0.42, g: 0.24, b: 0.72, a: 1}
-    m_PressedColor: {r: 0.25, g: 0.8, b: 0.95, a: 1}
-    m_SelectedColor: {r: 0.42, g: 0.24, b: 0.72, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_NormalColor: {r: 0.36, g: 0.2, b: 0.62, a: 1}
+    m_HighlightedColor: {r: 1, g: 0.42, b: 0.68, a: 1}
+    m_PressedColor: {r: 0.3, g: 0.92, b: 1, a: 1}
+    m_SelectedColor: {r: 1, g: 0.42, b: 0.68, a: 1}
+    m_DisabledColor: {r: 0.3, g: 0.28, b: 0.36, a: 0.6}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.06
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -1001,8 +1140,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 7e7bd97f0f258794cbacbcaadf50d65b, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -1010,7 +1149,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 1.5
 --- !u!222 &318854520
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1019,6 +1158,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 318854515}
   m_CullTransparentMesh: 1
+--- !u!114 &318854521
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318854515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -8
+--- !u!114 &318854522
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 318854515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1 &325149306
 GameObject:
   m_ObjectHideFlags: 0
@@ -1030,6 +1197,8 @@ GameObject:
   - component: {fileID: 325149307}
   - component: {fileID: 325149309}
   - component: {fileID: 325149308}
+  - component: {fileID: 325149311}
+  - component: {fileID: 325149310}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -1069,7 +1238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.98, g: 0.95, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1077,17 +1246,17 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 34
+    m_Font: {fileID: 12800000, guid: 54d7a3f4c58815a489b7be4630fa5240, type: 3}
+    m_FontSize: 42
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 42
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: "\xC7IKI\u015E"
 --- !u!222 &325149309
@@ -1098,6 +1267,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 325149306}
   m_CullTransparentMesh: 1
+--- !u!114 &325149310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325149306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -8
+--- !u!114 &325149311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325149306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1001 &325198701
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1171,6 +1368,8 @@ GameObject:
   - component: {fileID: 355374534}
   - component: {fileID: 355374536}
   - component: {fileID: 355374535}
+  - component: {fileID: 355374538}
+  - component: {fileID: 355374537}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -1210,7 +1409,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.98, g: 0.95, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1218,17 +1417,17 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 34
+    m_Font: {fileID: 12800000, guid: 54d7a3f4c58815a489b7be4630fa5240, type: 3}
+    m_FontSize: 42
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 42
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: OYNA
 --- !u!222 &355374536
@@ -1239,6 +1438,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 355374533}
   m_CullTransparentMesh: 1
+--- !u!114 &355374537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 355374533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -8
+--- !u!114 &355374538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 355374533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1 &357535318
 GameObject:
   m_ObjectHideFlags: 0
@@ -1532,6 +1759,81 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 542983545}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &579170538
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 579170539}
+  - component: {fileID: 579170541}
+  - component: {fileID: 579170540}
+  m_Layer: 0
+  m_Name: Halftone_Left
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &579170539
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579170538}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1568300811}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 360, y: 260}
+  m_SizeDelta: {x: 720, y: 520}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &579170540
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579170538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.82, g: 0.14, b: 0.52, a: 0.32}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 1bc94e65f4d2cee43b3f3bb494850ea1, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &579170541
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579170538}
+  m_CullTransparentMesh: 1
 --- !u!1 &634296993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1911,6 +2213,112 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2307066995946377776, guid: d224dc7b55f12254f822b57c8d6d91b9, type: 3}
   m_PrefabInstance: {fileID: 879740760}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &887847790
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 887847791}
+  - component: {fileID: 887847795}
+  - component: {fileID: 887847794}
+  - component: {fileID: 887847793}
+  - component: {fileID: 887847792}
+  m_Layer: 0
+  m_Name: SubtitleTag
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &887847791
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887847790}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1600386449}
+  m_Father: {fileID: 1568300811}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 0, y: 0.5}
+  m_AnchoredPosition: {x: 470, y: 190}
+  m_SizeDelta: {x: 680, y: 56}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &887847792
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887847790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: 12
+--- !u!114 &887847793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887847790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 5, y: -5}
+  m_UseGraphicAlpha: 1
+--- !u!114 &887847794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887847790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.82, g: 0.14, b: 0.52, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 7e7bd97f0f258794cbacbcaadf50d65b, type: 3}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 2
+--- !u!222 &887847795
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 887847790}
+  m_CullTransparentMesh: 1
 --- !u!1001 &915727276
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2023,7 +2431,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.98, g: 0.95, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2068,6 +2476,10 @@ GameObject:
   - component: {fileID: 1048761093}
   - component: {fileID: 1048761095}
   - component: {fileID: 1048761094}
+  - component: {fileID: 1048761100}
+  - component: {fileID: 1048761099}
+  - component: {fileID: 1048761098}
+  - component: {fileID: 1048761097}
   - component: {fileID: 1048761096}
   m_Layer: 0
   m_Name: Title
@@ -2083,7 +2495,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1048761092}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.034899496, w: 0.99939084}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -2092,8 +2504,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 130, y: 300}
-  m_SizeDelta: {x: 1200, y: 150}
+  m_AnchoredPosition: {x: 120, y: 300}
+  m_SizeDelta: {x: 1300, y: 200}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &1048761094
 MonoBehaviour:
@@ -2108,7 +2520,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.78, g: 0.58, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2116,17 +2528,17 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 128
+    m_Font: {fileID: 12800000, guid: 54d7a3f4c58815a489b7be4630fa5240, type: 3}
+    m_FontSize: 176
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 128
+    m_MaxSize: 176
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: FEVER DREAM
 --- !u!222 &1048761095
@@ -2146,12 +2558,69 @@ MonoBehaviour:
   m_GameObject: {fileID: 1048761092}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 799868be30130b447a729e52c9a41bbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiIdleFloat
+  bobPixels: 6
+  swayDegrees: 1.5
+  period: 3.2
+--- !u!114 &1048761097
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048761092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: 8
+--- !u!114 &1048761098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048761092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.3, g: 0.92, b: 1, a: 1}
+  m_EffectDistance: {x: 12, y: -12}
+  m_UseGraphicAlpha: 1
+--- !u!114 &1048761099
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048761092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0.1, g: 0.03, b: 0.2, a: 0.95}
-  m_EffectDistance: {x: 4, y: -4}
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 6, y: -6}
   m_UseGraphicAlpha: 1
+--- !u!114 &1048761100
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1048761092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea8b48f7e34a51841a06aa22c7034dfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiGradient
+  top: {r: 0.98, g: 0.95, b: 1, a: 1}
+  bottom: {r: 1, g: 0.6, b: 0.84, a: 1}
 --- !u!1 &1123961343
 GameObject:
   m_ObjectHideFlags: 0
@@ -2476,6 +2945,8 @@ GameObject:
   - component: {fileID: 1217825611}
   - component: {fileID: 1217825613}
   - component: {fileID: 1217825612}
+  - component: {fileID: 1217825615}
+  - component: {fileID: 1217825614}
   m_Layer: 0
   m_Name: Label
   m_TagString: Untagged
@@ -2515,7 +2986,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.98, g: 0.95, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2523,17 +2994,17 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 34
+    m_Font: {fileID: 12800000, guid: 54d7a3f4c58815a489b7be4630fa5240, type: 3}
+    m_FontSize: 42
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 42
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
+    m_HorizontalOverflow: 1
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: KONTROLLER
 --- !u!222 &1217825613
@@ -2544,6 +3015,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1217825610}
   m_CullTransparentMesh: 1
+--- !u!114 &1217825614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1217825610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -8
+--- !u!114 &1217825615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1217825610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 2, y: -2}
+  m_UseGraphicAlpha: 1
 --- !u!1 &1246315808
 GameObject:
   m_ObjectHideFlags: 0
@@ -2555,6 +3054,9 @@ GameObject:
   - component: {fileID: 1246315809}
   - component: {fileID: 1246315811}
   - component: {fileID: 1246315810}
+  - component: {fileID: 1246315815}
+  - component: {fileID: 1246315814}
+  - component: {fileID: 1246315813}
   - component: {fileID: 1246315812}
   m_Layer: 0
   m_Name: Title
@@ -2595,7 +3097,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.78, g: 0.58, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2603,17 +3105,17 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 56
+    m_Font: {fileID: 12800000, guid: 54d7a3f4c58815a489b7be4630fa5240, type: 3}
+    m_FontSize: 72
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 56
+    m_MaxSize: 72
     m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
   m_Text: KONTROLLER
 --- !u!222 &1246315811
@@ -2633,12 +3135,54 @@ MonoBehaviour:
   m_GameObject: {fileID: 1246315808}
   m_Enabled: 1
   m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: 8
+--- !u!114 &1246315813
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246315808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.3, g: 0.92, b: 1, a: 1}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
+--- !u!114 &1246315814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246315808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0.1, g: 0.03, b: 0.2, a: 0.95}
-  m_EffectDistance: {x: 2, y: -2}
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 4, y: -4}
   m_UseGraphicAlpha: 1
+--- !u!114 &1246315815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1246315808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea8b48f7e34a51841a06aa22c7034dfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiGradient
+  top: {r: 0.98, g: 0.95, b: 1, a: 1}
+  bottom: {r: 1, g: 0.68, b: 0.86, a: 1}
 --- !u!1 &1252074548
 GameObject:
   m_ObjectHideFlags: 0
@@ -2652,6 +3196,8 @@ GameObject:
   - component: {fileID: 1252074552}
   - component: {fileID: 1252074551}
   - component: {fileID: 1252074550}
+  - component: {fileID: 1252074555}
+  - component: {fileID: 1252074554}
   m_Layer: 0
   m_Name: Button_Back
   m_TagString: Untagged
@@ -2720,13 +3266,13 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.16, g: 0.09, b: 0.3, a: 0.88}
-    m_HighlightedColor: {r: 0.42, g: 0.24, b: 0.72, a: 1}
-    m_PressedColor: {r: 0.25, g: 0.8, b: 0.95, a: 1}
-    m_SelectedColor: {r: 0.42, g: 0.24, b: 0.72, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_NormalColor: {r: 0.36, g: 0.2, b: 0.62, a: 1}
+    m_HighlightedColor: {r: 1, g: 0.42, b: 0.68, a: 1}
+    m_PressedColor: {r: 0.3, g: 0.92, b: 1, a: 1}
+    m_SelectedColor: {r: 1, g: 0.42, b: 0.68, a: 1}
+    m_DisabledColor: {r: 0.3, g: 0.28, b: 0.36, a: 0.6}
     m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
+    m_FadeDuration: 0.06
   m_SpriteState:
     m_HighlightedSprite: {fileID: 0}
     m_PressedSprite: {fileID: 0}
@@ -2763,8 +3309,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 7e7bd97f0f258794cbacbcaadf50d65b, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -2772,7 +3318,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 1.5
 --- !u!222 &1252074553
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2781,6 +3327,34 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252074548}
   m_CullTransparentMesh: 1
+--- !u!114 &1252074554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1252074548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc5929cd58792345aef805ff3b7bbac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.UI.UiSkew
+  angle: -8
+--- !u!114 &1252074555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1252074548}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
+  m_EffectDistance: {x: 6, y: -6}
+  m_UseGraphicAlpha: 1
 --- !u!1001 &1256426604
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2904,8 +3478,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 579170539}
   - {fileID: 1048761093}
-  - {fileID: 1600386449}
+  - {fileID: 887847791}
   - {fileID: 1882060493}
   - {fileID: 270184893}
   m_Father: {fileID: 1123961344}
@@ -2946,13 +3521,13 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1568300811}
+  m_Father: {fileID: 887847791}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 138, y: 210}
-  m_SizeDelta: {x: 1200, y: 44}
-  m_Pivot: {x: 0, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1600386450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2966,7 +3541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
   m_Material: {fileID: 0}
-  m_Color: {r: 0.45, g: 0.95, b: 1, a: 1}
+  m_Color: {r: 0.98, g: 0.95, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2974,19 +3549,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 32
+    m_Font: {fileID: 12800000, guid: 54d7a3f4c58815a489b7be4630fa5240, type: 3}
+    m_FontSize: 34
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
     m_MaxSize: 40
-    m_Alignment: 3
+    m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
-    m_VerticalOverflow: 0
+    m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "Bir r\xFCya. Bir tuvalet. Bir g\xFCvercin."
+  m_Text: "B\u0130R R\xDCYA. B\u0130R TUVALET. B\u0130R G\xDCVERC\u0130N."
 --- !u!222 &1600386451
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3007,7 +3582,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Outline
-  m_EffectColor: {r: 0.1, g: 0.03, b: 0.2, a: 0.95}
+  m_EffectColor: {r: 0.07, g: 0.03, b: 0.13, a: 0.95}
   m_EffectDistance: {x: 2, y: -2}
   m_UseGraphicAlpha: 1
 --- !u!1001 &1658067968
@@ -3261,6 +3836,81 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &1932744698
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1932744699}
+  - component: {fileID: 1932744701}
+  - component: {fileID: 1932744700}
+  m_Layer: 0
+  m_Name: Halftone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1932744699
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932744698}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: -1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 151668954}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -120, y: -70}
+  m_SizeDelta: {x: 240, y: 120}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1932744700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932744698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.3, g: 0.92, b: 1, a: 0.25}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 1bc94e65f4d2cee43b3f3bb494850ea1, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1932744701
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1932744698}
+  m_CullTransparentMesh: 1
 --- !u!1 &2068143512
 GameObject:
   m_ObjectHideFlags: 0

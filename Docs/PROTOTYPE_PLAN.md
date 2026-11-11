@@ -106,6 +106,8 @@ duraklatma menüsü eklendi. Ses yok. Yapı baştan üretim temizliğindedir (bk
 - Can çubuğu, nişangâh, kanca işaretçisi, kombo sayacı ve süre çubuğu, bekleyen Aura ve çarpan, toplam Aura,
   alter ego altyazısı, kontrol listesi (F1), bölüm sonu mesajı. Kontrol listesi `ControlsText`'ten gelir; ana menü de
   aynı listeyi gösterir.
+- Görünüm manga/anime aksiyon stilindedir: kombo sayacı bir patlamanın üstünde her vuruşta zıplar, alter ego konuşma
+  balonunda isim etiketiyle konuşur, can çubuğu eğik ve bölmelidir (bkz. `PROJECT_STRUCTURE.md`, "Arayüz stili").
 
 ### Menüler (`MainMenuView`, `PauseMenuView`, `GamePause`, `SceneFlow`)
 - **Ana menü (`MENU_Main`):** Oyna, Kontroller, Çıkış. Arkada kitten kurulmuş küçük bir rüya odası. Build listesinde ilk
