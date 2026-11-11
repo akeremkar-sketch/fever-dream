@@ -300,7 +300,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: F1
+  m_Text: ESC / F1
 --- !u!1 &1112610515761452945
 GameObject:
   m_ObjectHideFlags: 0
@@ -957,7 +957,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: DURAKLAT
+  m_Text: "S\u0130LAHI \u0130NCELE"
 --- !u!1 &2074393137886262841
 GameObject:
   m_ObjectHideFlags: 0
@@ -1378,7 +1378,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: ESC
+  m_Text: Y
 --- !u!1 &3028218500323875805
 GameObject:
   m_ObjectHideFlags: 0
@@ -4424,7 +4424,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 1
     m_LineSpacing: 1
-  m_Text: "BU L\u0130STE"
+  m_Text: "DURAKLAT \xB7 BU L\u0130STE"
 --- !u!1 &8701457093972105551
 GameObject:
   m_ObjectHideFlags: 0
