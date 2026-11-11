@@ -29,7 +29,16 @@ namespace FeverDream.UI
         [SerializeField] private RectTransform comboTimerFill;
 
         [Header("Aura")]
-        [SerializeField] private Text auraTotalText;
+        [SerializeField] private UiRollingCounter auraCounter;
+        [Tooltip("The +N that flies into the total when a combo pays out.")]
+        [SerializeField] private UiFlyInLabel auraGainLabel;
+        [Tooltip("Played when the total lands, with the strength of the payout: number and icon punch, tone flash, burst.")]
+        [SerializeField] private UiImpact[] auraLandingEffects;
+        [SerializeField] private UiImpact auraTierStamp;
+        [SerializeField] private Text auraTierText;
+        [Tooltip("Shout when the total reaches a new tier, one per AuraTier. Capitals only: the HUD font has no lower case.")]
+        [SerializeField] private string[] auraTierCallouts = { "", "ALEV ALDI!", "AURA TAŞTI!" };
+        [Tooltip("Only the combo-lost line now; a gain is shown by the gain label.")]
         [SerializeField] private Text auraChangeText;
         [SerializeField] private Color auraGainColor = new Color(0.45f, 0.95f, 1f);
         [SerializeField] private Color auraLossColor = new Color(1f, 0.35f, 0.4f);
@@ -56,6 +65,7 @@ namespace FeverDream.UI
         /// <summary>Real time the HUD has been visible: unscaled (hit stop does not freeze it) but stopped while paused.</summary>
         private float hudTime;
         private bool levelComplete;
+        private AuraTier shownAuraTier;
         private Canvas canvas;
 
         private void Awake()
@@ -69,6 +79,7 @@ namespace FeverDream.UI
             HandlePauseChanged(GamePause.IsPaused);
             PlayerContext.Registered += Bind;
             LevelGoal.Reached += HandleLevelGoal;
+            auraCounter.Landed += HandleAuraLanded;
             if (PlayerContext.Current != null)
             {
                 Bind(PlayerContext.Current);
@@ -83,6 +94,7 @@ namespace FeverDream.UI
             GamePause.Changed -= HandlePauseChanged;
             PlayerContext.Registered -= Bind;
             LevelGoal.Reached -= HandleLevelGoal;
+            auraCounter.Landed -= HandleAuraLanded;
             AlterEgoCommentator.Registered -= BindCommentator;
             Unbind();
             UnbindCommentator();
@@ -94,7 +106,8 @@ namespace FeverDream.UI
             alterEgoGroup.alpha = 0f;
             auraChangeText.text = string.Empty;
             centerMessageText.text = string.Empty;
-            auraTotalText.text = player != null ? player.Wallet.Total.ToString() : "0";
+            auraCounter.SetImmediate(player != null ? player.Wallet.Total : 0);
+            shownAuraTier = player != null ? player.Wallet.Tier : AuraTier.Calm;
             grappleMarker.gameObject.SetActive(false);
             if (boundCommentator == null)
             {
@@ -232,18 +245,40 @@ namespace FeverDream.UI
 
         private void HandleAuraChanged(int total, int delta)
         {
-            auraTotalText.text = total.ToString();
-            ShowAuraChange($"+{delta}", auraGainColor);
+            // A gain replaces a "combo lost" line that is still showing in the same spot.
+            auraChangeText.text = string.Empty;
+            auraGainLabel.Play($"+{delta}", auraGainColor);
+            // The counter starts rolling when the label arrives. It is told the real total now, so it cannot get stuck.
+            auraCounter.RollTo(total, auraGainLabel.Duration);
             if (levelComplete)
             {
                 ShowLevelComplete();
             }
         }
 
+        /// <summary>The rolling total has come to rest: the widget reacts in proportion to the payout.</summary>
+        private void HandleAuraLanded(float strength)
+        {
+            for (int i = 0; i < auraLandingEffects.Length; i++)
+            {
+                auraLandingEffects[i].Play(strength);
+            }
+
+            AuraTier tier = player != null ? player.Wallet.Tier : shownAuraTier;
+            if (tier > shownAuraTier && (int)tier < auraTierCallouts.Length)
+            {
+                auraTierText.text = auraTierCallouts[(int)tier];
+                auraTierStamp.Play();
+            }
+            shownAuraTier = tier;
+        }
+
         private void HandleComboBroken(ComboBreakReason reason, int lostPoints)
         {
             if (lostPoints > 0)
             {
+                // The loss line sits where a "+N" may still be showing; the total keeps rolling without the label.
+                auraGainLabel.Stop();
                 ShowAuraChange($"KOMBO BOZULDU  -{lostPoints}", auraLossColor);
             }
         }
