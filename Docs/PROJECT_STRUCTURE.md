@@ -17,10 +17,10 @@ Assets/
         Palette/            modellerin ortak renk paleti (M_FD_...)
         Prototype/          blockout ve oynanış renk dili (M_Proto_...), modeli henüz olmayanların yer tutucuları
         World/              dünya yüzeyleri ve gökyüzü (M_World_..., M_Sky_...)
-        VFX/                efekt materyalleri (M_FX_...)
+        VFX/                efekt ve çıkartma materyalleri (M_FX_...)
       Models/               SM_ (statik), SK_ (iskeletli)
         Characters/  Props/  Weapons/
-      Textures/             T_ (T_FX_... efekt dokusu, T_Env_<Sahne> o sahnenin gökyüzü yansıması)
+      Textures/             T_ (T_FX_... efekt ve çıkartma dokusu, T_Env_<Sahne> o sahnenin gökyüzü yansıması)
       Animations/           A_ (klip), AC_ (animator controller)
       VFX/                  FX_ (parçacık prefab'ları)
       PostProcessing/       VP_ (volume profile)
@@ -137,6 +137,12 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
   kamera ve ışık yok, animasyon yok, birim metre, eksen dönüşümü kalıcı, çarpıştırıcı yok. Dosyadaki `FD_X` adlı
   materyaller `Art/Materials/Palette/M_FD_X` ile değiştirilir; kitin bütün modelleri bu tek paleti paylaşır. Ayarlar
   yalnızca ilk içe aktarmada yazılır, sonra Inspector'da yapılan değişiklikler korunur.
+- `Scripts/Editor/Import/ModelGeometryCuts.cs`, kitin modelde bıraktığı ama oyunda prefab'ın başka bir şeyle değiştirdiği
+  parçaları her içe aktarmada modelden keser (model, mesh adı ve mesh uzayında bir kutu; kutunun içindeki üçgenler
+  atılır). FBX dosyası değişmez, projede türetilmiş mesh tutulmaz. Model, `.meta` dosyasındaki GUID'iyle tanınır;
+  Unity içinden taşınır ya da yeniden adlandırılırsa kesim çalışmaya devam eder. Listeye satır eklenince ya da kutu
+  değişince `GetVersion` bir artırılır ki modeller herkeste yeniden içe aktarılsın. Sanatçı parçayı modelden
+  kaldırınca içe aktarma "nothing left to cut" uyarısı verir; o zaman satır silinir.
 - Kit modelleri -Z yönüne bakar. Karakter prefab'larında model 180° döndürülür (düşmanlar +Z'ye bakar); modelin kendi
   kök dönüşü korunur, üstüne eklenir.
 - Dekor prefab'ları `Prefabs/Environment/PF_Prop_...` adını taşır: kök `Environment` katmanındadır, model görsel olarak
@@ -157,6 +163,13 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
 - `PF_Prop_ApartmentDoor`'daki camgöbeği şerit yalnızca duvarda sürer. Kit'te kapı kanatlarının da kendi
   `M_FD_CyanGlow` yuvası vardı ve çizgi kapıların üstünden geçiyordu; prefab'da o yuva kanadın kendi rengiyle
   değiştirildi.
+- `PF_Prop_BathroomMirror`'daki "WC →" yazısı ruj çıkartmasıdır: `Decal_Writing` (aynanın 4 mm önünde bir Quad,
+  `Art/Materials/VFX/M_FX_MirrorWriting`, `Art/Textures/T_FX_MirrorWriting`). Kit yazıyı aynadan 5 cm çıkan kalın
+  çubuklar olarak modellemişti; çubuk gibi duruyor ve çevresinde grenli bir gölge lekesi (SSAO) oluşuyordu. Çubuklar
+  `ModelGeometryCuts` ile içe aktarmada kesilir. Çıkartma saydam olduğu için derinlik yazmaz, leke oluşmaz.
+  Materyalin çizim sırası 2999'dur (Sorting Priority -1): opak aynanın üstünde durduğu için öteki saydamlardan
+  (cam raf, zerrecikler) önce çizilir, rafın arkasından bakınca rafın önüne geçmez.
+  Sanatçıya not: yazı modelden kaldırılmalı (`BathroomMirror_Clutter` içindeki `FD_Magenta` çubuklar).
 - Sanatçıya not: Blender'dan FBX alırken "Apply Transform" kapalı olsun. Açıkken bazı alt parçaların dönüşü iki kez
   uygulanıyor (`SM_Prop_ApartmentDoor`'daki kapılar, `SM_Prop_BathroomDoor`'daki havlu askısı); bu parçalar şimdilik
   prefab'da düzeltildi.
