@@ -1,9 +1,10 @@
-# Fever Dream: Prototip Planı (v0.1)
+# Fever Dream: Prototip Planı (v0.2)
 
 **Kanıtlanacak şey (GDD):** Parkur ve dövüş akıcı biçimde birleşiyor mu?
 
-Bu prototip yer tutucu (placeholder) geometri ve materyallerle, sanat ve ses olmadan, çekirdek mekanikleri oynanabilir
-hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCTURE.md`).
+Bu prototip çekirdek mekanikleri oynanabilir hâle getirir. v0.1 yer tutucu geometriyle başladı; v0.2'de düşmanlar,
+Katana, kontrol noktası, hedef tuvalet ve dekor için ilk sanat kiti (rüyadaki dev apartman) geldi ve bir ana menü ile
+duraklatma menüsü eklendi. Ses yok. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCTURE.md`).
 
 ## Verilen kararlar
 
@@ -37,7 +38,7 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 | Ağır saldırı (fırlatma, bitirici, havada çakılma) | Sağ tık | Y |
 | Kaçınma (dash) | Q | RB |
 | Zincirli Kama kancası | E | LB |
-| İmleci kilitle/aç | Esc | Start |
+| Duraklat / menü | Esc | Start |
 | Kontrol listesini aç/kapa | F1 | Select |
 
 ## Sistemler
@@ -103,19 +104,33 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 
 ### HUD (`HudView`, `PF_HUD`)
 - Can çubuğu, nişangâh, kanca işaretçisi, kombo sayacı ve süre çubuğu, bekleyen Aura ve çarpan, toplam Aura,
-  alter ego altyazısı, kontrol listesi (F1), bölüm sonu mesajı.
+  alter ego altyazısı, kontrol listesi (F1), bölüm sonu mesajı. Kontrol listesi `ControlsText`'ten gelir; ana menü de
+  aynı listeyi gösterir.
+
+### Menüler (`MainMenuView`, `PauseMenuView`, `GamePause`, `SceneFlow`)
+- **Ana menü (`MENU_Main`):** Oyna, Kontroller, Çıkış. Arkada kitten kurulmuş küçük bir rüya odası. Build listesinde ilk
+  sahnedir.
+- **Duraklatma (`PF_PauseMenu`):** Esc / Start açar. Devam Et, Yeniden Başla, Ana Menü, Çıkış. Açıkken zaman durur
+  (`TimeEffects` üzerinden, vuruş duraksamasıyla çakışmaz), imleç serbest kalır ve oyun girdisi yok sayılır. Devam
+  ettiren tıklama veya gamepad A, aynı karede saldırı ya da zıplama olarak okunmaz.
+- **Bölüm sonu:** tuvalete ulaştıktan 4 sn sonra aynı menü "Bölüm tamamlandı" başlığıyla, Devam Et olmadan açılır.
 
 ## Test seviyesi: `L_Proto_Dream`
 
-Tek küçük seviye, her mekaniği sırayla öğretir:
+Tek seviye, her mekaniği sırayla öğretir. v0.2'de rüyadaki dev bir apartmana dönüştü: oyuncu fare boyunda, eşyalar
+4-5 kat büyük. Seviye artık elle düzenlenir (kodla üretilmez).
 
-1. **Başlangıç:** devasa buzdolabı ve çamaşır makineleri olan oda.
-2. **Parkur 1:** kanepenin altından kayma → boşluk üstünde sağ duvarda koşma → 2.2 m'lik kenara tırmanma.
-3. **Arena A:** 3 alarm saatli ofis çalışanı + 1 klozet kapaklı kalkan.
-4. **Parkur 2:** boşluk üstünde iki kanca noktası → iniş platformu → duvardan sıçrama bacası ve tırmanma.
-   Arena B, platformdan 6 m yukarıdadır: arka duvardan tek sıçrama yetmez, en az bir yan duvar sıçraması gerekir.
-5. **Arena B:** 2 ofis çalışanı, 1 kalkan, kasaların üstünde 2 palyaço; arenanın üstünde kanca noktası.
-6. **Hedef:** rüyadaki tuvalet. Bölüm sonu mesajı ve toplam Aura.
+1. **Yatak odası:** Jack dev yatağın üstünde uyanır. Pencerede perdeler.
+2. **Parkur 1:** kanepe engelinin altından kayma → boşluk üstünde sağ duvarda koşma → 2.2 m'lik kenara tırmanma.
+3. **Arena A (mutfak ve çamaşır köşesi):** 3 alarm saatli ofis çalışanı + 1 klozet kapaklı kalkan. Tezgâh, çamaşır
+   makineleri, buzdolabı.
+4. **Parkur 2:** çamaşır ipleri altındaki boşlukta iki kanca noktası → iniş platformu → duvardan sıçrama bacası ve
+   tırmanma. Arena B, platformdan 6 m yukarıdadır: arka duvardan tek sıçrama yetmez, en az bir yan duvar sıçraması gerekir.
+5. **Arena B (oturma odası):** 2 ofis çalışanı, 1 kalkan, çamaşır makinelerinin üstünde 2 palyaço; dev kanepe, posta
+   kutuları; arenanın üstünde kanca noktası.
+6. **Merdiven holü (yeni):** apartman kapıları, dev merdivenle 8.55 m yukarıdaki kata çıkış, sahanlıkta kontrol noktası.
+7. **Banyo (yeni):** ışıklı banyo kapısı, ayna, duş perdesi ve hedef: rüyadaki dev tuvalet. Bölüm sonu mesajı, toplam
+   Aura ve bölüm sonu menüsü.
 
 Her parkur bölümünden sonra kontrol noktası var; boşluğa düşen oyuncu son kontrol noktasına döner.
 
@@ -130,8 +145,9 @@ Her parkur bölümünden sonra kontrol noktası var; boşluğa düşen oyuncu so
 
 ## Kapsam dışı (sonraki adımlar)
 
-Tsunagi'nin diğer formları ve form geçiş bonusu, Aura harcama (kontrol noktası dükkânı), animasyonlu karakter ve
-düşman modelleri, ses ve seslendirme, gerçek seviye tasarımı, menüler, kaydetme, tuvalet arayışının hikâye akışı.
+Tsunagi'nin diğer formları ve form geçiş bonusu (modelleri `Art/Models/Weapons/` altında hazır), Aura harcama (kontrol
+noktası dükkânı), düşman animasyonları (modeller parçalı ve iskelet hiyerarşili, animasyon eklenebilir), ses ve
+seslendirme, ayarlar menüsü, kaydetme, tuvalet arayışının hikâye akışı.
 
 ## Test durumu (v0.1)
 
@@ -169,6 +185,23 @@ Doğrulama turundan sonra (v0.1.2) ayrıca doğrulananlar:
 Henüz elle oynanarak denenmeyenler: fare ile nişan ve vuruş hissi, duvardan sıçrama bacası (yeni 6 m yükseklikte),
 köşedeki duvar koşusundan kenara tırmanma, iki kanca noktasının zincirlenmesi, palyaço turtalarının gerçek isabeti,
 genel denge ve zorluk.
+
+## Test durumu (v0.2)
+
+Play modunda doğrulananlar:
+
+- Oyuncu yatağın üstünde başlıyor, yatağın ayak ucundan yere iniyor.
+- Karakter denetleyicisi merdiveni sonuna kadar çıkıyor (8.55 m), sahanlıktan üst hole ve ışıklı kapıdan banyoya geçiyor.
+- Duraklatma: zaman duruyor, imleç serbest kalıyor, ilk düğme seçili; Devam Et ile her şey geri geliyor ve devam
+  ettiren kare oyun girdisi olarak okunmuyor.
+- Tuvalete ulaşınca 4 sn sonra "Bölüm tamamlandı" menüsü açılıyor; Yeniden Başla seviyeyi temiz başlatıyor.
+- Ana menü ↔ seviye geçişleri: zaman ve imleç her sahnede doğru durumda, kontroller sayfası açılıp kapanıyor.
+- Yeni düşman modelleri: vuruş parlaması bütün malzeme yuvalarında çalışıp temizleniyor, kalkan kırılınca yana
+  açılıyor, palyaçolar çamaşır makinelerinin üstünde kalıp turta atıyor, düşmanlar kovalıyor ve vuruyor.
+- Konsol temiz (hata ve uyarı yok).
+
+Henüz elle oynanarak denenmeyenler: yeni dekorun parkur hissi (kanepe, tezgâh ve makinelerin üstüne çıkış), merdiven
+holü ve banyo bölümlerinin akışı, menülerin gamepad ile kullanımı.
 
 ## Oynanış testi kontrol listesi
 

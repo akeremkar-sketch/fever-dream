@@ -13,8 +13,11 @@ Projeye ait her şey `Assets/_Project/` altındadır. Dış paketler ve hazır a
 Assets/
   _Project/
     Art/
-      Materials/            M_  (prototip materyalleri: Materials/Prototype/)
+      Materials/            M_
+        Palette/            modellerin ortak renk paleti (M_FD_...)
+        Prototype/          blockout ve oynanış renk dili (M_Proto_...), modeli henüz olmayanların yer tutucuları
       Models/               SM_ (statik), SK_ (iskeletli)
+        Characters/  Props/  Weapons/
       Textures/             T_
       Animations/           A_ (klip), AC_ (animator controller)
       VFX/                  FX_
@@ -30,11 +33,13 @@ Assets/
       Characters/  Enemies/  Weapons/  Environment/  Gameplay/  UI/
     Scenes/
       Levels/               L_  (oynanabilir bölümler)
+      Menus/                MENU_ (ana menü)
       Sandbox/              SB_ (deneme sahneleri, build'e girmez)
     Scripts/
       Runtime/              FeverDream.Runtime assembly
         Core/  Player/  Combat/  Aura/  Enemies/  AlterEgo/  UI/
       Editor/               FeverDream.Editor assembly
+        Import/  Setup/
     UI/                     UI sprite ve fontları (UI_)
   ThirdParty/
   Settings/                 URP (Unity'nin kendi ayarları)
@@ -62,6 +67,7 @@ Docs/                       GDD, yapı, plan ve blockout belgeleri (Assets dış
 | Ses efekti | `SFX_` | Seslendirme | `VO_` |
 | Müzik | `MUS_` | Shader | `SH_` |
 | Bölüm sahnesi | `L_` | Sandbox sahnesi | `SB_` |
+| Menü sahnesi | `MENU_` | | |
 
 Kod dosyaları önek almaz: dosya adı = sınıf adı (`PlayerMovement.cs`).
 
@@ -70,13 +76,16 @@ Kod dosyaları önek almaz: dosya adı = sınıf adı (`PlayerMovement.cs`).
 Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları sıfırlanmış boş nesneler):
 
 ```
---- SETUP ---         ışık, global volume, sahne ayarları
---- ENVIRONMENT ---   bölüm geometrisi, bölüm bölüm alt gruplar (Section_01_Start, ...)
+--- SETUP ---         ışık, global volume, sahne ayarları; oyuncusu olmayan sahnelerde (menü) kamera
+--- ENVIRONMENT ---   bölüm geometrisi, bölüm bölüm alt gruplar (Section_01_Bedroom, ...)
 --- GAMEPLAY ---      oyuncu, alter ego, kontrol noktaları, kanca noktaları, ölüm alanları, hedef
 --- ENEMIES ---       arenalara göre gruplanmış düşmanlar (Arena_A, Arena_B, ...)
---- UI ---            HUD ve menüler
+--- UI ---            HUD, duraklatma menüsü (PauseMenu) ve EventSystem
 --- RUNTIME ---       yalnızca oyun sırasında kod tarafından oluşturulur (mermiler vb.)
 ```
+
+- Bir bölüme ait ışıklar (`Light_Kitchen` gibi) o bölümün grubunda durur; `--- SETUP ---` yalnızca sahne geneli ışığı,
+  volume'u ve gerekirse kamerayı tutar.
 
 - Sahne nesneleri önek almaz, açıklayıcı PascalCase ad ve gerekirse numara alır: `Wall_Corridor_Left`,
   `Prop_GiantFridge_01`, `Enemy_AlarmClockWorker_02`, `Light_Sun`, `Volume_Global`.
@@ -93,11 +102,11 @@ Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları 
   (`FeverDream.Editor` kullanılmaz: Unity'nin `UnityEditor.Editor` türünü gölgeler).
 - Dosya başına bir üst seviye tür; dosya adı = tür adı.
 - Ayarlanabilir oynanış değerleri ScriptableObject'lerde (`Data/` altında) tutulur ki tasarımcılar koda dokunmadan ayar
-  yapabilsin ve "Rebuild" bunları sıfırlamasın: `SO_PlayerMovement_Default`, `SO_PlayerCamera_Default`,
+  yapabilsin: `SO_PlayerMovement_Default`, `SO_PlayerCamera_Default`,
   `SO_PlayerCombat_Default` (can, kaçınma, hasar, yeniden doğma), `SO_Aura_Default`, `SO_Tsunagi_Katana`,
   `SO_Enemy_*` (palyaço turtasının uçuşu dahil), `SO_AlterEgo_Pigeon`.
   Prefab bileşenlerinde yalnızca referanslar ve görsel ayarlar (renkler, pozlar) kalır. Sahneye özgü ayarlar
-  (`EnemyArena` üzerindeki saldırgan sınırı ve savaşı bırakma payı) sahnede durur; "Rebuild" sahneyi baştan yazar.
+  (`EnemyArena` üzerindeki saldırgan sınırı ve savaşı bırakma payı) sahnede durur.
 - Bir ayar dosyası atanmamışsa bileşen konsola hata yazar ve kendini kapatır (sessiz `NullReference` yerine).
 - Veri olarak kaydedilen enum'lara (ör. `AlterEgoEvent`) sabit sayı verilir; yeni değer yeni sayı alır, mevcutlar değişmez.
 - Sahneler arası bağımlılık için `FindObjectOfType` yerine bilinen erişim noktaları kullanılır (`PlayerContext.Current`).
@@ -113,21 +122,32 @@ Her sahnede kök seviyede yalnızca şu grup nesneleri bulunur (transform'ları 
 | 10 | Projectile | Düşman mermileri (yalnızca Player ve Environment ile çarpışır) |
 
 Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındadır. Katman adları ve çarpışma kuralları
-prototip aracı tarafından da ayarlanır; değiştirirseniz bu tabloyu ve aracı birlikte güncelleyin.
+**Fever Dream > Setup > Create Missing Data** tarafından da ayarlanır; araç her çalıştığında 9 ve 10 numaralı katmanların
+çarpışma kurallarını yeniden yazar. Değiştirirseniz bu tabloyu ve `ProjectDataSetup.ConfigureLayers`'ı birlikte güncelleyin.
 
-## Prototip araçları
+## Sanat içe aktarma
 
-`Scripts/Editor/Prototype/PrototypeContentBuilder.cs`, prototipin katmanlarını, yer tutucu materyal, veri, prefab ve
-test sahnesini üretir (menü: **Fever Dream > Prototype**). Play modunda çalışmaz.
+- Modeller `Art/Models/` altında türüne göre (`Characters/`, `Props/`, `Weapons/`) `SM_` önekiyle durur. Dosya adı
+  oyundaki adı taşır (`SM_Enemy_AlarmClockWorker`), kaynak dosyanın adını değil.
+- `Scripts/Editor/Import/ModelImportRules.cs`, `Art/Models/` altına ilk kez giren her modeli aynı ayarlarla içe aktarır:
+  kamera ve ışık yok, animasyon yok, birim metre, eksen dönüşümü kalıcı, çarpıştırıcı yok. Dosyadaki `FD_X` adlı
+  materyaller `Art/Materials/Palette/M_FD_X` ile değiştirilir; kitin bütün modelleri bu tek paleti paylaşır. Ayarlar
+  yalnızca ilk içe aktarmada yazılır, sonra Inspector'da yapılan değişiklikler korunur.
+- Kit modelleri -Z yönüne bakar. Karakter prefab'larında model 180° döndürülür (düşmanlar +Z'ye bakar); modelin kendi
+  kök dönüşü korunur, üstüne eklenir.
+- Dekor prefab'ları `Prefabs/Environment/PF_Prop_...` adını taşır: kök `Environment` katmanındadır, model görsel olarak
+  durur, oynanışa giren yüzeyler `Collider_...` adlı kutu çarpıştırıcılardadır (çıkıntılar duvar koşusunu bozmasın diye).
+- Sanatçıya not: Blender'dan FBX alırken "Apply Transform" kapalı olsun. Açıkken bazı alt parçaların dönüşü iki kez
+  uygulanıyor (`SM_Prop_ApartmentDoor`'daki kapılar, `SM_Prop_BathroomDoor`'daki havlu askısı); bu parçalar şimdilik
+  prefab'da düzeltildi.
 
-- **Build Missing:** yalnızca eksikleri oluşturur, mevcut veri ve prefab'ları ezmez. Var olan prefab'larda boş kalmış
-  veya silinmiş bir veriyi (ya da palyaçonun turta prefab'ını) gösteren referansları yeniden bağlar. Eksik bir prefab'ı
-  yeniden oluşturduysa sahnenin hâlâ eskisini gösterdiğini konsolda uyarır.
-- Katman adları yalnızca boşsa yazılır; başka bir ad kullanılıyorsa dokunulmaz ve uyarı verilir.
-- **Rebuild:** prefab'ları ve `L_Proto_Dream` sahnesini baştan yazar; elle yapılan prefab ve sahne düzenlemeleri kaybolur.
-  SO verileri ve materyaller korunur.
-- Sahne üretilecekse önce açık sahneleri kaydetmek isteyip istemediğiniz sorulur; açık sahneler kapanır.
-- Sahne üretildiğinde `L_Proto_Dream`, build ayarlarındaki sahne listesine yoksa eklenir; listedeki diğer sahnelere
-  dokunulmaz. "Build Missing" sahneyi üretmediği sürece listeye dokunmaz.
+## Editör araçları
+
+- **Fever Dream > Setup > Create Missing Data** (`Scripts/Editor/Setup/ProjectDataSetup.cs`): katman adlarını ve çarpışma
+  kurallarını, eksik `SO_` veri dosyalarını ilk değerleriyle ve `VP_Dream` volume profile'ını oluşturur. Var olan hiçbir
+  asset'e, prefab'a veya sahneye dokunmaz. Katman adları yalnızca boşsa yazılır; başka bir ad kullanılıyorsa uyarır.
+- Prefab'lar ve sahneler elle düzenlenir; artık kodla üretilmezler.
+- Yeni bir sahne oynanabilir olunca build profile'ın sahne listesine eklenir. `MENU_Main` listede ilk sahnedir; menüler
+  sahneleri adlarıyla yükler (`SceneFlow`).
 
 Bölüm blockout'u ProBuilder ile yapılır. Kurallar ve oyuncunun ölçüleri `Docs/LEVEL_BLOCKOUT.md`'dedir.
