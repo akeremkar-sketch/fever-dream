@@ -31,6 +31,8 @@ kurallar ve oyuncunun gerçek ölçüleri var.
 - Her parçanın çarpıştırıcısı olmalı; yalnızca renk şeritleri (`Decal_`) çarpıştırıcısızdır. ProBuilder yeni şekle
   Mesh Collider ekler.
 - Duvarlar dik olmalı (dikeyden en fazla ~17° sapma). Üstünde durulacak yüzeyler en fazla 45° eğimli olmalı.
+- Köşede duvarlar üst üste binmeli: iki duvar yalnızca kenarından değerse köşedeki sütun boş kalır, ay ışığı oradan
+  içeri sızar ve zeminde ince bir ışık çizgisi görünür. Duvarlardan birini köşeyi kapatacak kadar uzat.
 - Parçalar `--- ENVIRONMENT ---` altında bölüm gruplarına girer (`Section_01_Bedroom`, `Section_02_Parkour` ...). Grup
   transform'ları sıfırdır. Adlar açıklayıcı olur: `Floor_`, `Wall_`, `WallRun_`, `Ledge_`, `Obstacle_SlideUnder_`,
   `Prop_`, `Decal_` ve gerekirse numara (`Wall_Corridor_Left`, `Prop_GiantFridge_01`).
