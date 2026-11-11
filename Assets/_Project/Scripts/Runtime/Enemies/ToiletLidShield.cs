@@ -12,20 +12,33 @@ namespace FeverDream.Enemies
     {
         private const AttackFlags GuardBreakers = AttackFlags.Heavy | AttackFlags.Launcher | AttackFlags.Finisher | AttackFlags.Slam;
 
+        [Tooltip("The part that swings away when the guard breaks (the shield arm).")]
         [SerializeField] private Transform lid;
+        [Tooltip("Rotation added to the lid's rest pose while guarding.")]
         [SerializeField] private Vector3 lidGuardEuler = Vector3.zero;
+        [Tooltip("Rotation added to the lid's rest pose while the guard is broken.")]
         [SerializeField] private Vector3 lidBrokenEuler = new Vector3(-110f, 0f, 0f);
 
         private float guardBrokenUntil;
+        private Quaternion lidRest;
 
         public bool GuardUp => !IsDead && Time.time >= guardBrokenUntil;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (lid != null)
+            {
+                lidRest = lid.localRotation;
+            }
+        }
 
         protected override void Update()
         {
             base.Update();
             if (lid != null)
             {
-                var target = Quaternion.Euler(GuardUp ? lidGuardEuler : lidBrokenEuler);
+                var target = lidRest * Quaternion.Euler(GuardUp ? lidGuardEuler : lidBrokenEuler);
                 lid.localRotation = Quaternion.Slerp(lid.localRotation, target, 1f - Mathf.Exp(-15f * Time.deltaTime));
             }
         }

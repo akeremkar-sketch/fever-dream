@@ -2,7 +2,10 @@ using UnityEngine;
 
 namespace FeverDream.Enemies
 {
-    /// <summary>Placeholder feedback without art: hit and block flashes, a pulsing attack telegraph and a death shrink.</summary>
+    /// <summary>
+    /// Hit and block flashes, a pulsing attack telegraph and a death shrink. Works per material slot, so models with several
+    /// materials keep their own colours, and the tint is cleared when no effect is running.
+    /// </summary>
     [DisallowMultipleComponent]
     public sealed class EnemyFeedback : MonoBehaviour
     {
@@ -19,8 +22,11 @@ namespace FeverDream.Enemies
         [SerializeField, Min(0f)] private float telegraphShake = 0.04f;
         [SerializeField, Min(0.01f)] private float deathDuration = 0.45f;
 
-        private Color[] baseColors;
+        /// <summary>Base colour of every material slot, per renderer.</summary>
+        private Color[][] baseColors;
         private MaterialPropertyBlock block;
+        private MaterialPropertyBlock emptyBlock;
+        private bool tinted;
         private Color flashColor;
         private float flashUntil;
         private bool telegraph;
@@ -34,13 +40,20 @@ namespace FeverDream.Enemies
             {
                 renderers = GetComponentsInChildren<Renderer>();
             }
-            baseColors = new Color[renderers.Length];
+            renderers = System.Array.FindAll(renderers, r => r != null);
+            baseColors = new Color[renderers.Length][];
             for (int i = 0; i < renderers.Length; i++)
             {
-                var material = renderers[i].sharedMaterial;
-                baseColors[i] = material != null && material.HasProperty(BaseColorId) ? material.GetColor(BaseColorId) : Color.white;
+                var materials = renderers[i].sharedMaterials;
+                baseColors[i] = new Color[materials.Length];
+                for (int slot = 0; slot < materials.Length; slot++)
+                {
+                    var material = materials[slot];
+                    baseColors[i][slot] = material != null && material.HasProperty(BaseColorId) ? material.GetColor(BaseColorId) : Color.white;
+                }
             }
             block = new MaterialPropertyBlock();
+            emptyBlock = new MaterialPropertyBlock();
             baseScale = transform.localScale;
             if (telegraphPart != null)
             {
@@ -70,24 +83,35 @@ namespace FeverDream.Enemies
                 transform.localScale = baseScale * (1f - Mathf.Clamp01(deathTime / deathDuration));
             }
 
-            float pulse = telegraph ? 0.5f + 0.5f * Mathf.Sin(Time.time * 30f) : 0f;
             bool flashing = Time.time < flashUntil;
-            for (int i = 0; i < renderers.Length; i++)
+            if (telegraph || flashing)
             {
-                Color color = baseColors[i];
-                if (telegraph)
+                float pulse = telegraph ? 0.5f + 0.5f * Mathf.Sin(Time.time * 30f) : 0f;
+                for (int i = 0; i < renderers.Length; i++)
                 {
-                    color = Color.Lerp(color, telegraphColor, 0.4f + 0.6f * pulse);
+                    for (int slot = 0; slot < baseColors[i].Length; slot++)
+                    {
+                        Color color = flashing ? flashColor : Color.Lerp(baseColors[i][slot], telegraphColor, 0.4f + 0.6f * pulse);
+                        block.SetColor(BaseColorId, color);
+                        renderers[i].SetPropertyBlock(block, slot);
+                    }
                 }
-                if (flashing)
+                tinted = true;
+            }
+            else if (tinted)
+            {
+                for (int i = 0; i < renderers.Length; i++)
                 {
-                    color = flashColor;
+                    for (int slot = 0; slot < baseColors[i].Length; slot++)
+                    {
+                        renderers[i].SetPropertyBlock(emptyBlock, slot);
+                    }
                 }
-                block.SetColor(BaseColorId, color);
-                renderers[i].SetPropertyBlock(block);
+                tinted = false;
             }
 
-            if (telegraphPart != null)
+            // The shake is random per frame, not driven by time, so it must not move while the game is paused.
+            if (telegraphPart != null && (Time.deltaTime > 0f || !telegraph))
             {
                 telegraphPart.localPosition = telegraphRestPosition + (telegraph ? Random.insideUnitSphere * telegraphShake : Vector3.zero);
             }
