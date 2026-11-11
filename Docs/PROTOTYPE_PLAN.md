@@ -138,6 +138,7 @@ Tek seviye, her mekaniği sırayla öğretir. v0.2'de rüyadaki dev bir apartman
 5. **Arena B (oturma odası):** 2 ofis çalışanı, 1 kalkan, çamaşır makinelerinin üstünde 2 palyaço; dev kanepe, posta
    kutuları; arenanın üstünde kanca noktası.
 6. **Merdiven holü (yeni):** apartman kapıları, dev merdivenle 8.55 m yukarıdaki kata çıkış, sahanlıkta kontrol noktası.
+   Üst katın altı duvarla kapalıdır (`Wall_StairHall_End`); üst kat, hole bakan korkuluksuz bir asma kattır.
 7. **Banyo (yeni):** ışıklı banyo kapısı, ayna, duş perdesi ve hedef: rüyadaki dev tuvalet. Bölüm sonu mesajı, toplam
    Aura ve bölüm sonu menüsü.
 
