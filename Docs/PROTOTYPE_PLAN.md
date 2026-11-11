@@ -39,7 +39,7 @@ duraklatma menüsü eklendi. Ses yok. Yapı baştan üretim temizliğindedir (bk
 | Kaçınma (dash) | Q | RB |
 | Zincirli Kama kancası | E | LB |
 | Duraklat / menü | Esc | Start |
-| Kontrol listesini aç/kapa | F1 | Select |
+| Kontrol listesi (duraklatır) | F1 | Select |
 
 ## Sistemler
 
@@ -104,18 +104,25 @@ duraklatma menüsü eklendi. Ses yok. Yapı baştan üretim temizliğindedir (bk
 
 ### HUD (`HudView`, `PF_HUD`)
 - Can çubuğu, nişangâh, kanca işaretçisi, kombo sayacı ve süre çubuğu, bekleyen Aura ve çarpan, toplam Aura,
-  alter ego altyazısı, kontrol listesi (F1), bölüm sonu mesajı. Kontrol listesi `ControlsText`'ten gelir; ana menü de
-  aynı listeyi gösterir.
-- Görünüm manga/anime aksiyon stilindedir: kombo sayacı bir patlamanın üstünde her vuruşta zıplar, alter ego konuşma
-  balonunda isim etiketiyle konuşur, can çubuğu eğik ve bölmelidir (bkz. `PROJECT_STRUCTURE.md`, "Arayüz stili").
+  alter ego altyazısı, bölüm sonu mesajı. Kontrol listesi oyun ekranında yazmaz; menülerdedir.
+- Görünüm manga/anime aksiyon stilindedir (bkz. `PROJECT_STRUCTURE.md`, "Arayüz stili"):
+  - Can: atan bir kalp ve eğik çerçevede 10 bölme. Hasar alınca çubuk sarsılır, can %30'un altındayken bölmeler
+    kırmızıya yanıp söner.
+  - Aura: eğik plaka, "AURA" etiketi, toplam değişince dönen yıldız ve temiz çizgili sayı.
+  - Kombo sayacı bir patlamanın üstünde her vuruşta zıplar; alter ego konuşma balonunda isim etiketiyle konuşur.
+  - Nişangâh ve kanca işaretçisi çizilmiş ikonlardır; kanca işaretçisi hedefin üstünde döner.
+- Oyun duraklayınca HUD gizlenir; menünün arkasından görünmez.
 
-### Menüler (`MainMenuView`, `PauseMenuView`, `GamePause`, `SceneFlow`)
-- **Ana menü (`MENU_Main`):** Oyna, Kontroller, Çıkış. Arkada kitten kurulmuş küçük bir rüya odası. Build listesinde ilk
-  sahnedir.
-- **Duraklatma (`PF_PauseMenu`):** Esc / Start açar. Devam Et, Yeniden Başla, Ana Menü, Çıkış. Açıkken zaman durur
-  (`TimeEffects` üzerinden, vuruş duraksamasıyla çakışmaz), imleç serbest kalır ve oyun girdisi yok sayılır. Devam
+### Menüler (`MainMenuView`, `PauseMenuView`, `ControlsPanel`, `GamePause`, `SceneFlow`)
+- **Ana menü (`MENU_Main`):** Oyna, Kontroller, Çıkış. Arkada kitten kurulmuş bir rüya odası: ortada dev tuvalet, sağ
+  duvarda apartman kapıları. Build listesinde ilk sahnedir.
+- **Duraklatma (`PF_PauseMenu`):** Esc / Start açar. Devam Et, Kontroller, Yeniden Başla, Ana Menü, Çıkış. Açıkken zaman
+  durur (`TimeEffects` üzerinden, vuruş duraksamasıyla çakışmaz), imleç serbest kalır ve oyun girdisi yok sayılır. Devam
   ettiren tıklama veya gamepad A, aynı karede saldırı ya da zıplama olarak okunmaz.
-- **Bölüm sonu:** tuvalete ulaştıktan 4 sn sonra aynı menü "Bölüm tamamlandı" başlığıyla, Devam Et olmadan açılır.
+- **Kontroller (`PF_ControlsPanel`):** iki menünün de gösterdiği tek kontrol listesi. Oyunda F1 menüyü doğrudan bu
+  sayfada açar; oradan Geri, Esc ya da gamepad B oyuna döndürür. Menüden açıldıysa menüye döndürür.
+- **Bölüm sonu:** tuvalete ulaştıktan 4 sn sonra aynı menü "Bölüm tamamlandı" başlığı ve toplam Aura ile, Devam Et
+  olmadan açılır. Kendi açıldığı için ilk 0.5 sn girdi almaz: o anda yapılan saldırı tıklaması bir düğmeye basmaz.
 
 ## Test seviyesi: `L_Proto_Dream`
 
@@ -200,10 +207,17 @@ Play modunda doğrulananlar:
 - Ana menü ↔ seviye geçişleri: zaman ve imleç her sahnede doğru durumda, kontroller sayfası açılıp kapanıyor.
 - Yeni düşman modelleri: vuruş parlaması bütün malzeme yuvalarında çalışıp temizleniyor, kalkan kırılınca yana
   açılıyor, palyaçolar çamaşır makinelerinin üstünde kalıp turta atıyor, düşmanlar kovalıyor ve vuruyor.
+- Arayüz gerçek oyun ekranından alınan görüntülerle kontrol edildi: HUD, duraklatma, kontroller, bölüm sonu, ana menü.
+- Menü akışı: Esc açıp kapatıyor; F1 doğrudan kontrol listesini açıyor ve Geri oyuna döndürüyor; menüden açılan kontrol
+  listesinden Geri/Esc menüye döndürüyor. Esc hem Duraklat hem UI Cancel olarak geldiğinde kare başına bir kez işleniyor.
+- Menü açıldığında duran imleç seçimi değiştirmiyor, fare oynayınca altındaki düğme seçiliyor. Bölüm sonu menüsü kendi
+  açıldığında 0.5 sn girdi almıyor.
+- Oyun duraklayınca HUD gizleniyor; can çubuğu %25'te 2.5 bölme gösterip yanıp sönüyor.
 - Konsol temiz (hata ve uyarı yok).
 
 Henüz elle oynanarak denenmeyenler: yeni dekorun parkur hissi (kanepe, tezgâh ve makinelerin üstüne çıkış), merdiven
-holü ve banyo bölümlerinin akışı, menülerin gamepad ile kullanımı.
+holü ve banyo bölümlerinin akışı, menülerin gerçek klavye, fare ve gamepad ile gezilmesi (menü akışı kod üzerinden
+tetiklenerek denendi).
 
 ## Oynanış testi kontrol listesi
 

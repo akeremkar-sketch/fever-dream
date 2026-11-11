@@ -188,8 +188,8 @@ Perde ve çamaşır ipinin pivotu tepededir; asıldıkları yükseklikten aşağ
 
 ## Deneme ve teslim
 
-- Play'e bas ve bölümü baştan sona oyna. Kontrol listesi sol üstte açık başlar; F1 (gamepad: Select) gizler ve
-  gösterir. Konsolda hata olmamalı.
+- Play'e bas ve bölümü baştan sona oyna. Kontrol listesini F1 (gamepad: Select) açar; Esc duraklatma menüsüdür.
+  Konsolda hata olmamalı.
 - Sahneyi ve `.meta` dosyasını birlikte commit et, dalını push edip `main`'e PR aç.
 - Bölüm oynanabilir hale gelince build profile'ın sahne listesine eklenmesi için haber ver. Menüler sahneleri adıyla
   yükler; listede olmayan bir sahneye geçilemez.

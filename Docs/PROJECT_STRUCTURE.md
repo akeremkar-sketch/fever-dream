@@ -149,14 +149,33 @@ kombo için patlama, alter ego için konuşma balonu. Yeni bir ekran eklerken ay
 
 - **Yazı tipi:** başlık, düğme ve sayılar `UI/Fonts/UI_Font_Bangers` (Google Fonts, SIL OFL 1.1; lisans dosyası yanında).
   Türkçe harflerin hepsi var, ama yalnızca büyük harf çizer: Türkçe metin elle büyük harfle yazılır (`BİR`, `BEKLİYOR`),
-  koddan gelen metin `HudView.TurkishUpper` gibi i→İ, ı→I dönüşümünden geçer. Uzun metin (kontrol listesi, alter ego
-  repliği) Unity'nin yerleşik yazı tipiyle kalır. Bangers satırları eski yazı tipinden uzundur; metinlerde dikey taşma açık.
-- **Sprite'lar (`UI/Sprites/`):** `UI_Panel_Sticker` (panel ve düğme, 9-slice), `UI_SpeechBubble` (kuyruk sol altta,
-  9-slice), `UI_Burst` (kombo patlaması), `UI_Halftone` (ekran tonu), `UI_Bar_Segments` (bar bölmeleri, Tiled). Hepsi beyaz
-  dolgu ve gömülü koyu çizgidir: Image rengi yalnızca dolguyu boyar, çizgi koyu kalır.
-- **Efekt bileşenleri (`Scripts/Runtime/UI/`):** `UiSkew` (eğim), `UiGradient` (dikey renk geçişi; Outline ve Shadow'un
-  üstünde durur), `UiPunchOnChange` (izlediği metin değişince zıplatır), `UiIdleFloat` (yavaş süzülme; LayoutGroup
-  içindeki öğelerde kullanılmaz, düzeni bozar).
+  koddan gelen metin `HudView.TurkishUpper` gibi i→İ, ı→I dönüşümünden geçer. Uzun cümleler (alter ego repliği)
+  Unity'nin yerleşik yazı tipiyle kalır. Bangers satırları yerleşik yazı tipinden uzundur; metinlerde dikey taşma açıktır.
+- **Yazı efekti:** Bangers metinleri `UiStickerOutline` kullanır (8-12 yöne eşit dış çizgi ve çizgili şeklin sert
+  gölgesi). Unity'nin `Outline` bileşeni yalnızca dört köşegen kopya çizer ve kalın çizgide tırtıklı görünür; metinde
+  kullanılmaz. Bileşen sırası: `UiGradient`, `UiSkew`, `UiStickerOutline`.
+- **Sprite'lar (`UI/Sprites/`):**
+  - Beyaz dolgu ve gömülü koyu çizgi; Image rengi yalnızca dolguyu boyar: `UI_Panel_Sticker` (panel ve düğme, 9-slice),
+    `UI_SpeechBubble` (kuyruk sol altta, 9-slice), `UI_Burst` (kombo patlaması), `UI_Crosshair`, `UI_GrappleMarker`.
+  - Çizgisiz, boyanır: `UI_Bar_Chip` (can bölmesi, üstünde parlaklık bandı), `UI_Halftone` (soldan sağa sönen ekran tonu),
+    `UI_Halftone_Corner` (sol alt köşeden dışa doğru sönen ekran tonu).
+  - Renkleri gömülü ikonlar, Image rengi beyaz kalır: `UI_Icon_Heart`, `UI_Icon_Sparkle`.
+- **Ekran tonu kuralı:** `UI_Halftone` yalnızca bir panelin içinde, panelle aynı eğimde ve kenarlarından içeride
+  kullanılır. Ekran köşelerinde `UI_Halftone_Corner` kullanılır; kenarlara varmadan söner, dikdörtgen izi bırakmaz. Başka
+  köşeler için ölçek -1 ile çevrilir (pivot ortada kalmalı, yoksa görüntü panelin dışına taşar).
+- **Efekt bileşenleri (`Scripts/Runtime/UI/`):** `UiSkew` (eğim), `UiGradient` (dikey renk geçişi),
+  `UiPunchOnChange` (izlediği metin değişince zıplatır), `UiIdleFloat` (yavaş süzülme; LayoutGroup içindeki öğelerde
+  kullanılmaz, düzeni bozar), `UiPulse` (nabız ve dönme), `UiSegmentedBar` (bölmeli çubuk: değer düşünce sarsılır, azken
+  yanıp söner), `UiMenuButton` (fareyle üstüne gelmek düğmeyi seçer; seçili düğme büyür ve işaretçisini gösterir).
+  `UiPulse` ile `UiPunchOnChange` aynı nesnede birlikte kullanılmaz; ikisi de ölçeği yazar.
+- **Menü düğmeleri:** her zaman tek bir düğme vurguludur. Fare, klavye ve gamepad aynı seçimi paylaşır (`UiMenuButton`):
+  - Fare bir düğmenin üstünde oynayınca o düğme seçilir. Menü duran imlecin altında açılırsa seçim değişmez.
+  - Düğmelerde Highlighted rengi Normal ile aynıdır; vurguyu yalnızca seçim gösterir.
+  - Sahnedeki `EventSystem`'de "Deselect On Background Click" kapalıdır; boşluğa tıklamak seçimi silmez.
+  - UI Cancel (Esc, gamepad B) yalnızca seçili nesneye gider; `UiMenuButton` bunu üstündeki menüye iletir.
+  - Bir sayfanın düğmesi, yerine geçtiği sayfadaki bir düğmeyle aynı yere konmaz: ikinci tıklama alttakine gider.
+- **Kontrol listesi:** `Prefabs/UI/PF_ControlsPanel` tek kaynaktır; ana menü ve duraklatma menüsü aynı prefab'ı gösterir.
+  Satırlar prefab'da elle düzenlenir ve `IA_Player` ile uyumlu tutulur. Oyun ekranında (HUD) kontrol listesi yoktur.
 - **Renkler:** mürekkep `#1F1238` (panel), erik `#5C339E` (düğme), pembe `#FF6BAD` (vurgu, can, seçili düğme), macenta
   `#D12485` (sert gölge), camgöbeği `#4DEBFF` (Aura, ikinci gölge), krem `#FAF2FF` (yazı), koyu `#120821` (dış çizgi).
 
