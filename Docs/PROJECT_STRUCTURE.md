@@ -144,9 +144,16 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
   Çarpıştırıcı modelin görünen sınırını aşmaz; oyuncu görmediği bir şeye takılmamalıdır. Eğik bir kutunun ucu
   eğimine dik olduğu için ileri taşar: eğik kutu modelin içinde başlatılır, başlangıcı dik bir kutuyla kapatılır
   (`PF_Prop_StairRailing`'deki `Collider_RailPost` ve `Collider_RailStart` gibi). Modeldeki küçük bir boşluğu kapatan
-  görsel parça `Patch_...` adını alır (`PF_Prop_BedroomSet` > `Patch_HeadboardGap`).
-- `PF_Prop_BathroomDoor`'daki ışık parçası (`BathroomDoor_Light`) kitin opak `M_FD_BladeGlow` materyali yerine
+  görsel parça `Patch_...` adını alır (`PF_Prop_BedroomSet` > `Patch_HeadboardGap`; `PF_Prop_StairRailing` >
+  `Patch_RunnerEdges`: halı basamak kenarının üstünden kesilmeden geçsin diye her basamağa bir parça).
+- `PF_Prop_StairRailing`'de `StairRailing_Posts` ve `StairRailing_Rail` 10 cm öne alınmıştır: ilk basamağın kenar
+  çıtası baş direğin önünden geçmez, direğin içinde biter.
+- `PF_Prop_BathroomDoor`'da kitin ışık parçası (`BathroomDoor_Light`) kapalıdır: opaktı ve kapının 1.4 m arkasında
+  duruyordu. Yerine kapı hizasında `Glow_Doorway` ve zeminde `Glow_DoorwayFloor` vardır; ikisi de
   `Art/Materials/VFX/M_FX_DoorGlow` (saydam, toplamalı) kullanır: kapı parlar ama içerisi görünür.
+- Duvar paneli olan dekor (`PF_Prop_ApartmentDoor`) blockout duvarının içine değil önüne konur: panelin yüzü duvar
+  yüzünün birkaç santim önünde durur, yoksa kapılar duvarın içinde kalır. Panelin ucu başka bir duvarın yüzeyiyle aynı
+  düzlemde bırakılmaz (iki yüzey titreşir); uç, o duvarın içine sokulur.
 - Sanatçıya not: Blender'dan FBX alırken "Apply Transform" kapalı olsun. Açıkken bazı alt parçaların dönüşü iki kez
   uygulanıyor (`SM_Prop_ApartmentDoor`'daki kapılar, `SM_Prop_BathroomDoor`'daki havlu askısı); bu parçalar şimdilik
   prefab'da düzeltildi.

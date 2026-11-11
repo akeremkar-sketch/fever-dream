@@ -187,7 +187,7 @@ oyuncu yanlarında fare boyunda kalır. Çarpıştırıcıları hazırdır ve `E
 | `PF_Prop_KitchenCounter` | Tezgâh 5.5 m, üst dolaplar 7.5-11.2 m | Engel veya kanca ile |
 | `PF_Prop_GiantFridge` | 9 m | Engel, uzaktan görünen işaret |
 | `PF_Prop_StairRailing` | 10 basamakla 8.5 m, sahanlık | Rampa gibi yürünür (ilk basamakta 40°, sonra 31°); çarpıştırıcı ilk basamağın önüne taşmaz |
-| `PF_Prop_ApartmentDoor` | 27 m uzunluk, 14 m yükseklik | Düz bir duvar yüzeyi; zemin olan yerde duvar koşusuna uygun. Paspaslar zemine yatık durur, boşluk üstünde havada kalır |
+| `PF_Prop_ApartmentDoor` | 27 m uzunluk, 14 m yükseklik | Düz bir duvar yüzeyi; zemin olan yerde duvar koşusuna uygun. Paspaslar zemine yatık durur, boşluk üstünde havada kalır. Duvarın önüne koy: panelin yüzü duvar yüzünün 3 cm önünde olsun, uçları yandaki duvarların içine girsin |
 | `PF_Prop_BathroomDoor` | Kasa 6 m, açıklık 4.5 m | Kapı kanadı menteşe tarafında (-X) içeri (+Z) açık; düz geçiş ~2.7 m. Bir duvar boşluğuna yerleştir |
 
 `PF_Prop_BathroomMirror`, `PF_Prop_CurtainRail` ve `PF_Prop_Clothesline` yalnızca görseldir, çarpıştırıcıları yoktur.
