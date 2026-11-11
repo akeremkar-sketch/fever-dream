@@ -1,9 +1,13 @@
+using FeverDream.Core;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace FeverDream.Player
 {
-    /// <summary>Single place that reads the IA_Player actions. Gameplay code asks this component, never the devices.</summary>
+    /// <summary>
+    /// Single place that reads the IA_Player actions. Gameplay code asks this component, never the devices.
+    /// While the game is paused, and on the frame it resumes, gameplay input reads as idle; Pause and ToggleHelp still work.
+    /// </summary>
     [DisallowMultipleComponent]
     public sealed class PlayerInputReader : MonoBehaviour
     {
@@ -22,20 +26,22 @@ namespace FeverDream.Player
         private InputAction pause;
         private InputAction toggleHelp;
 
-        public Vector2 Move => move.ReadValue<Vector2>();
-        public Vector2 Look => look.ReadValue<Vector2>();
+        public Vector2 Move => GameplayBlocked ? Vector2.zero : move.ReadValue<Vector2>();
+        public Vector2 Look => GameplayBlocked ? Vector2.zero : look.ReadValue<Vector2>();
         public bool LookFromMouse => look.activeControl == null || look.activeControl.device is Pointer;
 
-        public bool JumpPressed => jump.WasPressedThisFrame();
-        public bool SprintHeld => sprint.IsPressed();
-        public bool SlidePressed => slide.WasPressedThisFrame();
-        public bool SlideHeld => slide.IsPressed();
-        public bool LightAttackPressed => lightAttack.WasPressedThisFrame();
-        public bool HeavyAttackPressed => heavyAttack.WasPressedThisFrame();
-        public bool DodgePressed => dodge.WasPressedThisFrame();
-        public bool GrapplePressed => grapple.WasPressedThisFrame();
+        public bool JumpPressed => !GameplayBlocked && jump.WasPressedThisFrame();
+        public bool SprintHeld => !GameplayBlocked && sprint.IsPressed();
+        public bool SlidePressed => !GameplayBlocked && slide.WasPressedThisFrame();
+        public bool SlideHeld => !GameplayBlocked && slide.IsPressed();
+        public bool LightAttackPressed => !GameplayBlocked && lightAttack.WasPressedThisFrame();
+        public bool HeavyAttackPressed => !GameplayBlocked && heavyAttack.WasPressedThisFrame();
+        public bool DodgePressed => !GameplayBlocked && dodge.WasPressedThisFrame();
+        public bool GrapplePressed => !GameplayBlocked && grapple.WasPressedThisFrame();
         public bool PausePressed => pause.WasPressedThisFrame();
         public bool ToggleHelpPressed => toggleHelp.WasPressedThisFrame();
+
+        private static bool GameplayBlocked => GamePause.IsPaused || Time.frameCount <= GamePause.ResumedFrame;
 
         private void Awake()
         {

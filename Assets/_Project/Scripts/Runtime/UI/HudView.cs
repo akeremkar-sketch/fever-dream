@@ -43,6 +43,8 @@ namespace FeverDream.UI
         [Header("Messages")]
         [SerializeField] private Text centerMessageText;
         [SerializeField] private GameObject helpPanel;
+        [Tooltip("Filled from ControlsText, so the HUD and the main menu always list the same controls.")]
+        [SerializeField] private Text helpText;
 
         private PlayerContext player;
         private AlterEgoCommentator boundCommentator;
@@ -50,6 +52,14 @@ namespace FeverDream.UI
         private float auraChangeHideTime;
         private float centerMessageHideTime;
         private bool levelComplete;
+
+        private void Awake()
+        {
+            if (helpText != null)
+            {
+                helpText.text = ControlsText.HudHelp;
+            }
+        }
 
         private void OnEnable()
         {

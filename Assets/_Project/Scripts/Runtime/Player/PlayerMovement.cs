@@ -1,4 +1,5 @@
 using System;
+using FeverDream.Core;
 using UnityEngine;
 
 namespace FeverDream.Player
@@ -89,7 +90,9 @@ namespace FeverDream.Player
         private void Update()
         {
             float dt = Time.deltaTime;
-            if (dt <= 0f)
+            // On the frame the game pauses, deltaTime is still the old value but input already reads as idle;
+            // ticking it would end a wall run or a slide behind the pause menu.
+            if (dt <= 0f || GamePause.IsPaused)
             {
                 return;
             }

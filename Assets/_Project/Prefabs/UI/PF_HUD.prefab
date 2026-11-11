@@ -1354,6 +1354,7 @@ MonoBehaviour:
   grappleMarker: {fileID: 7078423205847502100}
   centerMessageText: {fileID: 9141305025028387730}
   helpPanel: {fileID: 5830587978792194739}
+  helpText: {fileID: 4572927823549620032}
 --- !u!1 &7684770450621363361
 GameObject:
   m_ObjectHideFlags: 0
@@ -1754,7 +1755,7 @@ MonoBehaviour:
     t\u0131k  Hafif sald\u0131r\u0131 (3'l\xFC zincir)\nSa\u011F t\u0131k  F\u0131rlatma,
     3 hafiften sonra Bitirici\nHavada  Sol t\u0131k hava kombosu, Sa\u011F t\u0131k
     \xC7ak\u0131lma\nQ  Ka\xE7\u0131nma (son anda: a\u011F\u0131r \xE7ekim)\nE  Zincirli
-    Kama (camg\xF6be\u011Fi nokta)\nEsc  \u0130mleci kilitle / a\xE7"
+    Kama (camg\xF6be\u011Fi nokta)\nEsc  Duraklat / men\xFC"
 --- !u!114 &3303506398551575802
 MonoBehaviour:
   m_ObjectHideFlags: 0

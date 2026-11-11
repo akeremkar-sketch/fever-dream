@@ -2,7 +2,9 @@ using UnityEngine;
 
 namespace FeverDream.Core
 {
-    /// <summary>Hit stop and slow motion. All requests are merged so overlapping effects never fight over Time.timeScale.</summary>
+    /// <summary>
+    /// Hit stop, slow motion and the pause. All requests are merged so overlapping effects never fight over Time.timeScale.
+    /// </summary>
     public static class TimeEffects
     {
         private static TimeEffectsRunner runner;
@@ -39,8 +41,19 @@ namespace FeverDream.Core
             slowMotionUntil = Mathf.Max(slowMotionUntil, Time.unscaledTime + duration);
         }
 
+        /// <summary>Applies the merged time scale right away, e.g. when the game is paused or resumed.</summary>
+        internal static void Refresh()
+        {
+            EnsureRunner();
+            Time.timeScale = EvaluateScale();
+        }
+
         internal static float EvaluateScale()
         {
+            if (GamePause.IsPaused)
+            {
+                return 0f;
+            }
             float now = Time.unscaledTime;
             float scale = now < slowMotionUntil ? slowMotionScale : 1f;
             if (now < hitStopUntil)

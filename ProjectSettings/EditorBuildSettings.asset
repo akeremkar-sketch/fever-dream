@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_Project/Scenes/Menus/MENU_Main.unity
+    guid: c0500071d26ffac4ea0a0d19741ac40f
+  - enabled: 1
     path: Assets/_Project/Scenes/Levels/L_Proto_Dream.unity
     guid: dc0bec80481b30b488dd414fa92e8965
   m_configObjects:
