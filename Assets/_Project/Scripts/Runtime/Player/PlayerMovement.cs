@@ -23,6 +23,7 @@ namespace FeverDream.Player
 
         private CharacterController controller;
         private PlayerInputReader input;
+        private float standStepOffset;
         private Vector3 velocity;
         private MovementState state = MovementState.Airborne;
         private float stateTime;
@@ -84,6 +85,7 @@ namespace FeverDream.Player
                 enabled = false;
                 return;
             }
+            standStepOffset = controller.stepOffset;
             ApplyHeight(settings.standHeight);
         }
 
@@ -786,6 +788,10 @@ namespace FeverDream.Player
         {
             controller.height = height;
             controller.center = new Vector3(0f, height * 0.5f, 0f);
+            // Before every sideways move the controller lifts itself by its step offset. With the standing step a low
+            // capsule rises into the edge of a gap it fits through and snags there, so a low capsule gets a low step.
+            bool low = height < settings.standHeight - 0.01f;
+            controller.stepOffset = low ? Mathf.Min(settings.crouchStepOffset, standStepOffset) : standStepOffset;
         }
 
         private void SetState(MovementState next)

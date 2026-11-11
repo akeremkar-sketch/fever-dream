@@ -17,6 +17,7 @@ MonoBehaviour:
     m_Bits: 256
   standHeight: 1.8
   crouchHeight: 1
+  crouchStepOffset: 0.05
   standEyeHeight: 1.65
   crouchEyeHeight: 0.85
   walkSpeed: 6.5
@@ -36,6 +37,8 @@ MonoBehaviour:
   slideExitSpeed: 4
   slideMinDuration: 0.25
   slideMaxDuration: 1.1
+  slideMaxSpeed: 13.5
+  slideSteerRate: 1.5
   wallCheckDistance: 0.8
   wallRunMinSpeed: 5
   wallRunSpeed: 11
@@ -43,9 +46,10 @@ MonoBehaviour:
   wallRunGravity: -2.5
   wallRunMinEntryUpSpeed: 2
   wallRunEntryUpSpeed: 2.5
-  wallRunCoyoteUpSpeed: 5
+  wallRunMaxEntryDot: 0.8
   wallRunMaxDuration: 1.8
   wallStickSpeed: 2
+  sameWallNormalDot: 0.9
   wallJumpUpSpeed: 10
   wallJumpSideSpeed: 6.5
   wallJumpMomentumKeep: 0.9
@@ -63,4 +67,7 @@ MonoBehaviour:
   grappleMaxDuration: 2.2
   grappleExitUpBoost: 4
   grappleExitVelocityKeep: 0.65
+  grappleFallDamping: 0.3
+  grappleReleaseGrace: 0.05
+  grappleBlockedGrace: 0.25
   airAttackHoverSpeed: 1.5
