@@ -44,7 +44,8 @@ namespace FeverDream.Core
         /// <summary>Applies the merged time scale right away, e.g. when the game is paused or resumed.</summary>
         internal static void Refresh()
         {
-            EnsureRunner();
+            // No runner is created here: a pause that ends while the scene is closing (stopping Play mode, a scene
+            // change) must not spawn an object during teardown. The runner only exists for timed effects.
             Time.timeScale = EvaluateScale();
         }
 
