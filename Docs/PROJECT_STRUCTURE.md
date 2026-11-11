@@ -144,6 +144,11 @@ Düşman arenalarının tetikleyici kutuları `Ignore Raycast` (2) katmanındad�
 - Sanatçıya not: Blender'dan FBX alırken "Apply Transform" kapalı olsun. Açıkken bazı alt parçaların dönüşü iki kez
   uygulanıyor (`SM_Prop_ApartmentDoor`'daki kapılar, `SM_Prop_BathroomDoor`'daki havlu askısı); bu parçalar şimdilik
   prefab'da düzeltildi.
+- Sanatçıya not: aynı düzlemde üst üste binen yüzeyler titreşir (z-fighting). `SM_Prop_BedroomSet`'in yatak başlığında
+  bulut biçimli parçalarla arkalarındaki tahta aynı düzlemdeydi ve aralarında tırtıklı bir bant görünüyordu. Şimdilik bu
+  modelin normalleri Unity'de yeniden hesaplanıyor (Model sekmesi: Normals = Calculate, Smoothing Angle = 45, Smoothing
+  Source = From Angle): iki yüzey aynı ışığı aldığı için bant görünmüyor. Kalıcı çözüm modeldedir: parçalar tahtayla
+  birleştirilmeli ya da birkaç milimetre öne alınmalı. Yeni bir modelde aynı bant görülürse önce modele bakılır.
 
 ## Dünya görseli
 
