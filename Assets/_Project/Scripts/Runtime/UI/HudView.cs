@@ -7,15 +7,20 @@ using UnityEngine.UI;
 
 namespace FeverDream.UI
 {
-    /// <summary>Prototype HUD. Reads the player through <see cref="PlayerContext.Current"/> and only displays state.</summary>
+    /// <summary>
+    /// In-game HUD. Reads the player through <see cref="PlayerContext.Current"/> and only displays state.
+    /// The control list is not shown here; it lives in the pause menu and the main menu.
+    /// The HUD hides while the game is paused, so it does not show through the menu.
+    /// </summary>
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(Canvas))]
     public sealed class HudView : MonoBehaviour
     {
         [Tooltip("The scene's alter ego. Optional: when empty the HUD uses AlterEgoCommentator.Current (any loaded scene).")]
         [SerializeField] private AlterEgoCommentator commentator;
 
         [Header("Health")]
-        [SerializeField] private RectTransform healthFill;
+        [SerializeField] private UiSegmentedBar healthBar;
 
         [Header("Combo")]
         [SerializeField] private CanvasGroup comboGroup;
@@ -42,27 +47,26 @@ namespace FeverDream.UI
 
         [Header("Messages")]
         [SerializeField] private Text centerMessageText;
-        [SerializeField] private GameObject helpPanel;
-        [Tooltip("Filled from ControlsText, so the HUD and the main menu always list the same controls.")]
-        [SerializeField] private Text helpText;
 
         private PlayerContext player;
         private AlterEgoCommentator boundCommentator;
         private float alterEgoHideTime;
         private float auraChangeHideTime;
         private float centerMessageHideTime;
+        /// <summary>Real time the HUD has been visible: unscaled (hit stop does not freeze it) but stopped while paused.</summary>
+        private float hudTime;
         private bool levelComplete;
+        private Canvas canvas;
 
         private void Awake()
         {
-            if (helpText != null)
-            {
-                helpText.text = ControlsText.HudHelp;
-            }
+            canvas = GetComponent<Canvas>();
         }
 
         private void OnEnable()
         {
+            GamePause.Changed += HandlePauseChanged;
+            HandlePauseChanged(GamePause.IsPaused);
             PlayerContext.Registered += Bind;
             LevelGoal.Reached += HandleLevelGoal;
             if (PlayerContext.Current != null)
@@ -76,6 +80,7 @@ namespace FeverDream.UI
 
         private void OnDisable()
         {
+            GamePause.Changed -= HandlePauseChanged;
             PlayerContext.Registered -= Bind;
             LevelGoal.Reached -= HandleLevelGoal;
             AlterEgoCommentator.Registered -= BindCommentator;
@@ -126,9 +131,17 @@ namespace FeverDream.UI
                 return;
             }
 
+            // The HUD is hidden while the game is paused. Its message timers wait too, so a line shown just before
+            // pausing is still on screen afterwards.
+            if (GamePause.IsPaused)
+            {
+                return;
+            }
+
             float dt = Time.unscaledDeltaTime;
-            float now = Time.unscaledTime;
-            healthFill.localScale = new Vector3(player.Health.Normalized, 1f, 1f);
+            hudTime += dt;
+            float now = hudTime;
+            healthBar.SetValue(player.Health.Normalized);
             UpdateCombo(dt);
             UpdateGrappleMarker();
 
@@ -141,11 +154,9 @@ namespace FeverDream.UI
             {
                 centerMessageText.text = string.Empty;
             }
-            if (player.Input.ToggleHelpPressed)
-            {
-                helpPanel.SetActive(!helpPanel.activeSelf);
-            }
         }
+
+        private void HandlePauseChanged(bool paused) => canvas.enabled = !paused;
 
         private void Bind(PlayerContext context)
         {
@@ -216,7 +227,7 @@ namespace FeverDream.UI
                 AuraTier.Uneasy => uneasyColor,
                 _ => calmColor,
             };
-            alterEgoHideTime = Time.unscaledTime + boundCommentator.Lines.lineDuration;
+            alterEgoHideTime = hudTime + boundCommentator.Lines.lineDuration;
         }
 
         private void HandleAuraChanged(int total, int delta)
@@ -244,7 +255,7 @@ namespace FeverDream.UI
         {
             auraChangeText.text = TurkishUpper(text);
             auraChangeText.color = color;
-            auraChangeHideTime = Time.unscaledTime + 1.8f;
+            auraChangeHideTime = hudTime + 1.8f;
         }
 
         private void HandleDowned(RespawnReason reason)
@@ -254,7 +265,7 @@ namespace FeverDream.UI
                 return;
             }
             centerMessageText.text = reason == RespawnReason.FellIntoVoid ? "BOŞLUĞA DÜŞTÜN" : "UYANMAK YOK, DEVAM";
-            centerMessageHideTime = Time.unscaledTime + 1.6f;
+            centerMessageHideTime = hudTime + 1.6f;
         }
 
         private void HandleLevelGoal(LevelGoal goal)

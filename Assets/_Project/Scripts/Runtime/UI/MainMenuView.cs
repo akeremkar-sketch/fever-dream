@@ -5,17 +5,15 @@ using UnityEngine.UI;
 
 namespace FeverDream.UI
 {
-    /// <summary>Opening screen: Play, Controls and Quit. The controls page lists the same controls as the HUD help panel.</summary>
+    /// <summary>Opening screen: Play, Controls and Quit. The control list is the same PF_ControlsPanel the pause menu shows.</summary>
     [DisallowMultipleComponent]
-    public sealed class MainMenuView : MonoBehaviour
+    public sealed class MainMenuView : MonoBehaviour, ICancelHandler
     {
         [SerializeField] private GameObject mainPanel;
-        [SerializeField] private GameObject controlsPanel;
-        [SerializeField] private Text controlsText;
+        [SerializeField] private ControlsPanel controls;
         [SerializeField] private Button playButton;
         [SerializeField] private Button controlsButton;
         [SerializeField] private Button quitButton;
-        [SerializeField] private Button controlsBackButton;
 
         [Tooltip("Scene loaded by Play. It must be in the build profile's scene list.")]
         [SerializeField] private string firstLevelScene = "L_Proto_Dream";
@@ -23,10 +21,9 @@ namespace FeverDream.UI
         private void Awake()
         {
             playButton.onClick.AddListener(() => SceneFlow.Load(firstLevelScene));
-            controlsButton.onClick.AddListener(() => Show(controlsPanel, controlsBackButton));
-            controlsBackButton.onClick.AddListener(() => Show(mainPanel, controlsButton));
+            controlsButton.onClick.AddListener(() => ShowControls(true));
+            controls.BackButton.onClick.AddListener(() => ShowControls(false));
             quitButton.onClick.AddListener(SceneFlow.Quit);
-            controlsText.text = ControlsText.Lines;
         }
 
         private void Start()
@@ -35,16 +32,27 @@ namespace FeverDream.UI
             GamePause.SetPaused(false);
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
-            Show(mainPanel, playButton);
+            ShowControls(false);
         }
 
-        private void Show(GameObject page, Button selected)
+        /// <summary>UI Cancel (Esc, gamepad B) leaves the control list.</summary>
+        public void OnCancel(BaseEventData eventData)
         {
-            mainPanel.SetActive(page == mainPanel);
-            controlsPanel.SetActive(page == controlsPanel);
+            if (controls.IsShown)
+            {
+                ShowControls(false);
+            }
+        }
+
+        private void ShowControls(bool show)
+        {
+            bool wasShown = controls.IsShown;
+            mainPanel.SetActive(!show);
+            controls.Show(show);
+            Button first = show ? controls.BackButton : wasShown ? controlsButton : playButton;
             if (EventSystem.current != null)
             {
-                EventSystem.current.SetSelectedGameObject(selected.gameObject);
+                EventSystem.current.SetSelectedGameObject(first.gameObject);
             }
         }
     }
