@@ -176,6 +176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4715015590776448673}
   - component: {fileID: 3664359871832460942}
+  - component: {fileID: 7485261855940138944}
   m_Layer: 0
   m_Name: WeaponHolder
   m_TagString: Untagged
@@ -213,12 +214,100 @@ MonoBehaviour:
   m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.Combat.WeaponSwingAnimator
   weapon: {fileID: 4798627089404604198}
   trail: {fileID: 6292359057991498181}
+  inspect: {fileID: 7485261855940138944}
   idlePosition: {x: 0.32, y: -0.32, z: 0.5}
   idleEuler: {x: -20, y: -12, z: 0}
   idleSharpness: 14
   bobAmount: 0.015
   bobFrequency: 9
   sweepDuration: 0.08
+  handOverDuration: 0.06
+--- !u!114 &7485261855940138944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2529037093835591665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46e8d6815959bf74fb18dd912140ee16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FeverDream.Runtime::FeverDream.Combat.WeaponInspect
+  balancePoint: 0.28
+  keys:
+  - duration: 0.12
+    offset: {x: 0, y: -0.04, z: 0}
+    euler: {x: 14, y: 6, z: 12}
+    moveEase: 2
+    turnEase: 2
+    trail: 0
+  - duration: 0.24
+    offset: {x: 0.34, y: 0.22, z: 0.44}
+    euler: {x: -282, y: -78, z: 0}
+    moveEase: 2
+    turnEase: 0
+    trail: 1
+  - duration: 0.42
+    offset: {x: 0.16, y: 0.05, z: 0.06}
+    euler: {x: -800, y: -78, z: 0}
+    moveEase: 1
+    turnEase: 0
+    trail: 1
+  - duration: 0.12
+    offset: {x: 0.14, y: 0.09, z: 0.06}
+    euler: {x: -786, y: -80, z: 0}
+    moveEase: 4
+    turnEase: 4
+    trail: 0
+  - duration: 0.24
+    offset: {x: 0.13, y: 0.1, z: 0.05}
+    euler: {x: -788, y: -113, z: 0}
+    moveEase: 3
+    turnEase: 3
+    trail: 0
+  - duration: 0.32
+    offset: {x: -0.14, y: 0.01, z: 0.04}
+    euler: {x: -706, y: -66, z: -12}
+    moveEase: 3
+    turnEase: 3
+    trail: 0
+  - duration: 0.24
+    offset: {x: -0.16, y: 0.02, z: -0.01}
+    euler: {x: -704, y: -72, z: -28}
+    moveEase: 0
+    turnEase: 0
+    trail: 0
+  - duration: 0.3
+    offset: {x: -0.16, y: 0.03, z: 0.01}
+    euler: {x: -708, y: -68, z: -195}
+    moveEase: 3
+    turnEase: 3
+    trail: 0
+  - duration: 0.22
+    offset: {x: -0.14, y: 0.02, z: 0.04}
+    euler: {x: -710, y: -64, z: -208}
+    moveEase: 0
+    turnEase: 0
+    trail: 0
+  - duration: 0.12
+    offset: {x: 0.19, y: -0.18, z: 0.05}
+    euler: {x: -690, y: 28, z: -270}
+    moveEase: 1
+    turnEase: 1
+    trail: 1
+  - duration: 0.14
+    offset: {x: 0.16, y: -0.145, z: 0.045}
+    euler: {x: -695, y: 24, z: -266}
+    moveEase: 4
+    turnEase: 4
+    trail: 0
+  - duration: 0.42
+    offset: {x: 0, y: 0, z: 0}
+    euler: {x: -720, y: 0, z: -360}
+    moveEase: 3
+    turnEase: 3
+    trail: 0
 --- !u!1 &3485280942418825609
 GameObject:
   m_ObjectHideFlags: 0

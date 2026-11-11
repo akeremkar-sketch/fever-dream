@@ -7,6 +7,8 @@ namespace FeverDream.Combat
     /// <summary>
     /// Procedural first-person swings for the placeholder Tsunagi: wind-up during startup, a fast sweep at the hit
     /// frame, then settle back. Uses scaled time so hit stop freezes the blade mid-swing.
+    /// The only component that poses the weapon view: between swings it eases to the rest pose, or shows the pose
+    /// <see cref="WeaponInspect"/> hands it.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class WeaponSwingAnimator : MonoBehaviour
@@ -25,6 +27,8 @@ namespace FeverDream.Combat
 
         [SerializeField] private TsunagiWeapon weapon;
         [SerializeField] private TrailRenderer trail;
+        [Tooltip("Optional cosmetic inspect. Found on this object when empty.")]
+        [SerializeField] private WeaponInspect inspect;
 
         [Header("Idle")]
         [SerializeField] private Vector3 idlePosition = new Vector3(0.32f, -0.32f, 0.5f);
@@ -35,18 +39,28 @@ namespace FeverDream.Combat
 
         [Header("Swing")]
         [SerializeField, Min(0.01f)] private float sweepDuration = 0.08f;
+        [Tooltip("Seconds in which a swing or an inspect that starts with the blade away from the rest pose (mid-inspect, "
+            + "still easing back) pulls it onto its own path. A swing never takes longer than its wind-up.")]
+        [SerializeField, Min(0.01f)] private float handOverDuration = 0.06f;
 
         private PlayerMovement movement;
         private ComboMove move;
         private float elapsed;
         private bool playing;
         private float bobPhase;
+        private Vector3 handOverPosition;
+        private Quaternion handOverRotation = Quaternion.identity;
+        private float handOver;
 
         private void Awake()
         {
             if (weapon == null)
             {
                 weapon = GetComponentInParent<TsunagiWeapon>();
+            }
+            if (inspect == null)
+            {
+                inspect = GetComponent<WeaponInspect>();
             }
             movement = GetComponentInParent<PlayerMovement>();
             transform.localPosition = idlePosition;
@@ -69,6 +83,8 @@ namespace FeverDream.Combat
             move = next;
             elapsed = 0f;
             playing = true;
+            // The wind-up is written from the idle pose, but the blade can be anywhere: mid-inspect, or still easing back.
+            BeginHandOver(idlePosition);
         }
 
         private void LateUpdate()
@@ -77,6 +93,23 @@ namespace FeverDream.Combat
             Vector3 restPosition = idlePosition + Bob(dt);
             if (!playing)
             {
+                if (inspect != null)
+                {
+                    if (inspect.Step(dt, restPosition, idleEuler,
+                        out Vector3 inspectPosition, out Quaternion inspectRotation, out bool inspectTrail))
+                    {
+                        // Every round starts from the rest pose; the blade may be elsewhere (still easing back, or at
+                        // the end of a held round whose keys do not come home).
+                        if (inspect.RoundBegan)
+                        {
+                            BeginHandOver(restPosition);
+                        }
+                        Write(inspectPosition, inspectRotation, dt, handOverDuration);
+                        SetTrail(inspectTrail);
+                        return;
+                    }
+                }
+
                 float blend = 1f - Mathf.Exp(-idleSharpness * dt);
                 transform.localPosition = Vector3.Lerp(transform.localPosition, restPosition, blend);
                 transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(idleEuler), blend);
@@ -120,8 +153,34 @@ namespace FeverDream.Combat
                 return;
             }
 
+            // Gone before the wind-up ends, so the blade is on the swing's own path at the hit frame.
+            Write(position, Quaternion.Euler(euler), dt, Mathf.Min(handOverDuration, windup));
+        }
+
+        /// <summary>
+        /// Remembers how far the blade is from the pose the swing or inspect that takes over starts at;
+        /// <see cref="Write"/> fades that difference out instead of letting the blade jump.
+        /// </summary>
+        private void BeginHandOver(Vector3 startPosition)
+        {
+            handOverPosition = transform.localPosition - startPosition;
+            handOverRotation = transform.localRotation * Quaternion.Inverse(Quaternion.Euler(idleEuler));
+            handOver = 1f;
+        }
+
+        /// <summary>Poses the weapon view for a swing or an inspect. Besides the idle easing, nothing else writes it.</summary>
+        private void Write(Vector3 position, Quaternion rotation, float dt, float handOverTime)
+        {
+            if (handOver > 0f)
+            {
+                handOver = Mathf.Max(0f, handOver - dt / handOverTime);
+                // Squared: most of the gap closes in the first frames, so the take-over reads as a whip, not a drift.
+                float weight = handOver * handOver;
+                position += handOverPosition * weight;
+                rotation = Quaternion.Slerp(Quaternion.identity, handOverRotation, weight) * rotation;
+            }
             transform.localPosition = position;
-            transform.localRotation = Quaternion.Euler(euler);
+            transform.localRotation = rotation;
         }
 
         private Vector3 Bob(float dt)

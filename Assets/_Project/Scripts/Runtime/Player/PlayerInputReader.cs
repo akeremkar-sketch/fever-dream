@@ -23,6 +23,7 @@ namespace FeverDream.Player
         private InputAction heavyAttack;
         private InputAction dodge;
         private InputAction grapple;
+        private InputAction inspect;
         private InputAction pause;
         private InputAction toggleHelp;
         /// <summary>Gamepad B closes the pause menu and is also Slide: a button still down from the menu must be released before it counts.</summary>
@@ -56,6 +57,8 @@ namespace FeverDream.Player
         public bool HeavyAttackPressed => !GameplayBlocked && heavyAttack.WasPressedThisFrame();
         public bool DodgePressed => !GameplayBlocked && dodge.WasPressedThisFrame();
         public bool GrapplePressed => !GameplayBlocked && grapple.WasPressedThisFrame();
+        public bool InspectPressed => !GameplayBlocked && inspect.WasPressedThisFrame();
+        public bool InspectHeld => !GameplayBlocked && inspect.IsPressed();
         public bool PausePressed => pause.WasPressedThisFrame();
         public bool ToggleHelpPressed => toggleHelp.WasPressedThisFrame();
 
@@ -73,6 +76,7 @@ namespace FeverDream.Player
             heavyAttack = map.FindAction("HeavyAttack", true);
             dodge = map.FindAction("Dodge", true);
             grapple = map.FindAction("Grapple", true);
+            inspect = map.FindAction("Inspect", true);
             pause = map.FindAction("Pause", true);
             toggleHelp = map.FindAction("ToggleHelp", true);
         }
