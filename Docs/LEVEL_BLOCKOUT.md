@@ -6,13 +6,12 @@ kurallar ve oyuncunun gerçek ölçüleri var.
 
 ## Başlamadan önce
 
-- **`L_Proto_Dream`'de çalışma.** **Fever Dream > Prototype > Rebuild Prefabs and Level (overwrites)** bu sahneyi ve
-  prefab'ları baştan yazar; elle yapılan değişiklikler silinir. Örnek ölçüler için sahneyi açıp bakabilirsin, ama bu
-  menüyü çalıştırma.
+- **Kendi bölümünü kendi sahnende yap.** `L_Proto_Dream` örnek ve test seviyesidir; ölçüler için açıp bakabilirsin.
 - Yeni bölüm `Assets/_Project/Scenes/Levels/` altında `L_<BolumAdi>` sahnesidir (PascalCase, boşluksuz, Türkçe
   karaktersiz; ör. `L_Dream_Kitchen`). Denemeler `Scenes/Sandbox/` altında `SB_<Ad>` olur; bunlar build'e girmez.
 - En hızlı başlangıç: Project penceresinde `L_Proto_Dream`'i seç, **Ctrl+D** ile çoğalt ve yeniden adlandır (F2).
-  Işık, sis, oyuncu, alter ego ve HUD hazır gelir. Sonra:
+  Işık, sis, oyuncu, alter ego, HUD, duraklatma menüsü ve EventSystem hazır gelir. Boş bir sahneden başlarsan bunları
+  da ekle: menüler `PF_PauseMenu` ve tıklanabilmesi için bir `EventSystem` ister. Sonra:
   - `--- ENVIRONMENT ---` ve `--- ENEMIES ---` altını kendi bölümüne göre değiştir.
   - `--- GAMEPLAY ---` altında oyuncuyu (`Player`), kontrol noktalarını, kanca noktalarını, hedefi ve
     `KillVolume_Void`'u yeni yerleşime taşı. Oyuncu ilk kez başladığı yerde yeniden doğar: altında zemin yoksa
@@ -32,7 +31,9 @@ kurallar ve oyuncunun gerçek ölçüleri var.
 - Her parçanın çarpıştırıcısı olmalı; yalnızca renk şeritleri (`Decal_`) çarpıştırıcısızdır. ProBuilder yeni şekle
   Mesh Collider ekler.
 - Duvarlar dik olmalı (dikeyden en fazla ~17° sapma). Üstünde durulacak yüzeyler en fazla 45° eğimli olmalı.
-- Parçalar `--- ENVIRONMENT ---` altında bölüm gruplarına girer (`Section_01_Start`, `Section_02_Parkour` ...). Grup
+- Köşede duvarlar üst üste binmeli: iki duvar yalnızca kenarından değerse köşedeki sütun boş kalır, ay ışığı oradan
+  içeri sızar ve zeminde ince bir ışık çizgisi görünür. Duvarlardan birini köşeyi kapatacak kadar uzat.
+- Parçalar `--- ENVIRONMENT ---` altında bölüm gruplarına girer (`Section_01_Bedroom`, `Section_02_Parkour` ...). Grup
   transform'ları sıfırdır. Adlar açıklayıcı olur: `Floor_`, `Wall_`, `WallRun_`, `Ledge_`, `Obstacle_SlideUnder_`,
   `Prop_`, `Decal_` ve gerekirse numara (`Wall_Corridor_Left`, `Prop_GiantFridge_01`).
 - Renk dili (`Art/Materials/Prototype/`). Mekanik renge değil geometriye bağlıdır; renk, oyuncu yüzeyin ne işe
@@ -46,6 +47,13 @@ kurallar ve oyuncunun gerçek ölçüleri var.
 | `M_Proto_Ledge` (sarı) | Tırmanılacak kenarın üstüne ince şerit (`Decal_`, çarpıştırıcısız) |
 | `M_Proto_SlideUnder` (turuncu) | Altından kayılacak engel |
 
+- Blockout oynanır hale gelince zemin, duvar ve duvar koşusu yüzeyleri `Art/Materials/World/` altındaki
+  `M_World_Floor`, `M_World_Wall` ve `M_World_WallRun` ile değiştirilir (`L_Proto_Dream` böyledir; istersen baştan
+  bunlarla da çalışabilirsin). Desenleri dünya konumundan hesaplanır: UV açmak gerekmez, şekli ölçeklemek deseni
+  bozmaz. Parlayan camgöbeği çizgiler "bu duvarda koşulur" demektir. Sarı ve turuncu işaretler `M_Proto_` olarak kalır.
+- Ayı (`--- SETUP ---/Light_Moon`) döndürürsen veya gökyüzünü değiştirirsen **Fever Dream > Setup > Bake Sky
+  Reflection** komutunu çalıştırıp sahneyi kaydet; ayna ve metal yüzeyler gökyüzünü bu dokudan yansıtır.
+
 ## Oyuncunun ölçüleri
 
 Değerler `Data/Player/SO_PlayerMovement_Default`'tan ve `PF_Player`'daki CharacterController'dan (yarıçap, basamak)
@@ -58,7 +66,7 @@ değerler bunu hesaba katar.
 | | Değer |
 | --- | --- |
 | Boy / genişlik | 1.8 m / 0.7 m. Ayakta geçmek için ~1.9 m yükseklik ve ~0.8 m genişlik gerekir; çömelip kayarak 1.1 m |
-| Basamak | 0.35 m'ye kadar yürüyerek çıkılır, daha yükseği zıplanarak |
+| Basamak | 0.35 m'ye kadar yürüyerek çıkılır, daha yükseği zıplanarak. Çömelirken ve kayarken yalnızca 0.05 m |
 | Hız | Yürüme 6.5 m/s, koşu (Shift) 10.5 m/s, çömelme 3.5 m/s |
 | Zıplama | 1.4 m |
 | Aynı yükseklikteki boşluk | Yürüyerek rahat 3 m (en fazla ~4 m), koşarak rahat 5 m (en fazla ~6.4 m), kayıp zıplayarak rahat 6.5 m (en fazla ~8.2 m) |
@@ -84,6 +92,9 @@ boşluğun yalnızca duvar koşusu veya kancayla geçilmesini istiyorsan onu bun
 - Altından kayılacak engelin alt kenarı yerden 1.1-1.7 m yukarıda olsun; ayakta geçilemez. Örnek: `L_Proto_Dream`'deki
   kanepe, 1.1 m.
 - Alçak geçidi 8 m'den uzun yapma: kayma bitince oyuncu kalanını çömelerek, yavaş yürür.
+- Alçak geçidin zemini düz olsun: çömelmiş ve kayan oyuncu 5 cm'den yüksek eşiği aşamaz
+  (`SO_PlayerMovement_Default` > `crouchStepOffset`). Bu değer bilerek küçüktür: kontrolcü her adımda basamak payı
+  kadar yükselir, ayaktaki 0.35 m ile 1.1 m'lik boşluğun kenarına takılır ve geçemez.
 
 ### Duvar koşusu
 
@@ -133,7 +144,8 @@ altındadır.
   önce bir tane koy. Geçit 6 m'den genişse ölçeğini büyüt ki yanından geçilmesin.
 - **`PF_KillVolume`** (`KillVolumes` alt grubunda): bölümün tamamının altında tek büyük tetikleyici. Düşen oyuncuyu son
   kontrol noktasına döndürür. Düşülebilecek her yerin altını kaplamalı. Örnek: y = -15, ölçek 300×10×420.
-- **`PF_Goal_DreamToilet`** (3×3×3 m tetikleyici): bölüm sonu.
+- **`PF_Goal_DreamToilet`**: bölüm sonu. Tuvaletin kendisi katıdır; 3.6×3×2.6 m'lik tetikleyici tuvaletin önündedir
+  (modelin -Z tarafı). Prefab'ı tuvaletin önü oyuncunun geldiği yöne bakacak şekilde döndür.
 
 ## Düşman arenaları
 
@@ -148,7 +160,7 @@ altındadır.
 - Düşmanlar yol bulma kullanmaz: oyuncuya düz yürür ve ~1 m'den derin düşüşlerin kenarında durur. Arenanın ortasını
   açık bırak, büyük engelleri kenarlara koy. Basamak çıkmaları da muhtemelen takılır (oyunda denenmedi): arena zeminini
   tek seviyede tut, gerekirse rampa kullan.
-- Palyaçolar oyuncuyu görmeden turta atmaz. Yüksek bir yerde iyi çalışırlar (örnek: 3 m'lik kasalar).
+- Palyaçolar oyuncuyu görmeden turta atmaz. Yüksek bir yerde iyi çalışırlar (örnek: Arena B'deki 4.1 m'lik çamaşır makineleri).
 - Denenmiş boyutlar: 24×32 m (3 işçi ve 1 kalkan) ve 26×40 m (2 işçi, 1 kalkan, 2 palyaço).
 
 ## ProBuilder
@@ -165,9 +177,32 @@ ProBuilder 6'da ayrı bir ProBuilder penceresi yoktur; araçlar Scene görünüm
   `Section_` grubuna taşı.
 - Çok tekrar eden bir parça prefab olur: `Prefabs/Environment/` altında `PF_` önekiyle.
 
+## Hazır dekor (rüyadaki apartman kiti)
+
+`Prefabs/Environment/PF_Prop_...` prefab'ları sahneye sürüklenip kullanılır. Eşyalar gerçeğin 4-5 katı büyüklüğündedir;
+oyuncu yanlarında fare boyunda kalır. Çarpıştırıcıları hazırdır ve `Environment` katmanındadır. Modeller -Z'ye bakar:
+önü sana dönsün istiyorsan sahnede Y'de döndür. Oyuncunun üstüne çıkabileceği yükseklikler:
+
+| Prefab | Üst yüzey | Not |
+| --- | --- | --- |
+| `PF_Prop_BedroomSet` | Yatak 3.1 m, komodin 2.8 m | Zıplayıp tırmanılır |
+| `PF_Prop_GiantCouch` | Oturak 3.5 m, kolçak 3.6 m, sırt 4.3 m | Oturağa zıplayıp tırmanılır |
+| `PF_Prop_WashingMachine` | 4.1 m | Zıplayarak tırmanmaya yetmez (en fazla ~3.9 m) |
+| `PF_Prop_MailboxRow` | 4.8 m | Engel veya kanca ile |
+| `PF_Prop_KitchenCounter` | Tezgâh 5.5 m, üst dolaplar 7.5-11.2 m | Engel veya kanca ile |
+| `PF_Prop_GiantFridge` | 9 m | Engel, uzaktan görünen işaret |
+| `PF_Prop_StairRailing` | 10 basamakla 8.5 m, sahanlık | Rampa gibi yürünür (ilk basamakta 40°, sonra 31°); çarpıştırıcı ilk basamağın önüne taşmaz |
+| `PF_Prop_ApartmentDoor` | 27 m uzunluk, 14 m yükseklik | Düz bir duvar yüzeyi; zemin olan yerde duvar koşusuna uygun. Paspaslar zemine yatık durur, boşluk üstünde havada kalır. Duvarın önüne koy: panelin yüzü duvar yüzünün 3 cm önünde olsun, uçları yandaki duvarların içine girsin |
+| `PF_Prop_BathroomDoor` | Kasa 6 m, açıklık 4.5 m | Kapı kanadı menteşe tarafında (-X) içeri (+Z) açık; düz geçiş ~2.7 m. Bir duvar boşluğuna yerleştir |
+
+`PF_Prop_BathroomMirror`, `PF_Prop_CurtainRail` ve `PF_Prop_Clothesline` yalnızca görseldir, çarpıştırıcıları yoktur.
+Perde ve çamaşır ipinin pivotu tepededir; asıldıkları yükseklikten aşağı sarkarlar.
+
 ## Deneme ve teslim
 
-- Play'e bas ve bölümü baştan sona oyna. Kontrol listesi sol üstte açık başlar; F1 (gamepad: Select) gizler ve
-  gösterir. Konsolda hata olmamalı.
-- Sahneyi ve `.meta` dosyasını birlikte commit et, dalını push edip `main`'e PR aç.
-- Bölüm oynanabilir hale gelince build listesine eklenmesi için haber ver.
+- Play'e bas ve bölümü baştan sona oyna. Kontrol listesini F1 (gamepad: Select) açar; Esc duraklatma menüsüdür.
+  Konsolda hata olmamalı.
+- Sahneyi ve `.meta` dosyasını birlikte commit et; Bake Sky Reflection çalıştırdıysan `Art/Textures/T_Env_<Sahne>.exr`
+  ve `.meta` dosyasını da ekle. Dalını push edip `main`'e PR aç.
+- Bölüm oynanabilir hale gelince build profile'ın sahne listesine eklenmesi için haber ver. Menüler sahneleri adıyla
+  yükler; listede olmayan bir sahneye geçilemez.

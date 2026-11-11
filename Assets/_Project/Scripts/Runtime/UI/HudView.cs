@@ -7,15 +7,20 @@ using UnityEngine.UI;
 
 namespace FeverDream.UI
 {
-    /// <summary>Prototype HUD. Reads the player through <see cref="PlayerContext.Current"/> and only displays state.</summary>
+    /// <summary>
+    /// In-game HUD. Reads the player through <see cref="PlayerContext.Current"/> and only displays state.
+    /// The control list is not shown here; it lives in the pause menu and the main menu.
+    /// The HUD hides while the game is paused, so it does not show through the menu.
+    /// </summary>
     [DisallowMultipleComponent]
+    [RequireComponent(typeof(Canvas))]
     public sealed class HudView : MonoBehaviour
     {
         [Tooltip("The scene's alter ego. Optional: when empty the HUD uses AlterEgoCommentator.Current (any loaded scene).")]
         [SerializeField] private AlterEgoCommentator commentator;
 
         [Header("Health")]
-        [SerializeField] private RectTransform healthFill;
+        [SerializeField] private UiSegmentedBar healthBar;
 
         [Header("Combo")]
         [SerializeField] private CanvasGroup comboGroup;
@@ -24,7 +29,16 @@ namespace FeverDream.UI
         [SerializeField] private RectTransform comboTimerFill;
 
         [Header("Aura")]
-        [SerializeField] private Text auraTotalText;
+        [SerializeField] private UiRollingCounter auraCounter;
+        [Tooltip("The +N that flies into the total when a combo pays out.")]
+        [SerializeField] private UiFlyInLabel auraGainLabel;
+        [Tooltip("Played when the total lands, with the strength of the payout: number and icon punch, tone flash, burst.")]
+        [SerializeField] private UiImpact[] auraLandingEffects;
+        [SerializeField] private UiImpact auraTierStamp;
+        [SerializeField] private Text auraTierText;
+        [Tooltip("Shout when the total reaches a new tier, one per AuraTier. Capitals only: the HUD font has no lower case.")]
+        [SerializeField] private string[] auraTierCallouts = { "", "ALEV ALDI!", "AURA TAŞTI!" };
+        [Tooltip("Only the combo-lost line now; a gain is shown by the gain label.")]
         [SerializeField] private Text auraChangeText;
         [SerializeField] private Color auraGainColor = new Color(0.45f, 0.95f, 1f);
         [SerializeField] private Color auraLossColor = new Color(1f, 0.35f, 0.4f);
@@ -42,19 +56,30 @@ namespace FeverDream.UI
 
         [Header("Messages")]
         [SerializeField] private Text centerMessageText;
-        [SerializeField] private GameObject helpPanel;
 
         private PlayerContext player;
         private AlterEgoCommentator boundCommentator;
         private float alterEgoHideTime;
         private float auraChangeHideTime;
         private float centerMessageHideTime;
+        /// <summary>Real time the HUD has been visible: unscaled (hit stop does not freeze it) but stopped while paused.</summary>
+        private float hudTime;
         private bool levelComplete;
+        private AuraTier shownAuraTier;
+        private Canvas canvas;
+
+        private void Awake()
+        {
+            canvas = GetComponent<Canvas>();
+        }
 
         private void OnEnable()
         {
+            GamePause.Changed += HandlePauseChanged;
+            HandlePauseChanged(GamePause.IsPaused);
             PlayerContext.Registered += Bind;
             LevelGoal.Reached += HandleLevelGoal;
+            auraCounter.Landed += HandleAuraLanded;
             if (PlayerContext.Current != null)
             {
                 Bind(PlayerContext.Current);
@@ -66,8 +91,10 @@ namespace FeverDream.UI
 
         private void OnDisable()
         {
+            GamePause.Changed -= HandlePauseChanged;
             PlayerContext.Registered -= Bind;
             LevelGoal.Reached -= HandleLevelGoal;
+            auraCounter.Landed -= HandleAuraLanded;
             AlterEgoCommentator.Registered -= BindCommentator;
             Unbind();
             UnbindCommentator();
@@ -79,7 +106,8 @@ namespace FeverDream.UI
             alterEgoGroup.alpha = 0f;
             auraChangeText.text = string.Empty;
             centerMessageText.text = string.Empty;
-            auraTotalText.text = player != null ? player.Wallet.Total.ToString() : "0";
+            auraCounter.SetImmediate(player != null ? player.Wallet.Total : 0);
+            shownAuraTier = player != null ? player.Wallet.Tier : AuraTier.Calm;
             grappleMarker.gameObject.SetActive(false);
             if (boundCommentator == null)
             {
@@ -96,7 +124,7 @@ namespace FeverDream.UI
             UnbindCommentator();
             boundCommentator = target;
             boundCommentator.LineSpoken += ShowAlterEgoLine;
-            alterEgoNameText.text = $"{boundCommentator.Lines.speakerName.ToUpperInvariant()}  ·  alter ego";
+            alterEgoNameText.text = TurkishUpper(boundCommentator.Lines.speakerName);
         }
 
         private void UnbindCommentator()
@@ -116,9 +144,17 @@ namespace FeverDream.UI
                 return;
             }
 
+            // The HUD is hidden while the game is paused. Its message timers wait too, so a line shown just before
+            // pausing is still on screen afterwards.
+            if (GamePause.IsPaused)
+            {
+                return;
+            }
+
             float dt = Time.unscaledDeltaTime;
-            float now = Time.unscaledTime;
-            healthFill.localScale = new Vector3(player.Health.Normalized, 1f, 1f);
+            hudTime += dt;
+            float now = hudTime;
+            healthBar.SetValue(player.Health.Normalized);
             UpdateCombo(dt);
             UpdateGrappleMarker();
 
@@ -131,11 +167,9 @@ namespace FeverDream.UI
             {
                 centerMessageText.text = string.Empty;
             }
-            if (player.Input.ToggleHelpPressed)
-            {
-                helpPanel.SetActive(!helpPanel.activeSelf);
-            }
         }
+
+        private void HandlePauseChanged(bool paused) => canvas.enabled = !paused;
 
         private void Bind(PlayerContext context)
         {
@@ -206,32 +240,57 @@ namespace FeverDream.UI
                 AuraTier.Uneasy => uneasyColor,
                 _ => calmColor,
             };
-            alterEgoHideTime = Time.unscaledTime + boundCommentator.Lines.lineDuration;
+            alterEgoHideTime = hudTime + boundCommentator.Lines.lineDuration;
         }
 
         private void HandleAuraChanged(int total, int delta)
         {
-            auraTotalText.text = total.ToString();
-            ShowAuraChange($"+{delta}", auraGainColor);
+            // A gain replaces a "combo lost" line that is still showing in the same spot.
+            auraChangeText.text = string.Empty;
+            auraGainLabel.Play($"+{delta}", auraGainColor);
+            // The counter starts rolling when the label arrives. It is told the real total now, so it cannot get stuck.
+            auraCounter.RollTo(total, auraGainLabel.Duration);
             if (levelComplete)
             {
                 ShowLevelComplete();
             }
         }
 
+        /// <summary>The rolling total has come to rest: the widget reacts in proportion to the payout.</summary>
+        private void HandleAuraLanded(float strength)
+        {
+            for (int i = 0; i < auraLandingEffects.Length; i++)
+            {
+                auraLandingEffects[i].Play(strength);
+            }
+
+            AuraTier tier = player != null ? player.Wallet.Tier : shownAuraTier;
+            if (tier > shownAuraTier && (int)tier < auraTierCallouts.Length)
+            {
+                auraTierText.text = auraTierCallouts[(int)tier];
+                auraTierStamp.Play();
+            }
+            shownAuraTier = tier;
+        }
+
         private void HandleComboBroken(ComboBreakReason reason, int lostPoints)
         {
             if (lostPoints > 0)
             {
+                // The loss line sits where a "+N" may still be showing; the total keeps rolling without the label.
+                auraGainLabel.Stop();
                 ShowAuraChange($"KOMBO BOZULDU  -{lostPoints}", auraLossColor);
             }
         }
 
+        /// <summary>The HUD lettering font only has capitals; Turkish needs İ for i and I for ı, which ToUpperInvariant gets wrong.</summary>
+        private static string TurkishUpper(string text) => text.Replace('i', 'İ').Replace('ı', 'I').ToUpperInvariant();
+
         private void ShowAuraChange(string text, Color color)
         {
-            auraChangeText.text = text;
+            auraChangeText.text = TurkishUpper(text);
             auraChangeText.color = color;
-            auraChangeHideTime = Time.unscaledTime + 1.8f;
+            auraChangeHideTime = hudTime + 1.8f;
         }
 
         private void HandleDowned(RespawnReason reason)
@@ -241,7 +300,7 @@ namespace FeverDream.UI
                 return;
             }
             centerMessageText.text = reason == RespawnReason.FellIntoVoid ? "BOŞLUĞA DÜŞTÜN" : "UYANMAK YOK, DEVAM";
-            centerMessageHideTime = Time.unscaledTime + 1.6f;
+            centerMessageHideTime = hudTime + 1.6f;
         }
 
         private void HandleLevelGoal(LevelGoal goal)

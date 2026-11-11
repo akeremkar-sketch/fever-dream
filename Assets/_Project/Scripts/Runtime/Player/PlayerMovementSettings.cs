@@ -10,6 +10,9 @@ namespace FeverDream.Player
         public LayerMask environmentMask = 1 << 8;
         [Min(0.5f)] public float standHeight = 1.8f;
         [Min(0.5f)] public float crouchHeight = 1.0f;
+        [Tooltip("Highest step a crouching or sliding player walks up. Keep it small: the controller needs crouchHeight "
+            + "plus this as headroom. With 0.05 a 1.1 m gap is free; with the standing step the player snags on its edge.")]
+        [Min(0f)] public float crouchStepOffset = 0.05f;
         [Min(0.1f)] public float standEyeHeight = 1.65f;
         [Min(0.1f)] public float crouchEyeHeight = 0.85f;
 

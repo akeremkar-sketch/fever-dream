@@ -1,3 +1,4 @@
+using FeverDream.Core;
 using UnityEngine;
 
 namespace FeverDream.Player
@@ -41,25 +42,25 @@ namespace FeverDream.Player
 
         private void OnEnable()
         {
-            SetCursorLocked(true);
+            GamePause.Changed += HandlePauseChanged;
+            SetCursorLocked(!GamePause.IsPaused);
         }
 
         private void OnDisable()
         {
+            GamePause.Changed -= HandlePauseChanged;
             SetCursorLocked(false);
         }
 
         private void Update()
         {
-            if (input.PausePressed)
-            {
-                SetCursorLocked(Cursor.lockState != CursorLockMode.Locked);
-            }
-            if (Cursor.lockState == CursorLockMode.Locked)
+            if (!GamePause.IsPaused && Cursor.lockState == CursorLockMode.Locked)
             {
                 ApplyLook();
             }
         }
+
+        private static void HandlePauseChanged(bool paused) => SetCursorLocked(!paused);
 
         private void LateUpdate()
         {

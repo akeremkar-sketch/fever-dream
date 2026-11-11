@@ -88,6 +88,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Inspect",
+                    "type": "Button",
+                    "id": "692d9189-16d3-45d7-85ac-ad6b4a93c04f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Pause",
                     "type": "Button",
                     "id": "21da5114-0c3c-430f-b476-5c0109a1d6ef",
@@ -346,6 +355,28 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "Grapple",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b88265d3-f840-459b-b011-fbdc01092541",
+                    "path": "<Keyboard>/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Inspect",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1a7db973-891e-4e01-95a3-77d059c4d100",
+                    "path": "<Gamepad>/dpad/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Inspect",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

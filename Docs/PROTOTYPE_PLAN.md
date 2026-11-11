@@ -1,9 +1,10 @@
-# Fever Dream: Prototip Planı (v0.1)
+# Fever Dream: Prototip Planı (v0.2)
 
 **Kanıtlanacak şey (GDD):** Parkur ve dövüş akıcı biçimde birleşiyor mu?
 
-Bu prototip yer tutucu (placeholder) geometri ve materyallerle, sanat ve ses olmadan, çekirdek mekanikleri oynanabilir
-hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCTURE.md`).
+Bu prototip çekirdek mekanikleri oynanabilir hâle getirir. v0.1 yer tutucu geometriyle başladı; v0.2'de düşmanlar,
+Katana, kontrol noktası, hedef tuvalet ve dekor için ilk sanat kiti (rüyadaki dev apartman) geldi ve bir ana menü ile
+duraklatma menüsü eklendi. Ses yok. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCTURE.md`).
 
 ## Verilen kararlar
 
@@ -37,8 +38,9 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 | Ağır saldırı (fırlatma, bitirici, havada çakılma) | Sağ tık | Y |
 | Kaçınma (dash) | Q | RB |
 | Zincirli Kama kancası | E | LB |
-| İmleci kilitle/aç | Esc | Start |
-| Kontrol listesini aç/kapa | F1 | Select |
+| Silahı incele (yalnızca gösteriş; basılı tutunca döngü) | Y | D-pad yukarı |
+| Duraklat / menü | Esc | Start |
+| Kontrol listesi (duraklatır) | F1 | Select |
 
 ## Sistemler
 
@@ -69,6 +71,13 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 - Vuruş yönü her zaman oyuncudan hedefe doğrudur (kalkanın önden bloğu ve geri itme gerçek konuma göre çalışır).
 - **Kaçınma:** kısa dash, dokunulmazlık penceresi. Saldırı son anda (ilk 0.15 sn) savuşturulursa **son an kaçınma**:
   kısa ağır çekim ve Aura bonusu. Kaçınma ve hasar ayarları `SO_PlayerCombat_Default`, kamera ayarları `SO_PlayerCamera_Default`.
+- **Silah inceleme:** Y (gamepad D-pad yukarı) ile Tsunagi 2.9 sn'lik bir gösteri yapar: fırıldak gibi döner, dik
+  yakalanır, iki yüzünü gösterir, savrulup yerine oturur. Yalnızca görseldir (`WeaponInspect`; pozlar ve süreler
+  `PF_Player` içindeki `WeaponHolder` üzerindedir). Silahı tek bir bileşen (`WeaponSwingAnimator`) hareket ettirir;
+  inceleme ona yalnızca poz verir. Saldırı, kaçınma, kanca, tırmanma, hasar ve ölüm incelemeyi anında keser, ilk
+  saldırı gecikmez. Oyun duraklatılmışken başlamaz; sürerken tekrar Y'ye basmak yok sayılır. Tuş basılı tutulursa
+  gösteri bitince baştan başlar (Counter-Strike'taki gibi döngü); tuş bırakılınca o tur tamamlanır ve biter. Kesilen
+  inceleme tuş basılı kalsa da kendiliğinden geri gelmez, yeniden basmak gerekir.
 
 ### Aura (`ComboTracker`, `AuraWallet`, ayarlar `SO_Aura_Default`)
 - Her başarılı vuruş komboyu uzatır; 2.5 sn vuruş olmazsa kombo biter ve puan çarpanla birlikte verilir.
@@ -103,21 +112,52 @@ hâle getirir. Yapı baştan üretim temizliğindedir (bkz. `Docs/PROJECT_STRUCT
 
 ### HUD (`HudView`, `PF_HUD`)
 - Can çubuğu, nişangâh, kanca işaretçisi, kombo sayacı ve süre çubuğu, bekleyen Aura ve çarpan, toplam Aura,
-  alter ego altyazısı, kontrol listesi (F1), bölüm sonu mesajı.
+  alter ego altyazısı, bölüm sonu mesajı. Kontrol listesi oyun ekranında yazmaz; menülerdedir.
+- Görünüm manga/anime aksiyon stilindedir (bkz. `PROJECT_STRUCTURE.md`, "Arayüz stili"):
+  - Can: atan bir kalp ve eğik çerçevede 10 bölme. Hasar alınca çubuk sarsılır, can %30'un altındayken bölmeler
+    kırmızıya yanıp söner.
+  - Aura: eğik plaka (macenta ve camgöbeği çift gölge), "AURA" etiketi, yıldız ve hane hane dönen sayı. Kombo ödenince
+    "+N" sayıya uçar, sayı döner ve oturur; oturduğu anda sayı, yıldız ve ekran tonu ödemenin büyüklüğüyle orantılı
+    tepki verir, büyük ödemede plakanın arkasında patlama çıkar. Toplam 600 ve 1500'e ulaşınca etiketin üstüne kademe
+    damgası basılır ("ALEV ALDI!", "AURA TAŞTI!").
+  - Kombo sayacı bir patlamanın üstünde her vuruşta zıplar; alter ego konuşma balonunda isim etiketiyle konuşur.
+  - Nişangâh ve kanca işaretçisi çizilmiş ikonlardır; kanca işaretçisi hedefin üstünde döner.
+- Oyun duraklayınca HUD gizlenir; menünün arkasından görünmez.
+
+### Menüler (`MainMenuView`, `PauseMenuView`, `ControlsPanel`, `GamePause`, `SceneFlow`)
+- **Ana menü (`MENU_Main`):** Oyna, Kontroller, Çıkış. Arkada kitten kurulmuş bir rüya odası: ortada dev tuvalet, sağ
+  duvarda apartman kapıları. Build listesinde ilk sahnedir.
+- **Duraklatma (`PF_PauseMenu`):** Esc / Start açar. Devam Et, Kontroller, Yeniden Başla, Ana Menü, Çıkış. Açıkken zaman
+  durur (`TimeEffects` üzerinden, vuruş duraksamasıyla çakışmaz), imleç serbest kalır ve oyun girdisi yok sayılır. Devam
+  ettiren tıklama veya gamepad A, aynı karede saldırı ya da zıplama olarak okunmaz.
+- **Kontroller (`PF_ControlsPanel`):** iki menünün de gösterdiği tek kontrol listesi. Oyunda F1 menüyü doğrudan bu
+  sayfada açar; oradan Geri, Esc ya da gamepad B oyuna döndürür. Menüden açıldıysa menüye döndürür.
+- **Bölüm sonu:** tuvalete ulaştıktan 4 sn sonra aynı menü "Bölüm tamamlandı" başlığı ve toplam Aura ile, Devam Et
+  olmadan açılır. Kendi açıldığı için ilk 0.5 sn girdi almaz: o anda yapılan saldırı tıklaması bir düğmeye basmaz.
 
 ## Test seviyesi: `L_Proto_Dream`
 
-Tek küçük seviye, her mekaniği sırayla öğretir:
+Tek seviye, her mekaniği sırayla öğretir. v0.2'de rüyadaki dev bir apartmana dönüştü: oyuncu fare boyunda, eşyalar
+4-5 kat büyük. Seviye artık elle düzenlenir (kodla üretilmez).
 
-1. **Başlangıç:** devasa buzdolabı ve çamaşır makineleri olan oda.
-2. **Parkur 1:** kanepenin altından kayma → boşluk üstünde sağ duvarda koşma → 2.2 m'lik kenara tırmanma.
-3. **Arena A:** 3 alarm saatli ofis çalışanı + 1 klozet kapaklı kalkan.
-4. **Parkur 2:** boşluk üstünde iki kanca noktası → iniş platformu → duvardan sıçrama bacası ve tırmanma.
-   Arena B, platformdan 6 m yukarıdadır: arka duvardan tek sıçrama yetmez, en az bir yan duvar sıçraması gerekir.
-5. **Arena B:** 2 ofis çalışanı, 1 kalkan, kasaların üstünde 2 palyaço; arenanın üstünde kanca noktası.
-6. **Hedef:** rüyadaki tuvalet. Bölüm sonu mesajı ve toplam Aura.
+1. **Yatak odası:** Jack dev yatağın üstünde uyanır. Pencerede perdeler.
+2. **Parkur 1:** kanepe engelinin altından kayma → boşluk üstünde sağ duvarda koşma → 2.2 m'lik kenara tırmanma.
+3. **Arena A (mutfak ve çamaşır köşesi):** 3 alarm saatli ofis çalışanı + 1 klozet kapaklı kalkan. Tezgâh, çamaşır
+   makineleri, buzdolabı.
+4. **Parkur 2:** çamaşır ipleri altındaki boşlukta iki kanca noktası → iniş platformu → duvardan sıçrama bacası ve
+   tırmanma. Arena B, platformdan 6 m yukarıdadır: arka duvardan tek sıçrama yetmez, en az bir yan duvar sıçraması gerekir.
+5. **Arena B (oturma odası):** 2 ofis çalışanı, 1 kalkan, çamaşır makinelerinin üstünde 2 palyaço; dev kanepe, posta
+   kutuları; arenanın üstünde kanca noktası.
+6. **Merdiven holü (yeni):** apartman kapıları, dev merdivenle 8.55 m yukarıdaki kata çıkış, sahanlıkta kontrol noktası.
+   Üst katın altı duvarla kapalıdır (`Wall_StairHall_End`); üst kat, hole bakan korkuluksuz bir asma kattır.
+7. **Banyo (yeni):** ışıklı banyo kapısı, ayna, duş perdesi ve hedef: rüyadaki dev tuvalet. Bölüm sonu mesajı, toplam
+   Aura ve bölüm sonu menüsü.
 
 Her parkur bölümünden sonra kontrol noktası var; boşluğa düşen oyuncu son kontrol noktasına döner.
+
+Görsel: rüya gecesi. Odaların tavanı yoktur; üstte yıldızlı mor gökyüzü, pembe ufuk ve hilal ay görünür (ay ana ışığın
+yönündedir). Zemin dama desenli, duvarlar çizgili duvar kâğıdı, duvar koşusu yüzeyleri parlayan camgöbeği çizgilidir.
+Havada ışık zerrecikleri süzülür. Ayrıntılar `Docs/PROJECT_STRUCTURE.md` > "Dünya görseli" bölümündedir.
 
 ## Adımlar
 
@@ -130,8 +170,9 @@ Her parkur bölümünden sonra kontrol noktası var; boşluğa düşen oyuncu so
 
 ## Kapsam dışı (sonraki adımlar)
 
-Tsunagi'nin diğer formları ve form geçiş bonusu, Aura harcama (kontrol noktası dükkânı), animasyonlu karakter ve
-düşman modelleri, ses ve seslendirme, gerçek seviye tasarımı, menüler, kaydetme, tuvalet arayışının hikâye akışı.
+Tsunagi'nin diğer formları ve form geçiş bonusu (modelleri `Art/Models/Weapons/` altında hazır), Aura harcama (kontrol
+noktası dükkânı), düşman animasyonları (modeller parçalı ve iskelet hiyerarşili, animasyon eklenebilir), ses ve
+seslendirme, ayarlar menüsü, kaydetme, tuvalet arayışının hikâye akışı.
 
 ## Test durumu (v0.1)
 
@@ -170,6 +211,36 @@ Henüz elle oynanarak denenmeyenler: fare ile nişan ve vuruş hissi, duvardan s
 köşedeki duvar koşusundan kenara tırmanma, iki kanca noktasının zincirlenmesi, palyaço turtalarının gerçek isabeti,
 genel denge ve zorluk.
 
+## Test durumu (v0.2)
+
+Play modunda doğrulananlar:
+
+- Oyuncu yatağın üstünde başlıyor, yatağın ayak ucundan yere iniyor.
+- Karakter denetleyicisi merdiveni sonuna kadar çıkıyor (8.55 m), sahanlıktan üst hole ve ışıklı kapıdan banyoya geçiyor.
+- Duraklatma: zaman duruyor, imleç serbest kalıyor, ilk düğme seçili; Devam Et ile her şey geri geliyor ve devam
+  ettiren kare oyun girdisi olarak okunmuyor.
+- Tuvalete ulaşınca 4 sn sonra "Bölüm tamamlandı" menüsü açılıyor; Yeniden Başla seviyeyi temiz başlatıyor.
+- Ana menü ↔ seviye geçişleri: zaman ve imleç her sahnede doğru durumda, kontroller sayfası açılıp kapanıyor.
+- Yeni düşman modelleri: vuruş parlaması bütün malzeme yuvalarında çalışıp temizleniyor, kalkan kırılınca yana
+  açılıyor, palyaçolar çamaşır makinelerinin üstünde kalıp turta atıyor, düşmanlar kovalıyor ve vuruyor.
+- Arayüz gerçek oyun ekranından alınan görüntülerle kontrol edildi: HUD, duraklatma, kontroller, bölüm sonu, ana menü.
+- Menü akışı: Esc açıp kapatıyor; F1 doğrudan kontrol listesini açıyor ve Geri oyuna döndürüyor; menüden açılan kontrol
+  listesinden Geri/Esc menüye döndürüyor. Esc hem Duraklat hem UI Cancel olarak geldiğinde kare başına bir kez işleniyor.
+- Menü açıldığında duran imleç seçimi değiştirmiyor, fare oynayınca altındaki düğme seçiliyor. Bölüm sonu menüsü kendi
+  açıldığında 0.5 sn girdi almıyor.
+- Oyun duraklayınca HUD gizleniyor; can çubuğu %25'te 2.5 bölme gösterip yanıp sönüyor.
+- Rüya gecesi görseli gerçek oyun ekranından alınan görüntülerle kontrol edildi: yatak odası, duvar koşusu, iki arena,
+  merdiven holü, banyo, ana menü. Ay ana ışığın yönünde duruyor, gölgeler ona uyuyor.
+- Banyo aynası rüya gökyüzünü yansıtıyor (ortam yansıması `T_Env_L_Proto_Dream`).
+- Zerrecikler: ışınlanma ve yeniden doğmadan sonra bulut yeni yerde hemen doluyor; parçacık sayısı sınırın altında
+  kalıyor (yaklaşık 2700 / 3300).
+- Kontroller kartındaki ekran tonu kartın içinde kesiliyor; keskin kenar kalmadı.
+- Konsol temiz (hata ve uyarı yok).
+
+Henüz elle oynanarak denenmeyenler: yeni dekorun parkur hissi (kanepe, tezgâh ve makinelerin üstüne çıkış), merdiven
+holü ve banyo bölümlerinin akışı, menülerin gerçek klavye, fare ve gamepad ile gezilmesi (menü akışı kod üzerinden
+tetiklenerek denendi), yeni ışıkta dövüşün okunabilirliği (düşmanların ve turtaların hareket halindeyken seçilmesi).
+
 ## Oynanış testi kontrol listesi
 
 - [ ] Kanepenin altından kayarak geçilebiliyor.
@@ -180,6 +251,8 @@ genel denge ve zorluk.
 - [ ] İki kanca noktasıyla boşluk geçilebiliyor.
 - [ ] Bacada duvardan sıçrayıp tırmanarak Arena B'ye çıkılabiliyor.
 - [ ] Palyaço turtaları kaçınma ile savuşturulabiliyor veya kesilebiliyor; son an kaçınma ağır çekim veriyor.
+- [ ] Y ile silah incelemesi oynuyor, Y basılı tutulunca döngüye giriyor; saldırı, kaçınma, kanca ve hasar onu anında
+  kesiyor, ilk vuruş gecikmiyor.
 - [ ] Kombo bitince Aura toplu ekleniyor, hasar alınca kombo bozuluyor.
 - [ ] Alter ego olaylara tepki veriyor, Aura arttıkça tonu değişiyor.
 - [ ] Tuvalete ulaşınca bölüm sonu mesajı çıkıyor.
